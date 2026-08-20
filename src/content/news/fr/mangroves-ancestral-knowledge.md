@@ -3,8 +3,8 @@ title: "Mangroves : des savoirs ancestraux à protéger"
 description: "Là où le droit de la préservation a échoué, certains pays et ONG se tournent vers les religions endogènes pour protéger les mangroves."
 date: 2025-11-13
 category: informations
-cover: ../../../assets/photos/community-2.jpg
-coverAlt: "Écosystème de mangrove sur le littoral ouest-africain"
+cover: ../../../assets/news/mangroves.png
+coverAlt: "Écosystème de mangrove"
 featured: false
 ---
 

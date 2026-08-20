@@ -1,11 +1,12 @@
 ---
 title: "World Wetlands Day: an unforgettable visit"
 description: "To mark World Wetlands Day, YAAC partnered with AGIRE for a field visit dedicated to the ecosystems that quietly sustain life on Earth."
-date: 2025-02-02
+date: 2025-11-13
 category: public-action
-cover: ../../../assets/photos/partners-hero.jpg
-coverAlt: "Field visit to a wetland area during World Wetlands Day"
+cover: ../../../assets/news/wetlands.jpg
+coverAlt: "Aerial view of the wetland visited for World Wetlands Day"
 featured: false
+video: WyR1O4WxLU4
 ---
 
 Every year on **2 February**, the world unites to celebrate **World Wetlands Day** — a moment to recognise the crucial role wetlands play in sustaining life on Earth.

@@ -1,0 +1,155 @@
+---
+import Base from '../../layouts/Base.astro';
+import ContactForm from '../ContactForm.astro';
+import SocialLinks from '../SocialLinks.astro';
+import {
+  useTranslations, contactInfo, registrations, type Lang,
+} from '../../i18n/utils';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const tel = (n: string) => `tel:${n.replace(/[\s+]/g, (c) => (c === '+' ? '+' : ''))}`;
+---
+<Base lang={lang} routeKey="contact" title={t.contact.title} description={t.contact.lead}>
+  <section class="section chead">
+    <div class="container container--narrow">
+      <p class="eyebrow">{t.meta.siteName}</p>
+      <h1>{t.contact.title}</h1>
+      <p class="lead chead__lead">{t.contact.lead}</p>
+    </div>
+  </section>
+
+  <section class="section cbody">
+    <div class="container cgrid">
+      <div class="cgrid__form">
+        <h2 class="cgrid__title">{t.contact.formTitle}</h2>
+        <ContactForm lang={lang} bare />
+      </div>
+
+      <aside class="cgrid__aside">
+        <div class="cbox">
+          <h2 class="cbox__title">{t.contact.directTitle}</h2>
+          <dl class="cbox__list">
+            <dt>{t.contact.emailLabel}</dt>
+            <dd><a href={`mailto:${contactInfo.email}`}>{contactInfo.email}</a></dd>
+
+            <dt>{t.contact.phoneLabel} · {registrations[1].country[lang]}</dt>
+            <dd><a href={tel(contactInfo.phoneSenegal)}>{contactInfo.phoneSenegal}</a></dd>
+
+            <dt>{t.contact.phoneLabel} · {registrations[0].country[lang]}</dt>
+            <dd><a href={tel(contactInfo.phoneBenin)}>{contactInfo.phoneBenin}</a></dd>
+          </dl>
+
+          <a class="btn btn--primary cbox__wa" href={`https://wa.me/${contactInfo.whatsapp}`}
+             target="_blank" rel="noopener">
+            {t.contact.whatsappCta}
+          </a>
+        </div>
+
+        <div class="cbox">
+          <h2 class="cbox__title">{t.contact.followTitle}</h2>
+          <SocialLinks tone="light" />
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section section--tint">
+    <div class="container">
+      <p class="eyebrow">{t.contact.legalTitle}</p>
+      <h2 class="legal__title">{t.contact.legalLead}</h2>
+
+      <dl class="legal__grid">
+        {registrations.map((r) => (
+          <div class="legal__card">
+            <dt>{r.country[lang]}</dt>
+            <dd>
+              <span class="legal__key">{t.contact.referenceLabel}</span>
+              <span>{r.reference}</span>
+            </dd>
+            <dd>
+              <span class="legal__key">{r.taxLabel}</span>
+              <span>{r.taxId}</span>
+            </dd>
+            <dd>
+              <span class="legal__key">{t.contact.phoneLabel}</span>
+              <a href={tel(r.phone)}>{r.phone}</a>
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .chead { padding-bottom: 0; }
+  .chead h1 { margin-block: var(--space-3); }
+  .chead__lead { max-width: 58ch; }
+
+  .cgrid { display: grid; gap: var(--space-7); align-items: start; }
+  @media (min-width: 900px) { .cgrid { grid-template-columns: 1.4fr 1fr; } }
+
+  .cgrid__title, .cbox__title {
+    font-size: var(--step-2);
+    margin-bottom: var(--space-5);
+  }
+
+  .cgrid__aside { display: grid; gap: var(--space-5); }
+
+  .cbox {
+    padding: var(--space-6);
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+  }
+  .cbox__title { font-size: var(--step-1); }
+
+  .cbox__list { margin: 0; display: grid; gap: var(--space-1); }
+  .cbox__list dt {
+    font-size: var(--step--1);
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-top: var(--space-3);
+  }
+  .cbox__list dt:first-child { margin-top: 0; }
+  .cbox__list dd { margin: 0; }
+  .cbox__list a { font-weight: 500; text-decoration: none; }
+  .cbox__list a:hover { text-decoration: underline; }
+
+  .cbox__wa { margin-top: var(--space-5); width: 100%; }
+
+  .legal__title { margin-block: var(--space-3) var(--space-6); font-size: var(--step-3); }
+  .legal__grid { display: grid; gap: var(--space-5); margin: 0; }
+  @media (min-width: 700px) { .legal__grid { grid-template-columns: 1fr 1fr; } }
+
+  .legal__card {
+    padding: var(--space-6);
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    border-top: 3px solid var(--yaac-accent);
+  }
+  .legal__card dt {
+    font-family: var(--font-heading);
+    font-size: var(--step-1);
+    font-weight: 700;
+    color: var(--green-900);
+    margin-bottom: var(--space-4);
+  }
+  .legal__card dd {
+    display: grid;
+    gap: var(--space-1);
+    margin: 0 0 var(--space-3);
+    font-size: var(--step--1);
+  }
+  .legal__key {
+    font-weight: 600;
+    color: var(--accent-text);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.8em;
+  }
+</style>

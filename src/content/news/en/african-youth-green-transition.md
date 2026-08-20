@@ -3,9 +3,10 @@ title: "African Youth at the Heart of the Green Transition"
 description: "With the DAAD Alumni Network, YAAC gathered nearly 40 young people, experts and partners in Dakar for the workshop “A Green and Resilient Africa”."
 date: 2025-11-13
 category: public-action
-cover: ../../../assets/photos/community-3.jpg
-coverAlt: "Workshop participants during the A Green and Resilient Africa session in Dakar"
+cover: ../../../assets/news/green-transition.jpg
+coverAlt: "Participants of the A Green and Resilient Africa workshop in Dakar"
 featured: true
+video: Xnmqnu0Zidg
 ---
 
 The YAAC network, in collaboration with the **DAAD Alumni Network**, organised the workshop *“A Green and Resilient Africa”* in Dakar, bringing together nearly **40 young people, experts and partners** committed to agroecological and energy transition in Africa.

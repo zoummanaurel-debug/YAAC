@@ -1,11 +1,12 @@
 ---
 title: "YAAC Talk 2: Women, knowledge and agroecology"
 description: "For more than two and a half hours, women leaders and environmental advocates shared how their knowledge sits at the heart of sustainable climate adaptation."
-date: 2025-11-01
+date: 2025-11-13
 category: yaac-talk
-cover: ../../../assets/photos/community-2.jpg
-coverAlt: "Women leaders speaking during the second YAAC Talk"
+cover: ../../../assets/news/yaac-talk-2.jpg
+coverAlt: "YAAC identity, values, vision and mission board"
 featured: true
+video: zFwQ49O2nGw
 ---
 
 On **1 November 2025**, the Youth Alliance for Agroecology and Climate held its second YAAC Talk, dedicated to the theme *“Women, knowledge and agroecology: at the heart of sustainable climate adaptation.”*

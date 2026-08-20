@@ -1,11 +1,12 @@
 ---
 title: "YAAC Talk N°3: African Youth, Climate & Migration"
 description: "African youth: endure the climate, or transform it? The third YAAC Talk brought committed voices together around one of our generation’s most pressing questions."
-date: 2025-02-21
+date: 2026-04-28
 category: yaac-talk
-cover: ../../../assets/photos/community-1.jpg
-coverAlt: "Participants gathered during a YAAC Talk panel discussion"
+cover: ../../../assets/news/yaac-talk-3.jpg
+coverAlt: "YAAC Talk N°3 presentation cover"
 featured: true
+video: 2jQyEOxLUd8
 ---
 
 **African youth: endure the climate, or transform it?**

@@ -1,53 +1,79 @@
 ---
-import { useTranslations, type Lang } from '../i18n/utils';
+import { useTranslations, contactInfo, type Lang } from '../i18n/utils';
 
-interface Props { lang: Lang }
-const { lang } = Astro.props;
+interface Props {
+  lang: Lang;
+  /** `true` : rend uniquement le formulaire, sans section ni titre.
+   *  Utilisé par la page Contact, qui fournit sa propre mise en page. */
+  bare?: boolean;
+}
+const { lang, bare = false } = Astro.props;
 const t = useTranslations(lang);
 
 // Un site statique ne traite pas les envois côté serveur. `mailto:` fonctionne
-// partout sans dépendance ni compte tiers ; pour recevoir les messages dans une
+// partout, sans dépendance ni compte tiers. Pour recevoir les messages dans une
 // boîte de réception, remplacer `action` par un point de terminaison Formspree
 // et retirer method="post" / enctype.
-const MAILTO = 'mailto:contact@yaac.network';
+const MAILTO = `mailto:${contactInfo.email}`;
 ---
-<section class="section section--tint" id="contact">
-  <div class="container container--narrow contact">
-    <p class="eyebrow">{t.meta.siteName}</p>
-    <h2>{t.contact.title}</h2>
-    <p class="lead contact__lead">{t.contact.lead}</p>
-
-    <form class="contact__form" action={MAILTO} method="post" enctype="text/plain">
-      <div class="contact__row">
-        <div class="field">
-          <label for="cf-name">{t.contact.name}</label>
-          <input id="cf-name" name="name" type="text" required autocomplete="name"
-                 placeholder={t.contact.namePlaceholder} />
-        </div>
-        <div class="field">
-          <label for="cf-email">{t.contact.email}</label>
-          <input id="cf-email" name="email" type="email" required autocomplete="email"
-                 placeholder={t.contact.emailPlaceholder} />
-        </div>
-      </div>
-
+{bare ? (
+  <form class="cform" action={MAILTO} method="post" enctype="text/plain">
+    <div class="cform__row">
       <div class="field">
-        <label for="cf-message">{t.contact.message}</label>
-        <textarea id="cf-message" name="message" rows="5" required
-                  placeholder={t.contact.messagePlaceholder}></textarea>
+        <label for="cf-name">{t.contact.name}</label>
+        <input id="cf-name" name="name" type="text" required autocomplete="name"
+               placeholder={t.contact.namePlaceholder} />
       </div>
+      <div class="field">
+        <label for="cf-email">{t.contact.email}</label>
+        <input id="cf-email" name="email" type="email" required autocomplete="email"
+               placeholder={t.contact.emailPlaceholder} />
+      </div>
+    </div>
+    <div class="field">
+      <label for="cf-message">{t.contact.message}</label>
+      <textarea id="cf-message" name="message" rows="6" required
+                placeholder={t.contact.messagePlaceholder}></textarea>
+    </div>
+    <button class="btn btn--primary" type="submit">{t.contact.send}</button>
+  </form>
+) : (
+  <section class="section section--tint" id="contact">
+    <div class="container container--narrow">
+      <p class="eyebrow">{t.meta.siteName}</p>
+      <h2>{t.contact.title}</h2>
+      <p class="lead cform__lead">{t.contact.lead}</p>
 
-      <button class="btn btn--primary" type="submit">{t.contact.send}</button>
-    </form>
-  </div>
-</section>
+      <form class="cform" action={MAILTO} method="post" enctype="text/plain">
+        <div class="cform__row">
+          <div class="field">
+            <label for="cf-name">{t.contact.name}</label>
+            <input id="cf-name" name="name" type="text" required autocomplete="name"
+                   placeholder={t.contact.namePlaceholder} />
+          </div>
+          <div class="field">
+            <label for="cf-email">{t.contact.email}</label>
+            <input id="cf-email" name="email" type="email" required autocomplete="email"
+                   placeholder={t.contact.emailPlaceholder} />
+          </div>
+        </div>
+        <div class="field">
+          <label for="cf-message">{t.contact.message}</label>
+          <textarea id="cf-message" name="message" rows="5" required
+                    placeholder={t.contact.messagePlaceholder}></textarea>
+        </div>
+        <button class="btn btn--primary" type="submit">{t.contact.send}</button>
+      </form>
+    </div>
+  </section>
+)}
 
 <style>
-  .contact__lead { margin-block: var(--space-3) var(--space-6); }
-  .contact__form { display: grid; gap: var(--space-5); }
-  .contact__row { display: grid; gap: var(--space-5); }
+  .cform__lead { margin-block: var(--space-3) var(--space-6); }
+  .cform { display: grid; gap: var(--space-5); }
+  .cform__row { display: grid; gap: var(--space-5); }
   @media (min-width: 640px) {
-    .contact__row { grid-template-columns: 1fr 1fr; }
+    .cform__row { grid-template-columns: 1fr 1fr; }
   }
 
   .field { display: grid; gap: var(--space-2); }
@@ -72,5 +98,5 @@ const MAILTO = 'mailto:contact@yaac.network';
   }
   .field textarea { resize: vertical; min-height: 8rem; }
 
-  .contact__form .btn { justify-self: start; }
+  .cform .btn { justify-self: start; }
 </style>

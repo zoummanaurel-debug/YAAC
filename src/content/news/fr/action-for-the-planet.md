@@ -3,8 +3,8 @@ title: "Agir pour la planète : construire un avenir durable"
 description: "Un appel à l’action : chaque jeune a un rôle à jouer dans l’atténuation et l’adaptation climatiques, et c’est le collectif qui transforme l’intention en impact."
 date: 2025-11-13
 category: informations
-cover: ../../../assets/photos/community-1.jpg
-coverAlt: "Jeunes membres de YAAC lors d’une action collective"
+cover: ../../../assets/news/action-planet.png
+coverAlt: "Visuel « Agir pour la planète »"
 featured: false
 ---
 

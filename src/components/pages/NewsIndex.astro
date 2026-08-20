@@ -2,7 +2,6 @@
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import NewsCard from '../NewsCard.astro';
-import ContactForm from '../ContactForm.astro';
 import { useTranslations, type Lang } from '../../i18n/utils';
 
 interface Props { lang: Lang }
@@ -49,8 +48,6 @@ const filters = [
       <p class="news-empty" id="news-empty" hidden>{t.news.empty}</p>
     </div>
   </section>
-
-  <ContactForm lang={lang} />
 </Base>
 
 <style>

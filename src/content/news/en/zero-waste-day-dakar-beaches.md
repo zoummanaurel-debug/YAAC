@@ -1,10 +1,10 @@
 ---
 title: "International Zero Waste Day: YAAC takes action for clean beaches in Dakar"
 description: "On International Zero Waste Day, YAAC drew attention to the urgency of beach pollution in the Senegalese capital — and got to work."
-date: 2025-03-30
+date: 2025-11-13
 category: public-action
-cover: ../../../assets/photos/hero.jpg
-coverAlt: "YAAC members collecting waste on a beach in Dakar"
+cover: ../../../assets/news/zero-waste.jpg
+coverAlt: "YAAC members during the beach clean-up in Dakar"
 featured: true
 ---
 

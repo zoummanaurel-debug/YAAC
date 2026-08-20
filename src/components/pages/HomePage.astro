@@ -6,7 +6,6 @@ import StatsBand from '../StatsBand.astro';
 import TestimonialCarousel from '../TestimonialCarousel.astro';
 import NewsCard from '../NewsCard.astro';
 import CtaBand from '../CtaBand.astro';
-import ContactForm from '../ContactForm.astro';
 import heroImage from '../../assets/photos/hero.jpg';
 import { useTranslations, localePath, externalLinks, type Lang } from '../../i18n/utils';
 
@@ -14,12 +13,19 @@ interface Props { lang: Lang }
 const { lang } = Astro.props;
 const t = useTranslations(lang);
 
-// Les 4 articles les plus récents de la langue courante, comme sur le site actuel.
 const posts = await getCollection('news', ({ id }) => id.startsWith(`${lang}/`));
-const latest = posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime()).slice(0, 4);
+const byDate = (a: typeof posts[number], b: typeof posts[number]) =>
+  b.data.date.getTime() - a.data.date.getTime();
+
+// Les articles marqués `featured` sont ceux mis en avant sur yaac.network.
+// La plupart partagent la même date de publication : sans ce drapeau, l'ordre
+// des 4 vedettes dépendrait d'un tri instable.
+const featured = posts.filter((p) => p.data.featured).sort(byDate);
+const latest = (featured.length >= 4 ? featured : [...posts].sort(byDate)).slice(0, 4);
 ---
 <Base lang={lang} routeKey="home">
   <Hero
+    homeTitle
     title={t.home.heroTitle}
     lead={t.home.heroLead}
     image={heroImage}
@@ -28,7 +34,7 @@ const latest = posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime(
     <a class="btn btn--accent" href={externalLinks.membership} target="_blank" rel="noopener">
       {t.home.heroCta}
     </a>
-    <a class="btn btn--outline" href={localePath(lang, 'about')} style="border-color:#fff;color:#fff">
+    <a class="btn btn--outline hero-alt" href={localePath(lang, 'about')}>
       {t.home.heroCtaAlt}
     </a>
   </Hero>
@@ -66,10 +72,18 @@ const latest = posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime(
     ctaHref={externalLinks.membership}
   />
 
-  <ContactForm lang={lang} />
+  <section class="section contact-teaser">
+    <div class="container container--narrow">
+      <h2>{t.home.contactTeaser}</h2>
+      <a class="btn btn--primary" href={localePath(lang, 'contact')}>{t.home.contactCta}</a>
+    </div>
+  </section>
 </Base>
 
 <style>
+  .hero-alt { border-color: var(--white); color: var(--white); }
+  .hero-alt:hover { background: var(--white); color: var(--green-900); }
+
   .news-head {
     display: flex;
     flex-wrap: wrap;
@@ -85,4 +99,7 @@ const latest = posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime(
     gap: var(--space-5);
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
   }
+
+  .contact-teaser { text-align: center; }
+  .contact-teaser h2 { font-size: var(--step-3); margin-bottom: var(--space-5); }
 </style>

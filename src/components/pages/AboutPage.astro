@@ -3,10 +3,9 @@ import { Image } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
 import Hero from '../Hero.astro';
 import FeatureGrid from '../FeatureGrid.astro';
-import ContactForm from '../ContactForm.astro';
 import CtaBand from '../CtaBand.astro';
 import heroImage from '../../assets/photos/community-3.jpg';
-import teamImage from '../../assets/photos/community-1.jpg';
+import teamImage from '../../assets/brand/organigram.png';
 import { useTranslations, externalLinks, type Lang } from '../../i18n/utils';
 
 interface Props { lang: Lang }
@@ -47,22 +46,24 @@ const t = useTranslations(lang);
     items={t.about.values}
   />
 
+  <!-- L'organigramme est un schéma : il doit être lisible en entier, jamais
+       recadré. D'où la pleine largeur et `object-fit: contain`. -->
   <section class="section">
     <div class="container team">
-      <div class="team__media">
-        <Image
-          src={teamImage}
-          alt={t.about.teamTitle}
-          widths={[480, 900]}
-          sizes="(min-width: 900px) 45vw, 100vw"
-          loading="lazy"
-        />
-      </div>
       <div class="team__text">
         <p class="eyebrow">{t.meta.siteName}</p>
         <h2>{t.about.teamTitle}</h2>
         <p class="lead">{t.about.teamText}</p>
       </div>
+      <figure class="team__chart">
+        <Image
+          src={teamImage}
+          alt={t.about.teamChartAlt}
+          widths={[768, 1200, 1600]}
+          sizes="(min-width: 1200px) 1100px, 100vw"
+          loading="lazy"
+        />
+      </figure>
     </div>
   </section>
 
@@ -72,8 +73,6 @@ const t = useTranslations(lang);
     ctaLabel={t.home.ctaButton}
     ctaHref={externalLinks.membership}
   />
-
-  <ContactForm lang={lang} />
 </Base>
 
 <style>
@@ -97,10 +96,21 @@ const t = useTranslations(lang);
 
   .vm__card--mission { background: var(--bg-subtle); }
 
-  .team { display: grid; gap: var(--space-7); align-items: center; }
-  @media (min-width: 900px) { .team { grid-template-columns: 5fr 6fr; } }
-
-  .team__media { border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-lg); }
-  .team__media :global(img) { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+  .team { display: grid; gap: var(--space-7); }
+  .team__text { max-width: 70ch; }
   .team__text h2 { margin-block: var(--space-3) var(--space-4); }
+
+  .team__chart {
+    margin: 0;
+    padding: var(--space-5);
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+  }
+  .team__chart :global(img) {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+  }
 </style>

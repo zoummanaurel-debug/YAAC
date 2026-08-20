@@ -45,6 +45,12 @@ const categoryLabel = t.news.categories[category];
 
 <style>
   .ncard { display: flex; height: 100%; background: var(--white); }
+
+  /* `display: flex` ci-dessus est une regle d'AUTEUR : elle ecrase le
+     `[hidden] { display: none }` de la feuille par defaut du navigateur, qui
+     n'est qu'une regle UA. Sans cette ligne, le filtre par categorie masque
+     l'attribut mais la carte reste visible. */
+  .ncard[hidden] { display: none; }
   .ncard__link {
     display: flex;
     flex-direction: column;

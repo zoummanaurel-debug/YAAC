@@ -1,11 +1,12 @@
 ---
 title: "Journée mondiale des zones humides : une visite inoubliable"
 description: "Pour la Journée mondiale des zones humides, YAAC s’est associée à AGIRE pour une visite de terrain consacrée à ces écosystèmes qui soutiennent discrètement la vie sur Terre."
-date: 2025-02-02
+date: 2025-11-13
 category: public-action
-cover: ../../../assets/photos/partners-hero.jpg
-coverAlt: "Visite de terrain dans une zone humide lors de la Journée mondiale des zones humides"
+cover: ../../../assets/news/wetlands.jpg
+coverAlt: "Vue aérienne de la zone humide visitée pour la Journée mondiale des zones humides"
 featured: false
+video: WyR1O4WxLU4
 ---
 
 Chaque année, le **2 février**, le monde célèbre la **Journée mondiale des zones humides** — un moment pour reconnaître le rôle déterminant de ces milieux dans le maintien de la vie sur Terre.

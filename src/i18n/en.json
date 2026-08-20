@@ -15,7 +15,8 @@
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
     "skip": "Skip to main content",
-    "langLabel": "Language"
+    "langLabel": "Language",
+    "contact": "Contact"
   },
   "home": {
     "heroTitle": "Sustainability starts here and now!",
@@ -25,10 +26,21 @@
     "statsEyebrow": "Our impact",
     "statsTitle": "A growing movement",
     "stats": [
-      { "value": 250, "suffix": "+", "label": "Members" },
-      { "value": 12, "suffix": "", "label": "Projects" },
-      { "value": 5, "suffix": "", "label": "Partners" },
-      { "value": 8, "suffix": "", "label": "Ongoing support" }
+      {
+        "value": 34,
+        "suffix": "",
+        "label": "Members"
+      },
+      {
+        "value": 3,
+        "suffix": "",
+        "label": "Projects"
+      },
+      {
+        "value": 5,
+        "suffix": "",
+        "label": "Partners"
+      }
     ],
     "testimonialsEyebrow": "Our community",
     "testimonialsTitle": "Voices from the field",
@@ -38,7 +50,9 @@
     "newsAll": "See all news",
     "ctaTitle": "Ready to act with us?",
     "ctaLead": "Join a network of young Africans building climate resilience where it matters most.",
-    "ctaButton": "Become a member"
+    "ctaButton": "Become a member",
+    "contactTeaser": "A question, a project, a partnership idea?",
+    "contactCta": "Contact us"
   },
   "about": {
     "title": "Who we are",
@@ -50,14 +64,30 @@
     "valuesTitle": "Our values",
     "valuesLead": "Five principles guide every project we run.",
     "values": [
-      { "name": "Inclusion", "text": "Everyone has a place in the alliance, regardless of background, gender or training." },
-      { "name": "Environment protection", "text": "Every action is measured against its impact on ecosystems and biodiversity." },
-      { "name": "Poverty alleviation", "text": "Agroecology is a lever for dignified livelihoods, not only for conservation." },
-      { "name": "Integrity", "text": "Transparency in how we work, spend and report to our communities and partners." },
-      { "name": "Local adaptation", "text": "Solutions are rooted in the knowledge and realities of each territory." }
+      {
+        "name": "Inclusion",
+        "text": "Everyone has a place in the alliance, regardless of background, gender or training."
+      },
+      {
+        "name": "Environment protection",
+        "text": "Every action is measured against its impact on ecosystems and biodiversity."
+      },
+      {
+        "name": "Poverty alleviation",
+        "text": "Agroecology is a lever for dignified livelihoods, not only for conservation."
+      },
+      {
+        "name": "Integrity",
+        "text": "Transparency in how we work, spend and report to our communities and partners."
+      },
+      {
+        "name": "Local adaptation",
+        "text": "Solutions are rooted in the knowledge and realities of each territory."
+      }
     ],
     "teamTitle": "Meet our team",
-    "teamText": "Our team brings together expertise in agroecology, project management, communications, entrepreneurship and the social sciences — a deliberate mix that lets us move from field practice to public advocacy."
+    "teamText": "Our team brings together expertise in agroecology, project management, communications, entrepreneurship and the social sciences — a deliberate mix that lets us move from field practice to public advocacy.",
+    "teamChartAlt": "YAAC organisational chart"
   },
   "news": {
     "title": "News",
@@ -73,7 +103,8 @@
       "informations": "Information",
       "public-action": "Public action",
       "yaac-talk": "YAAC Talk"
-    }
+    },
+    "watchVideo": "Watch the video"
   },
   "partners": {
     "title": "Stronger Together for Change",
@@ -82,10 +113,22 @@
     "whyTitle": "Why partner with us?",
     "whyLead": "Four reasons organisations choose to work with YAAC.",
     "why": [
-      { "name": "Community impact", "text": "Our projects are designed with the communities that live them, so results outlast the funding cycle." },
-      { "name": "Sustainable practices", "text": "Agroecology is at the core of every intervention — restoring soils, water and biodiversity together." },
-      { "name": "Shared resources", "text": "Pooled expertise, training material and field data, openly accessible to our partners." },
-      { "name": "Local rootedness", "text": "A youth network anchored across African territories, able to act quickly and close to the ground." }
+      {
+        "name": "Community impact",
+        "text": "Our projects are designed with the communities that live them, so results outlast the funding cycle."
+      },
+      {
+        "name": "Sustainable practices",
+        "text": "Agroecology is at the core of every intervention — restoring soils, water and biodiversity together."
+      },
+      {
+        "name": "Shared resources",
+        "text": "Pooled expertise, training material and field data, openly accessible to our partners."
+      },
+      {
+        "name": "Local rootedness",
+        "text": "A youth network anchored across African territories, able to act quickly and close to the ground."
+      }
     ],
     "partnerCta": "Become our partner",
     "volunteerTitle": "Volunteer with us",
@@ -94,14 +137,24 @@
   },
   "contact": {
     "title": "Contact us",
-    "lead": "A question, a project, a partnership idea? Write to us.",
+    "lead": "A question, a project, a partnership idea? Write to us — we read every message.",
     "name": "Name",
     "email": "Email",
     "message": "Message",
     "send": "Send message",
     "namePlaceholder": "Your full name",
     "emailPlaceholder": "you@example.com",
-    "messagePlaceholder": "How can we help?"
+    "messagePlaceholder": "How can we help?",
+    "formTitle": "Send us a message",
+    "directTitle": "Write to us directly",
+    "followTitle": "Follow us",
+    "emailLabel": "Email",
+    "phoneLabel": "Phone",
+    "whatsappLabel": "WhatsApp",
+    "whatsappCta": "Chat on WhatsApp",
+    "legalTitle": "Legal registration",
+    "legalLead": "YAAC is officially registered in two countries.",
+    "referenceLabel": "Registration"
   },
   "footer": {
     "about": "Youth Alliance for Agroecology and Climate",
@@ -109,6 +162,9 @@
     "navTitle": "Navigation",
     "actTitle": "Take action",
     "rights": "All rights reserved.",
-    "backToTop": "Back to top"
+    "backToTop": "Back to top",
+    "socialTitle": "Follow us",
+    "legalTitle": "Legal registration",
+    "contactTitle": "Contact"
   }
 }

@@ -10,11 +10,13 @@ interface Props {
   imageAlt: string;
   /** Hauteur réduite pour les pages intérieures. */
   compact?: boolean;
+  /** Slogan d'accueil : tenu sur une seule ligne sur grand écran. */
+  homeTitle?: boolean;
 }
 
-const { eyebrow, title, lead, image, imageAlt, compact = false } = Astro.props;
+const { eyebrow, title, lead, image, imageAlt, compact = false, homeTitle = false } = Astro.props;
 ---
-<section class:list={['hero', { 'hero--compact': compact }]}>
+<section class:list={['hero', { 'hero--compact': compact, 'hero--home': homeTitle }]}>
   <Image
     class="hero__bg"
     src={image}
@@ -30,7 +32,7 @@ const { eyebrow, title, lead, image, imageAlt, compact = false } = Astro.props;
 
   <div class="container hero__inner">
     {eyebrow && <p class="eyebrow hero__eyebrow">{eyebrow}</p>}
-    <h1 class="hero__title">{title}</h1>
+    <h1 class:list={['hero__title', { 'hero__title--home': homeTitle }]}>{title}</h1>
     <p class="hero__lead">{lead}</p>
     <div class="hero__actions"><slot /></div>
   </div>
@@ -74,6 +76,15 @@ const { eyebrow, title, lead, image, imageAlt, compact = false } = Astro.props;
   .hero__inner {
     padding-block: var(--space-9);
     max-width: 62ch;
+  }
+  /* Le slogan doit tenir sur une seule ligne. Il fait ~41 caracteres en
+     francais, donc au-dela de 1100px on elargit le bloc et on empeche le
+     retour a la ligne. En dessous, il se replie normalement. */
+  .hero--home .hero__inner { max-width: none; }
+
+  .hero__title--home { font-size: clamp(1.9rem, 1rem + 3.4vw, 3.4rem); }
+  @media (min-width: 1100px) {
+    .hero__title--home { white-space: nowrap; }
   }
   .hero__eyebrow { color: var(--green-300); margin-bottom: var(--space-4); }
   .hero__eyebrow::before { background: var(--yaac-accent); }

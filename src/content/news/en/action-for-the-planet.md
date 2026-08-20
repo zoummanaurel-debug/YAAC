@@ -3,8 +3,8 @@ title: "Action for the Planet: building a sustainable future"
 description: "A call to action: every young person has a role in climate mitigation and adaptation, and coming together is what turns intention into impact."
 date: 2025-11-13
 category: informations
-cover: ../../../assets/photos/community-1.jpg
-coverAlt: "Young YAAC members during a collective action"
+cover: ../../../assets/news/action-planet.png
+coverAlt: "Action for the Planet visual"
 featured: false
 ---
 

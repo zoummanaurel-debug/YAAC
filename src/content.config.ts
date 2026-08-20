@@ -14,13 +14,16 @@ const news = defineCollection({
     z.object({
       title: z.string(),
       description: z.string(),
-      /** Date de l'événement quand elle est documentée dans l'article,
-       *  sinon date de publication relevée sur yaac.network. */
+      /** Date de publication relevée sur yaac.network via l'API REST
+       *  WordPress (champ `date`), pour rester fidèle au site d'origine. */
       date: z.coerce.date(),
       category: z.enum(['events', 'informations', 'public-action', 'yaac-talk']),
       cover: image(),
       coverAlt: z.string(),
       featured: z.boolean().default(false),
+      /** Identifiant YouTube de la vidéo associée à l'article sur le site
+       *  d'origine, quand il y en a une. */
+      video: z.string().optional(),
     }),
 });
 

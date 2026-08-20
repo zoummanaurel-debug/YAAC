@@ -1,6 +1,7 @@
 ---
+import SocialLinks from './SocialLinks.astro';
 import {
-  useTranslations, localePath, externalLinks,
+  useTranslations, localePath, externalLinks, contactInfo, registrations,
   type Lang, type RouteKey,
 } from '../i18n/utils';
 
@@ -14,6 +15,7 @@ const navItems: { key: RouteKey; label: string }[] = [
   { key: 'about',    label: t.nav.about },
   { key: 'news',     label: t.nav.news },
   { key: 'partners', label: t.nav.partners },
+  { key: 'contact',  label: t.nav.contact },
 ];
 ---
 <footer class="ftr">
@@ -21,6 +23,9 @@ const navItems: { key: RouteKey; label: string }[] = [
     <div class="ftr__brand">
       <p class="ftr__name">{t.footer.about}</p>
       <p class="ftr__blurb">{t.footer.blurb}</p>
+
+      <h2 class="ftr__title ftr__title--social">{t.footer.socialTitle}</h2>
+      <SocialLinks tone="dark" />
     </div>
 
     <nav class="ftr__col" aria-label={t.footer.navTitle}>
@@ -39,7 +44,29 @@ const navItems: { key: RouteKey; label: string }[] = [
         <li><a href={externalLinks.partnership} target="_blank" rel="noopener">{t.partners.partnerCta}</a></li>
         <li><a href={externalLinks.volunteer} target="_blank" rel="noopener">{t.partners.volunteerCta}</a></li>
       </ul>
+
+      <h2 class="ftr__title ftr__title--contact">{t.footer.contactTitle}</h2>
+      <ul>
+        <li><a href={`mailto:${contactInfo.email}`}>{contactInfo.email}</a></li>
+        <li><a href={`tel:${contactInfo.phoneSenegal.replace(/\s/g, '')}`}>{contactInfo.phoneSenegal}</a></li>
+        <li><a href={`tel:${contactInfo.phoneBenin.replace(/\s/g, '')}`}>{contactInfo.phoneBenin}</a></li>
+      </ul>
     </div>
+  </div>
+
+  <!-- Références d'enregistrement : attendues d'une ONG, en particulier
+       par les bailleurs qui vérifient l'existence juridique. -->
+  <div class="container ftr__legal">
+    <h2 class="ftr__title">{t.footer.legalTitle}</h2>
+    <dl class="ftr__legal-grid">
+      {registrations.map((r) => (
+        <div class="ftr__legal-item">
+          <dt>{r.country[lang]}</dt>
+          <dd>{r.reference}</dd>
+          <dd><span class="ftr__legal-key">{r.taxLabel}</span> {r.taxId}</dd>
+        </div>
+      ))}
+    </dl>
   </div>
 
   <div class="container ftr__bar">
@@ -62,7 +89,7 @@ const navItems: { key: RouteKey; label: string }[] = [
     padding-bottom: var(--space-7);
   }
   @media (min-width: 720px) {
-    .ftr__grid { grid-template-columns: 2fr 1fr 1fr; gap: var(--space-6); }
+    .ftr__grid { grid-template-columns: 2fr 1fr 1.2fr; gap: var(--space-6); }
   }
 
   .ftr__name {
@@ -82,6 +109,8 @@ const navItems: { key: RouteKey; label: string }[] = [
     color: var(--green-300);
     margin-bottom: var(--space-4);
   }
+  .ftr__title--social, .ftr__title--contact { margin-top: var(--space-6); }
+
   .ftr__col ul { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--space-3); }
   .ftr__col a, .ftr__top {
     color: var(--green-100);
@@ -89,6 +118,26 @@ const navItems: { key: RouteKey; label: string }[] = [
     transition: color var(--dur) var(--ease);
   }
   .ftr__col a:hover, .ftr__top:hover { color: var(--yaac-accent); text-decoration: underline; }
+
+  .ftr__legal { padding-bottom: var(--space-6); }
+  .ftr__legal-grid { display: grid; gap: var(--space-5); margin: 0; }
+  @media (min-width: 640px) { .ftr__legal-grid { grid-template-columns: 1fr 1fr; } }
+
+  .ftr__legal-item {
+    padding-left: var(--space-4);
+    border-left: 2px solid color-mix(in srgb, var(--green-300) 40%, transparent);
+  }
+  .ftr__legal-item dt {
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: var(--space-2);
+  }
+  .ftr__legal-item dd {
+    margin: 0;
+    font-size: var(--step--1);
+    color: var(--green-200);
+  }
+  .ftr__legal-key { color: var(--green-300); font-weight: 600; }
 
   .ftr__bar {
     display: flex;

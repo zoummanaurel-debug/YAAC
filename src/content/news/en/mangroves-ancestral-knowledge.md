@@ -3,8 +3,8 @@ title: "Mangroves: ancestral knowledge to protect"
 description: "Where preservation law has failed, some countries and NGOs are turning to endogenous belief systems to protect mangroves."
 date: 2025-11-13
 category: informations
-cover: ../../../assets/photos/community-2.jpg
-coverAlt: "Mangrove ecosystem along the West African coastline"
+cover: ../../../assets/news/mangroves.png
+coverAlt: "Mangrove ecosystem"
 featured: false
 ---
 

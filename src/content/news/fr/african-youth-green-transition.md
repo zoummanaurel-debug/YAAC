@@ -3,9 +3,10 @@ title: "La jeunesse africaine au cœur de la transition verte"
 description: "Avec le réseau DAAD Alumni, YAAC a réuni à Dakar près de 40 jeunes, experts et partenaires pour l’atelier « Une Afrique verte et résiliente »."
 date: 2025-11-13
 category: public-action
-cover: ../../../assets/photos/community-3.jpg
+cover: ../../../assets/news/green-transition.jpg
 coverAlt: "Participants à l’atelier « Une Afrique verte et résiliente » à Dakar"
 featured: true
+video: Xnmqnu0Zidg
 ---
 
 Le réseau YAAC, en collaboration avec le **réseau DAAD Alumni**, a organisé à Dakar l’atelier *« Une Afrique verte et résiliente »*, réunissant près de **40 jeunes, experts et partenaires** engagés dans la transition agroécologique et énergétique en Afrique.

@@ -1,11 +1,12 @@
 ---
 title: "Comprendre les énergies propres"
 description: "Moussa Ka, doctorant et membre de YAAC, explique ce que recouvre vraiment l’énergie propre — et pourquoi la transition est plus urgente que jamais."
-date: 2025-01-26
+date: 2025-11-13
 category: informations
-cover: ../../../assets/photos/clean-energy.jpg
-coverAlt: "Installation solaire photographiée lors d’une visite de terrain YAAC"
+cover: ../../../assets/news/clean-energy.jpg
+coverAlt: "Image de l’entretien sur les énergies propres avec Moussa Ka"
 featured: false
+video: zO_167CxKI8
 ---
 
 **Moussa Ka**, doctorant et membre de YAAC, nous a parlé d’énergie à l’occasion de la **Journée mondiale de l’énergie propre, le 26 janvier 2025**.

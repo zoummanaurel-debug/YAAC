@@ -30,14 +30,13 @@ const { eyebrow, title, stats } = Astro.props;
   .stats { background: var(--green-900); }
   .stats__title { margin-block: var(--space-3) var(--space-7); }
 
+  /* `auto-fit` s'adapte au nombre de compteurs reellement fournis :
+     passer de 4 a 3 chiffres ne demande aucune retouche ici. */
   .stats__grid {
     display: grid;
     gap: var(--space-6);
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
     margin: 0;
-  }
-  @media (min-width: 860px) {
-    .stats__grid { grid-template-columns: repeat(4, 1fr); }
   }
 
   .stats__item {

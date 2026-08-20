@@ -15,7 +15,8 @@
     "openMenu": "Ouvrir le menu",
     "closeMenu": "Fermer le menu",
     "skip": "Aller au contenu principal",
-    "langLabel": "Langue"
+    "langLabel": "Langue",
+    "contact": "Contact"
   },
   "home": {
     "heroTitle": "La durabilité commence ici et maintenant !",
@@ -25,10 +26,21 @@
     "statsEyebrow": "Notre impact",
     "statsTitle": "Un mouvement qui grandit",
     "stats": [
-      { "value": 250, "suffix": "+", "label": "Membres" },
-      { "value": 12, "suffix": "", "label": "Projets" },
-      { "value": 5, "suffix": "", "label": "Partenaires" },
-      { "value": 8, "suffix": "", "label": "Soutiens en cours" }
+      {
+        "value": 34,
+        "suffix": "",
+        "label": "Membres"
+      },
+      {
+        "value": 3,
+        "suffix": "",
+        "label": "Projets"
+      },
+      {
+        "value": 5,
+        "suffix": "",
+        "label": "Partenaires"
+      }
     ],
     "testimonialsEyebrow": "Notre communauté",
     "testimonialsTitle": "Paroles du terrain",
@@ -38,7 +50,9 @@
     "newsAll": "Voir toutes les actualités",
     "ctaTitle": "Prêt à agir avec nous ?",
     "ctaLead": "Rejoignez un réseau de jeunes Africains qui construisent la résilience climatique là où elle compte le plus.",
-    "ctaButton": "Devenir membre"
+    "ctaButton": "Devenir membre",
+    "contactTeaser": "Une question, un projet, une idée de partenariat ?",
+    "contactCta": "Nous contacter"
   },
   "about": {
     "title": "Qui sommes-nous",
@@ -50,14 +64,30 @@
     "valuesTitle": "Nos valeurs",
     "valuesLead": "Cinq principes guident chacun de nos projets.",
     "values": [
-      { "name": "Inclusion", "text": "Chacun a sa place dans l'alliance, quels que soient son parcours, son genre ou sa formation." },
-      { "name": "Protection de l'environnement", "text": "Chaque action est évaluée à l'aune de son impact sur les écosystèmes et la biodiversité." },
-      { "name": "Lutte contre la pauvreté", "text": "L'agroécologie est un levier de revenus dignes, et pas seulement un outil de conservation." },
-      { "name": "Intégrité", "text": "Transparence sur notre manière de travailler, de dépenser et de rendre compte à nos communautés et partenaires." },
-      { "name": "Adaptation locale", "text": "Les solutions s'enracinent dans les savoirs et les réalités de chaque territoire." }
+      {
+        "name": "Inclusion",
+        "text": "Chacun a sa place dans l'alliance, quels que soient son parcours, son genre ou sa formation."
+      },
+      {
+        "name": "Protection de l'environnement",
+        "text": "Chaque action est évaluée à l'aune de son impact sur les écosystèmes et la biodiversité."
+      },
+      {
+        "name": "Lutte contre la pauvreté",
+        "text": "L'agroécologie est un levier de revenus dignes, et pas seulement un outil de conservation."
+      },
+      {
+        "name": "Intégrité",
+        "text": "Transparence sur notre manière de travailler, de dépenser et de rendre compte à nos communautés et partenaires."
+      },
+      {
+        "name": "Adaptation locale",
+        "text": "Les solutions s'enracinent dans les savoirs et les réalités de chaque territoire."
+      }
     ],
     "teamTitle": "Notre équipe",
-    "teamText": "Notre équipe réunit des expertises en agroécologie, gestion de projet, communication, entrepreneuriat et sciences sociales — un mélange volontaire qui nous permet de passer de la pratique de terrain au plaidoyer public."
+    "teamText": "Notre équipe réunit des expertises en agroécologie, gestion de projet, communication, entrepreneuriat et sciences sociales — un mélange volontaire qui nous permet de passer de la pratique de terrain au plaidoyer public.",
+    "teamChartAlt": "Organigramme de YAAC"
   },
   "news": {
     "title": "Actualités",
@@ -73,7 +103,8 @@
       "informations": "Informations",
       "public-action": "Action publique",
       "yaac-talk": "YAAC Talk"
-    }
+    },
+    "watchVideo": "Voir la vidéo"
   },
   "partners": {
     "title": "Plus forts ensemble pour le changement",
@@ -82,10 +113,22 @@
     "whyTitle": "Pourquoi devenir partenaire ?",
     "whyLead": "Quatre raisons pour lesquelles des organisations choisissent de travailler avec YAAC.",
     "why": [
-      { "name": "Impact communautaire", "text": "Nos projets sont conçus avec les communautés qui les vivent : les résultats survivent au cycle de financement." },
-      { "name": "Pratiques durables", "text": "L'agroécologie est au cœur de chaque intervention — restaurer ensemble les sols, l'eau et la biodiversité." },
-      { "name": "Ressources partagées", "text": "Expertise, supports de formation et données de terrain mutualisés, accessibles à nos partenaires." },
-      { "name": "Ancrage local", "text": "Un réseau de jeunes implanté dans les territoires africains, capable d'agir vite et au plus près du terrain." }
+      {
+        "name": "Impact communautaire",
+        "text": "Nos projets sont conçus avec les communautés qui les vivent : les résultats survivent au cycle de financement."
+      },
+      {
+        "name": "Pratiques durables",
+        "text": "L'agroécologie est au cœur de chaque intervention — restaurer ensemble les sols, l'eau et la biodiversité."
+      },
+      {
+        "name": "Ressources partagées",
+        "text": "Expertise, supports de formation et données de terrain mutualisés, accessibles à nos partenaires."
+      },
+      {
+        "name": "Ancrage local",
+        "text": "Un réseau de jeunes implanté dans les territoires africains, capable d'agir vite et au plus près du terrain."
+      }
     ],
     "partnerCta": "Devenir partenaire",
     "volunteerTitle": "Devenir bénévole",
@@ -94,14 +137,24 @@
   },
   "contact": {
     "title": "Nous contacter",
-    "lead": "Une question, un projet, une idée de partenariat ? Écrivez-nous.",
+    "lead": "Une question, un projet, une idée de partenariat ? Écrivez-nous — nous lisons chaque message.",
     "name": "Nom",
     "email": "E-mail",
     "message": "Message",
     "send": "Envoyer le message",
     "namePlaceholder": "Votre nom complet",
     "emailPlaceholder": "vous@exemple.com",
-    "messagePlaceholder": "Comment pouvons-nous aider ?"
+    "messagePlaceholder": "Comment pouvons-nous aider ?",
+    "formTitle": "Envoyez-nous un message",
+    "directTitle": "Nous écrire directement",
+    "followTitle": "Nous suivre",
+    "emailLabel": "E-mail",
+    "phoneLabel": "Téléphone",
+    "whatsappLabel": "WhatsApp",
+    "whatsappCta": "Discuter sur WhatsApp",
+    "legalTitle": "Enregistrement légal",
+    "legalLead": "YAAC est officiellement enregistrée dans deux pays.",
+    "referenceLabel": "Enregistrement"
   },
   "footer": {
     "about": "Youth Alliance for Agroecology and Climate",
@@ -109,6 +162,9 @@
     "navTitle": "Navigation",
     "actTitle": "Agir",
     "rights": "Tous droits réservés.",
-    "backToTop": "Haut de page"
+    "backToTop": "Haut de page",
+    "socialTitle": "Nous suivre",
+    "legalTitle": "Enregistrement légal",
+    "contactTitle": "Contact"
   }
 }

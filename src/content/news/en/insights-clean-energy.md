@@ -1,11 +1,12 @@
 ---
 title: "Insights into clean energy"
 description: "Moussa Ka, PhD student and YAAC member, explains what clean energy actually means — and why the transition is more urgent than ever."
-date: 2025-01-26
+date: 2025-11-13
 category: informations
-cover: ../../../assets/photos/clean-energy.jpg
-coverAlt: "Solar installation photographed during a YAAC field visit"
+cover: ../../../assets/news/clean-energy.jpg
+coverAlt: "Still from the clean energy interview with Moussa Ka"
 featured: false
+video: zO_167CxKI8
 ---
 
 **Moussa Ka**, PhD student and member of YAAC, spoke to us on **World Clean Energy Day, 26 January 2025**.

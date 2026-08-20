@@ -1,10 +1,10 @@
 ---
 title: "Lancement officiel de YAAC"
 description: "Dakar, 30 novembre 2024 — juste avant la Semaine mondiale de l’environnement, la Youth Alliance for Agroecology and Climate était officiellement lancée."
-date: 2024-11-30
+date: 2025-11-13
 category: events
-cover: ../../../assets/photos/community-3.jpg
-coverAlt: "Membres fondateurs lors du lancement officiel de YAAC à Dakar"
+cover: ../../../assets/news/official-launch.png
+coverAlt: "Lancement officiel de YAAC à Dakar"
 featured: false
 ---
 

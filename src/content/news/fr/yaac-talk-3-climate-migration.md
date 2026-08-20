@@ -1,11 +1,12 @@
 ---
 title: "YAAC Talk n°3 : jeunesse africaine, climat et migration"
 description: "La jeunesse africaine doit-elle subir le climat ou le transformer ? Le troisième YAAC Talk a réuni des voix engagées autour d’une des questions les plus pressantes de notre génération."
-date: 2025-02-21
+date: 2026-04-28
 category: yaac-talk
-cover: ../../../assets/photos/community-1.jpg
-coverAlt: "Participants réunis lors d’un panel YAAC Talk"
+cover: ../../../assets/news/yaac-talk-3.jpg
+coverAlt: "Visuel de présentation du YAAC Talk n°3"
 featured: true
+video: 2jQyEOxLUd8
 ---
 
 **Jeunesse africaine : subir le climat, ou le transformer ?**

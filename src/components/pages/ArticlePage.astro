@@ -2,14 +2,13 @@
 import { Image } from 'astro:assets';
 import { render, type CollectionEntry } from 'astro:content';
 import Base from '../../layouts/Base.astro';
-import ContactForm from '../ContactForm.astro';
 import { useTranslations, localePath, formatDate, type Lang } from '../../i18n/utils';
 
 interface Props { entry: CollectionEntry<'news'>; lang: Lang }
 const { entry, lang } = Astro.props;
 const t = useTranslations(lang);
 const { Content } = await render(entry);
-const { title, description, date, category, cover, coverAlt } = entry.data;
+const { title, description, date, category, cover, coverAlt, video } = entry.data;
 
 // L'id vaut "<lang>/<slug>" ; le slug est le même dans les deux langues.
 const slug = entry.id.split('/').pop()!;
@@ -43,12 +42,25 @@ const slug = entry.id.split('/').pop()!;
       />
     </div>
 
+    {video && (
+      <div class="container container--narrow post__video">
+        <h2 class="post__video-title">{t.news.watchVideo}</h2>
+        <div class="post__video-frame">
+          <iframe
+            src={`https://www.youtube-nocookie.com/embed/${video}?rel=0`}
+            title={title}
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    )}
+
     <div class="container container--narrow post__body">
       <Content />
     </div>
   </article>
-
-  <ContactForm lang={lang} />
 </Base>
 
 <style>
@@ -83,6 +95,17 @@ const slug = entry.id.split('/').pop()!;
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-lg);
   }
+
+  .post__video { padding-top: var(--space-8); }
+  .post__video-title { font-size: var(--step-2); margin-bottom: var(--space-4); }
+  .post__video-frame {
+    aspect-ratio: 16 / 9;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    background: var(--green-950);
+  }
+  .post__video-frame iframe { width: 100%; height: 100%; border: 0; display: block; }
 
   /* Mesure de lecture confortable : ~68 caractères par ligne */
   .post__body { padding-block: var(--space-8); font-size: var(--step-1); }
