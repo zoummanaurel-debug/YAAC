@@ -1,0 +1,88 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Hero from '../Hero.astro';
+import StatsBand from '../StatsBand.astro';
+import TestimonialCarousel from '../TestimonialCarousel.astro';
+import NewsCard from '../NewsCard.astro';
+import CtaBand from '../CtaBand.astro';
+import ContactForm from '../ContactForm.astro';
+import heroImage from '../../assets/photos/hero.jpg';
+import { useTranslations, localePath, externalLinks, type Lang } from '../../i18n/utils';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+// Les 4 articles les plus récents de la langue courante, comme sur le site actuel.
+const posts = await getCollection('news', ({ id }) => id.startsWith(`${lang}/`));
+const latest = posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime()).slice(0, 4);
+---
+<Base lang={lang} routeKey="home">
+  <Hero
+    title={t.home.heroTitle}
+    lead={t.home.heroLead}
+    image={heroImage}
+    imageAlt={t.meta.fullName}
+  >
+    <a class="btn btn--accent" href={externalLinks.membership} target="_blank" rel="noopener">
+      {t.home.heroCta}
+    </a>
+    <a class="btn btn--outline" href={localePath(lang, 'about')} style="border-color:#fff;color:#fff">
+      {t.home.heroCtaAlt}
+    </a>
+  </Hero>
+
+  <StatsBand eyebrow={t.home.statsEyebrow} title={t.home.statsTitle} stats={t.home.stats} />
+
+  <TestimonialCarousel
+    eyebrow={t.home.testimonialsEyebrow}
+    title={t.home.testimonialsTitle}
+    lead={t.home.testimonialsLead}
+  />
+
+  <section class="section section--tint">
+    <div class="container">
+      <div class="news-head">
+        <div>
+          <p class="eyebrow">{t.home.newsEyebrow}</p>
+          <h2>{t.home.newsTitle}</h2>
+        </div>
+        <a class="btn btn--outline" href={localePath(lang, 'news')}>{t.home.newsAll}</a>
+      </div>
+
+      <div class="news-grid">
+        {latest.map((entry, i) => (
+          <NewsCard entry={entry} lang={lang} wide={i === 0} />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <CtaBand
+    title={t.home.ctaTitle}
+    lead={t.home.ctaLead}
+    ctaLabel={t.home.ctaButton}
+    ctaHref={externalLinks.membership}
+  />
+
+  <ContactForm lang={lang} />
+</Base>
+
+<style>
+  .news-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: var(--space-4);
+    margin-bottom: var(--space-7);
+  }
+  .news-head .eyebrow { margin-bottom: var(--space-3); }
+
+  .news-grid {
+    display: grid;
+    gap: var(--space-5);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  }
+</style>

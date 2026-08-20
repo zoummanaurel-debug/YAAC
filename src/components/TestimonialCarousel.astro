@@ -1,0 +1,139 @@
+---
+interface Props { eyebrow: string; title: string; lead: string }
+const { eyebrow, title, lead } = Astro.props;
+
+// Vidéos déjà intégrées sur yaac.network. On charge une facade (miniature +
+// bouton) plutôt qu'une iframe YouTube : l'iframe pèse ~700 Ko et dépose des
+// cookies avant même que le visiteur ait cliqué.
+const videos = [
+  { id: 'D8LZC2wvi5I', title: 'YAAC — témoignage 1' },
+  { id: 'RF28Kf2TErI', title: 'YAAC — témoignage 2' },
+  { id: 'i3p7r5nu-y8', title: 'YAAC — témoignage 3' },
+  { id: 'qhW_5tUfGjg', title: 'YAAC — témoignage 4' },
+];
+---
+<section class="section testi">
+  <div class="container">
+    <p class="eyebrow">{eyebrow}</p>
+    <h2 class="testi__title">{title}</h2>
+    <p class="lead testi__lead">{lead}</p>
+
+    <ul class="testi__track">
+      {videos.map((v) => (
+        <li class="testi__item">
+          <button
+            class="testi__card"
+            type="button"
+            data-video={v.id}
+            aria-label={v.title}
+          >
+            <img
+              class="testi__thumb"
+              src={`https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`}
+              alt=""
+              loading="lazy"
+              width="480"
+              height="360"
+            />
+            <span class="testi__play" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </span>
+          </button>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .testi__title { margin-block: var(--space-3) var(--space-3); }
+  .testi__lead { max-width: 60ch; margin-bottom: var(--space-7); }
+
+  .testi__track {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(260px, 1fr);
+    gap: var(--space-5);
+    list-style: none;
+    padding: 0 0 var(--space-4);
+    margin: 0;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+    overscroll-behavior-x: contain;
+  }
+  .testi__item { scroll-snap-align: start; }
+
+  @media (min-width: 1000px) {
+    .testi__track { grid-auto-flow: row; grid-template-columns: repeat(4, 1fr); overflow: visible; }
+  }
+
+  .testi__card {
+    position: relative;
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: var(--green-900);
+    cursor: pointer;
+    aspect-ratio: 4 / 3;
+    transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+  }
+  .testi__card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+
+  .testi__thumb {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    opacity: 0.85;
+    transition: opacity var(--dur) var(--ease);
+  }
+  .testi__card:hover .testi__thumb { opacity: 1; }
+
+  .testi__play {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 4rem; height: 4rem;
+    display: grid;
+    place-items: center;
+    background: var(--yaac-primary);
+    color: var(--white);
+    border-radius: var(--radius-full);
+    box-shadow: var(--shadow-lg);
+    transition: background var(--dur) var(--ease), transform var(--dur) var(--ease);
+  }
+  .testi__card:hover .testi__play { background: var(--yaac-accent); color: var(--green-950); transform: scale(1.08); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .testi__card:hover { transform: none; }
+    .testi__card:hover .testi__play { transform: none; }
+  }
+</style>
+
+<script>
+  // Au clic seulement, la facade est remplacée par l'iframe YouTube.
+  document.querySelectorAll<HTMLButtonElement>('.testi__card').forEach((card) => {
+    card.addEventListener('click', () => {
+      const id = card.dataset.video;
+      if (!id) return;
+
+      const frame = document.createElement('iframe');
+      frame.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`;
+      frame.title = card.getAttribute('aria-label') ?? 'YAAC';
+      frame.allow = 'accelerometer; autoplay; encrypted-media; picture-in-picture';
+      frame.allowFullscreen = true;
+      frame.loading = 'lazy';
+      frame.style.cssText = 'width:100%;height:100%;border:0;display:block';
+
+      const wrapper = document.createElement('div');
+      wrapper.style.cssText = 'aspect-ratio:4/3;border-radius:var(--radius-lg);overflow:hidden';
+      wrapper.appendChild(frame);
+
+      card.replaceWith(wrapper);
+    });
+  });
+</script>

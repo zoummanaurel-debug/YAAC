@@ -1,0 +1,98 @@
+---
+interface Stat { value: number; suffix: string; label: string }
+interface Props { eyebrow: string; title: string; stats: Stat[] }
+
+const { eyebrow, title, stats } = Astro.props;
+---
+<section class="section section--invert stats">
+  <div class="container">
+    <p class="eyebrow">{eyebrow}</p>
+    <h2 class="stats__title">{title}</h2>
+
+    <dl class="stats__grid">
+      {stats.map((s) => (
+        <div class="stats__item">
+          <dt class="visually-hidden">{s.label}</dt>
+          <dd class="stats__value">
+            {/* La valeur finale est présente dans le HTML : si le script ne
+                s'exécute pas, le chiffre reste lisible. */}
+            <span class="stats__num" data-count-to={s.value}>{s.value}</span><span
+              class="stats__suffix">{s.suffix}</span>
+          </dd>
+          <p class="stats__label" aria-hidden="true">{s.label}</p>
+        </div>
+      ))}
+    </dl>
+  </div>
+</section>
+
+<style>
+  .stats { background: var(--green-900); }
+  .stats__title { margin-block: var(--space-3) var(--space-7); }
+
+  .stats__grid {
+    display: grid;
+    gap: var(--space-6);
+    grid-template-columns: repeat(2, 1fr);
+    margin: 0;
+  }
+  @media (min-width: 860px) {
+    .stats__grid { grid-template-columns: repeat(4, 1fr); }
+  }
+
+  .stats__item {
+    padding-left: var(--space-5);
+    border-left: 3px solid var(--yaac-accent);
+  }
+  .stats__value {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--step-5);
+    font-weight: 700;
+    line-height: 1;
+    color: var(--white);
+    font-variant-numeric: tabular-nums;
+  }
+  .stats__suffix { color: var(--yaac-accent); }
+  .stats__label {
+    margin-top: var(--space-2);
+    font-size: var(--step-0);
+    color: var(--green-200);
+  }
+</style>
+
+<script>
+  const nums = document.querySelectorAll<HTMLElement>('.stats__num');
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (nums.length && !reduced && 'IntersectionObserver' in window) {
+    const animate = (el: HTMLElement) => {
+      const target = Number(el.dataset.countTo ?? 0);
+      const duration = 1200;
+      const start = performance.now();
+
+      const tick = (now: number) => {
+        const p = Math.min((now - start) / duration, 1);
+        // easeOutCubic : rapide au début, s'arrête net sur la valeur exacte
+        const eased = 1 - Math.pow(1 - p, 3);
+        el.textContent = String(Math.round(target * eased));
+        if (p < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    };
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            animate(entry.target as HTMLElement);
+            io.unobserve(entry.target);
+          }
+        }
+      },
+      { threshold: 0.4 },
+    );
+
+    nums.forEach((n) => io.observe(n));
+  }
+</script>

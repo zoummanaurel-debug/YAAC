@@ -1,0 +1,76 @@
+---
+import { useTranslations, type Lang } from '../i18n/utils';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+// Un site statique ne traite pas les envois côté serveur. `mailto:` fonctionne
+// partout sans dépendance ni compte tiers ; pour recevoir les messages dans une
+// boîte de réception, remplacer `action` par un point de terminaison Formspree
+// et retirer method="post" / enctype.
+const MAILTO = 'mailto:contact@yaac.network';
+---
+<section class="section section--tint" id="contact">
+  <div class="container container--narrow contact">
+    <p class="eyebrow">{t.meta.siteName}</p>
+    <h2>{t.contact.title}</h2>
+    <p class="lead contact__lead">{t.contact.lead}</p>
+
+    <form class="contact__form" action={MAILTO} method="post" enctype="text/plain">
+      <div class="contact__row">
+        <div class="field">
+          <label for="cf-name">{t.contact.name}</label>
+          <input id="cf-name" name="name" type="text" required autocomplete="name"
+                 placeholder={t.contact.namePlaceholder} />
+        </div>
+        <div class="field">
+          <label for="cf-email">{t.contact.email}</label>
+          <input id="cf-email" name="email" type="email" required autocomplete="email"
+                 placeholder={t.contact.emailPlaceholder} />
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="cf-message">{t.contact.message}</label>
+        <textarea id="cf-message" name="message" rows="5" required
+                  placeholder={t.contact.messagePlaceholder}></textarea>
+      </div>
+
+      <button class="btn btn--primary" type="submit">{t.contact.send}</button>
+    </form>
+  </div>
+</section>
+
+<style>
+  .contact__lead { margin-block: var(--space-3) var(--space-6); }
+  .contact__form { display: grid; gap: var(--space-5); }
+  .contact__row { display: grid; gap: var(--space-5); }
+  @media (min-width: 640px) {
+    .contact__row { grid-template-columns: 1fr 1fr; }
+  }
+
+  .field { display: grid; gap: var(--space-2); }
+  .field label { font-weight: 600; font-size: var(--step--1); color: var(--green-900); }
+
+  .field input,
+  .field textarea {
+    padding: var(--space-3) var(--space-4);
+    background: var(--white);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+  }
+  .field input::placeholder,
+  .field textarea::placeholder { color: var(--ink-400); }
+
+  .field input:focus,
+  .field textarea:focus {
+    outline: none;
+    border-color: var(--yaac-primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--yaac-accent) 45%, transparent);
+  }
+  .field textarea { resize: vertical; min-height: 8rem; }
+
+  .contact__form .btn { justify-self: start; }
+</style>

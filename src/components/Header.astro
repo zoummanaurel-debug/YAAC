@@ -1,0 +1,172 @@
+---
+import { Image } from 'astro:assets';
+import logo from '../assets/brand/yaac-logo.png';
+import {
+  useTranslations, localePath, otherLang, languages, externalLinks,
+  routes, type Lang, type RouteKey,
+} from '../i18n/utils';
+
+interface Props { lang: Lang; routeKey: RouteKey }
+const { lang, routeKey } = Astro.props;
+const t = useTranslations(lang);
+const alt = otherLang(lang);
+
+const items: { key: RouteKey; label: string }[] = [
+  { key: 'home',     label: t.nav.home },
+  { key: 'about',    label: t.nav.about },
+  { key: 'news',     label: t.nav.news },
+  { key: 'partners', label: t.nav.partners },
+];
+---
+<header class="hdr">
+  <div class="container hdr__inner">
+    <a class="hdr__brand" href={localePath(lang, 'home')}>
+      <Image src={logo} alt={t.meta.fullName} widths={[180, 360]} sizes="180px" loading="eager" />
+      <span class="visually-hidden">{t.meta.fullName}</span>
+    </a>
+
+    <button class="hdr__burger" type="button" aria-expanded="false" aria-controls="primary-nav">
+      <span class="hdr__burger-box" aria-hidden="true"><span></span><span></span><span></span></span>
+      <span class="visually-hidden">{t.nav.openMenu}</span>
+    </button>
+
+    <nav id="primary-nav" class="hdr__nav" aria-label={t.nav.menu}>
+      <ul class="hdr__list">
+        {items.map(({ key, label }) => (
+          <li>
+            <a
+              href={localePath(lang, key)}
+              class:list={['hdr__link', { 'is-active': key === routeKey }]}
+              aria-current={key === routeKey ? 'page' : undefined}
+            >{label}</a>
+          </li>
+        ))}
+      </ul>
+
+      <div class="hdr__actions">
+        <a class="hdr__lang" href={localePath(alt, routeKey)} lang={alt} hreflang={alt}>
+          <span class="visually-hidden">{t.nav.langLabel}: </span>{languages[alt]}
+        </a>
+        <a class="btn btn--primary hdr__cta" href={externalLinks.membership} target="_blank" rel="noopener">
+          {t.nav.join}
+        </a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .hdr {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: color-mix(in srgb, var(--white) 88%, transparent);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .hdr__inner { display: flex; align-items: center; gap: var(--space-5); min-height: 4.5rem; }
+  .hdr__brand { display: flex; align-items: center; flex-shrink: 0; }
+  .hdr__brand :global(img) { width: 150px; height: auto; }
+
+  .hdr__nav { display: flex; align-items: center; gap: var(--space-6); margin-left: auto; }
+  .hdr__list { display: flex; align-items: center; gap: var(--space-5); list-style: none; padding: 0; margin: 0; }
+
+  .hdr__link {
+    position: relative;
+    display: inline-block;
+    padding-block: var(--space-2);
+    font-weight: 500;
+    color: var(--ink-700);
+    text-decoration: none;
+  }
+  .hdr__link::after {
+    content: '';
+    position: absolute;
+    left: 0; bottom: 0;
+    width: 100%; height: 2px;
+    background: var(--yaac-accent);
+    border-radius: var(--radius-full);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--dur) var(--ease);
+  }
+  .hdr__link:hover, .hdr__link.is-active { color: var(--yaac-primary); }
+  .hdr__link:hover::after, .hdr__link.is-active::after { transform: scaleX(1); }
+
+  .hdr__actions { display: flex; align-items: center; gap: var(--space-4); }
+  .hdr__lang {
+    font-size: var(--step--1);
+    font-weight: 600;
+    color: var(--ink-500);
+    text-decoration: none;
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    transition: border-color var(--dur) var(--ease), color var(--dur) var(--ease);
+  }
+  .hdr__lang:hover { color: var(--yaac-primary); border-color: var(--yaac-primary); }
+  .hdr__cta { padding: var(--space-2) var(--space-5); }
+
+  /* --- Bouton hamburger --- */
+  .hdr__burger {
+    display: none;
+    margin-left: auto;
+    padding: var(--space-2);
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+  }
+  .hdr__burger-box { display: grid; gap: 4px; width: 22px; }
+  .hdr__burger-box span {
+    height: 2px;
+    background: var(--green-900);
+    border-radius: var(--radius-full);
+    transition: transform var(--dur) var(--ease), opacity var(--dur-fast) var(--ease);
+  }
+  .hdr__burger[aria-expanded='true'] .hdr__burger-box span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+  .hdr__burger[aria-expanded='true'] .hdr__burger-box span:nth-child(2) { opacity: 0; }
+  .hdr__burger[aria-expanded='true'] .hdr__burger-box span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+  @media (max-width: 900px) {
+    .hdr__burger { display: block; }
+    .hdr__nav {
+      position: absolute;
+      inset-inline: 0;
+      top: 100%;
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--space-4);
+      padding: var(--space-5) var(--gutter) var(--space-6);
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      box-shadow: var(--shadow-lg);
+      display: none;
+    }
+    .hdr__nav.is-open { display: flex; }
+    .hdr__list { flex-direction: column; align-items: stretch; gap: var(--space-1); }
+    .hdr__link { padding: var(--space-3) 0; border-bottom: 1px solid var(--ink-100); }
+    .hdr__link::after { display: none; }
+    .hdr__actions { justify-content: space-between; }
+  }
+</style>
+
+<script>
+  const burger = document.querySelector<HTMLButtonElement>('.hdr__burger');
+  const nav = document.querySelector<HTMLElement>('#primary-nav');
+
+  burger?.addEventListener('click', () => {
+    const open = burger.getAttribute('aria-expanded') === 'true';
+    burger.setAttribute('aria-expanded', String(!open));
+    nav?.classList.toggle('is-open', !open);
+  });
+
+  // Échap referme le menu et rend le focus au bouton
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && burger?.getAttribute('aria-expanded') === 'true') {
+      burger.setAttribute('aria-expanded', 'false');
+      nav?.classList.remove('is-open');
+      burger.focus();
+    }
+  });
+</script>

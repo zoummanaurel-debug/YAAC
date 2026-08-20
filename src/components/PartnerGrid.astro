@@ -1,0 +1,71 @@
+---
+import { Image } from 'astro:assets';
+import daad from '../assets/partners/daad.png';
+import bmz from '../assets/partners/bmz.png';
+import sesam from '../assets/partners/sesam.png';
+import gbedjigbon from '../assets/partners/gbedjigbon.png';
+import rjbd from '../assets/partners/rjbd.png';
+
+interface Props { title: string }
+const { title } = Astro.props;
+
+// Sur yaac.network ces logos existent bien dans la médiathèque mais le
+// carrousel n'affiche que des placeholders. Ils sont ici servis en dur.
+const partners = [
+  { name: 'DAAD', src: daad },
+  { name: 'BMZ', src: bmz },
+  { name: 'SESAM+', src: sesam },
+  { name: 'GBEDJIGBON', src: gbedjigbon },
+  { name: 'RJBD', src: rjbd },
+];
+---
+<section class="section partners">
+  <div class="container">
+    <h2 class="partners__title">{title}</h2>
+    <ul class="partners__grid">
+      {partners.map((p) => (
+        <li class="partners__item">
+          <Image src={p.src} alt={p.name} widths={[160, 320]} sizes="160px" loading="lazy" />
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .partners__title {
+    font-size: var(--step-2);
+    text-align: center;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-bottom: var(--space-7);
+  }
+
+  .partners__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: var(--space-6);
+    align-items: center;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .partners__item {
+    display: grid;
+    place-items: center;
+    padding: var(--space-4);
+    min-height: 6rem;
+  }
+  .partners__item :global(img) {
+    max-height: 4.5rem;
+    width: auto;
+    object-fit: contain;
+    /* Les logos partenaires ont des chartes très différentes : on les
+       harmonise en niveaux de gris, la couleur revient au survol. */
+    filter: grayscale(1);
+    opacity: 0.7;
+    transition: filter var(--dur) var(--ease), opacity var(--dur) var(--ease);
+  }
+  .partners__item:hover :global(img) { filter: grayscale(0); opacity: 1; }
+</style>

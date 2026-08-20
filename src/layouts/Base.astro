@@ -1,0 +1,79 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import {
+  useTranslations, localePath, otherLang, languages,
+  type Lang, type RouteKey,
+} from '../i18n/utils';
+
+interface Props {
+  lang: Lang;
+  routeKey: RouteKey;
+  title?: string;
+  description?: string;
+}
+
+const { lang, routeKey, title, description } = Astro.props;
+const t = useTranslations(lang);
+
+const pageTitle = title ? `${title} — ${t.meta.siteName}` : `${t.meta.siteName} — ${t.meta.fullName}`;
+const pageDesc = description ?? t.meta.description;
+const canonical = new URL(localePath(lang, routeKey), Astro.site);
+const alt = otherLang(lang);
+
+// Balisage structuré : YAAC est une ONG, pas une entreprise.
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'NGO',
+  name: t.meta.fullName,
+  alternateName: 'YAAC',
+  url: canonical.href,
+  description: t.meta.description,
+  areaServed: 'Africa',
+  slogan: t.meta.tagline,
+};
+---
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={pageDesc} />
+    <link rel="canonical" href={canonical.href} />
+
+    <!-- Chaque page déclare sa contrepartie dans l'autre langue -->
+    <link rel="alternate" hreflang={lang} href={canonical.href} />
+    <link rel="alternate" hreflang={alt} href={new URL(localePath(alt, routeKey), Astro.site).href} />
+    <link rel="alternate" hreflang="x-default" href={new URL(localePath('fr', routeKey), Astro.site).href} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={t.meta.fullName} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDesc} />
+    <meta property="og:url" content={canonical.href} />
+    <meta property="og:locale" content={lang === 'fr' ? 'fr_FR' : 'en_GB'} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL}favicon.svg`} />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Palanquin:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Montserrat+Alternates:wght@500;600;700&display=swap"
+    />
+
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    <slot name="head" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{t.nav.skip}</a>
+    <Header lang={lang} routeKey={routeKey} />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer lang={lang} />
+  </body>
+</html>

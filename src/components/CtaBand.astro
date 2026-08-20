@@ -1,0 +1,28 @@
+---
+interface Props { title: string; lead: string; ctaLabel: string; ctaHref: string }
+const { title, lead, ctaLabel, ctaHref } = Astro.props;
+---
+<section class="section cta">
+  <div class="container cta__inner">
+    <div class="cta__text">
+      <h2>{title}</h2>
+      <p class="lead cta__lead">{lead}</p>
+    </div>
+    <a class="btn btn--accent cta__btn" href={ctaHref} target="_blank" rel="noopener">{ctaLabel}</a>
+  </div>
+</section>
+
+<style>
+  .cta { background: var(--green-800); color: var(--white); }
+  .cta__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-6);
+  }
+  .cta h2 { color: var(--white); }
+  .cta__text { max-width: 52ch; }
+  .cta__lead { color: var(--green-100); margin-top: var(--space-3); }
+  .cta__btn { flex-shrink: 0; padding-inline: var(--space-7); }
+</style>

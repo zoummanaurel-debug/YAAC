@@ -1,0 +1,108 @@
+/* =========================================================================
+   YAAC — Jetons de design
+   Les valeurs marquées « officiel » proviennent du kit global Elementor de
+   yaac.network (--e-global-color-* / --e-global-typography-*). Elles ne
+   doivent pas être modifiées : c'est la charte graphique de l'organisation.
+   Les autres teintes sont des dérivées calculées pour construire une échelle
+   utilisable (fonds, bordures, états) sans trahir la marque.
+   ========================================================================= */
+
+:root {
+  /* --- Couleurs de marque (officiel) --- */
+  --yaac-primary: #006738; /* vert profond  — couleur principale */
+  --yaac-accent:  #87bd43; /* vert feuille  — décoratif uniquement */
+  --yaac-forest:  #123524; /* vert très foncé — fonds immersifs */
+
+  /* --- Échelle verte dérivée --- */
+  --green-950: #08180f;
+  --green-900: #123524;
+  --green-800: #0b4527;
+  --green-700: #006738;
+  --green-600: #077c45;
+  --green-500: #109252;
+  --green-400: #4aad6c;
+  --green-300: #87bd43;
+  --green-200: #c2dd9e;
+  --green-100: #e6f1d8;
+  --green-50:  #f5faf0;
+
+  /* Variante accessible de l'accent : #87bd43 ne donne que 2,24:1 sur blanc,
+     très en dessous du seuil WCAG AA (4,5:1). Pour du TEXTE vert clair on
+     utilise cette version assombrie — même teinte (86,6°) et même saturation
+     (48 %) que l'accent officiel, luminosité abaissée à 33 %.
+     Mesuré : 4,81:1 sur #ffffff et 4,53:1 sur le fond teinté #f5faf0.
+     L'accent brut reste réservé aux filets, puces, aplats et survols —
+     jamais à du texte sur fond clair. */
+  --accent-text: #597d2c;
+
+  /* --- Neutres --- */
+  --ink-900: #0b0f0c;
+  --ink-700: #2b332d;
+  --ink-500: #5a6560;
+  --ink-400: #7c8781;
+  --ink-300: #9ba5a0;
+  --ink-200: #d8ded9;
+  --ink-100: #edf1ee;
+  --ink-50:  #f7f9f8;
+  --white:   #ffffff;
+
+  /* --- Rôles sémantiques --- */
+  --bg:            var(--white);
+  --bg-subtle:     var(--green-50);
+  --bg-invert:     var(--green-900);
+  --text:          var(--ink-900);
+  --text-muted:    var(--ink-500);
+  --text-invert:   var(--white);
+  --border:        var(--ink-200);
+  --border-strong: var(--ink-300);
+
+  /* --- Typographie (familles : officiel) --- */
+  --font-heading: 'Palanquin', 'Segoe UI', system-ui, sans-serif;
+  --font-body:    'Roboto', 'Segoe UI', system-ui, sans-serif;
+  --font-display: 'Montserrat Alternates', 'Palanquin', system-ui, sans-serif;
+
+  /* Échelle fluide : s'adapte entre 360px et 1440px sans media query */
+  --step--1: clamp(0.83rem, 0.79rem + 0.18vw, 0.94rem);
+  --step-0:  clamp(1rem, 0.95rem + 0.24vw, 1.13rem);
+  --step-1:  clamp(1.2rem, 1.11rem + 0.42vw, 1.44rem);
+  --step-2:  clamp(1.44rem, 1.3rem + 0.7vw, 1.84rem);
+  --step-3:  clamp(1.73rem, 1.5rem + 1.1vw, 2.35rem);
+  --step-4:  clamp(2.07rem, 1.72rem + 1.68vw, 3rem);
+  --step-5:  clamp(2.49rem, 1.96rem + 2.5vw, 3.82rem);
+
+  --leading-tight: 1.15;
+  --leading-snug:  1.35;
+  --leading-body:  1.65;
+
+  /* --- Espacement (échelle 4px) --- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+  --space-9: 6rem;
+  --space-10: 8rem;
+
+  /* --- Formes et profondeur --- */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-full: 999px;
+
+  --shadow-sm: 0 1px 2px rgb(11 15 12 / 0.06), 0 1px 3px rgb(11 15 12 / 0.08);
+  --shadow-md: 0 4px 6px -1px rgb(11 15 12 / 0.07), 0 2px 4px -2px rgb(11 15 12 / 0.06);
+  --shadow-lg: 0 12px 20px -6px rgb(11 15 12 / 0.12), 0 4px 8px -4px rgb(11 15 12 / 0.08);
+
+  /* --- Mise en page --- */
+  --container: 1200px;
+  --container-narrow: 760px;
+  --gutter: clamp(1rem, 0.5rem + 2.5vw, 2.5rem);
+
+  /* --- Mouvement --- */
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --dur-fast: 140ms;
+  --dur: 240ms;
+}

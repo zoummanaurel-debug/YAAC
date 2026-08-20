@@ -1,0 +1,109 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import { articlePath, formatDate, useTranslations, type Lang } from '../i18n/utils';
+
+interface Props {
+  entry: CollectionEntry<'news'>;
+  lang: Lang;
+  /** Le premier article d'une grille peut occuper toute la largeur. */
+  wide?: boolean;
+}
+
+const { entry, lang, wide = false } = Astro.props;
+const t = useTranslations(lang);
+const { title, description, date, category, cover, coverAlt } = entry.data;
+
+// L'id vaut "<lang>/<slug>" — on ne garde que le slug.
+const slug = entry.id.split('/').pop()!;
+const href = articlePath(lang, slug);
+const categoryLabel = t.news.categories[category];
+---
+<article class:list={['card ncard', { 'ncard--wide': wide }]} data-category={category}>
+  <a class="ncard__link" href={href}>
+    <div class="ncard__media">
+      <Image
+        src={cover}
+        alt={coverAlt}
+        widths={wide ? [640, 1024, 1400] : [400, 800]}
+        sizes={wide ? '(min-width: 900px) 60vw, 100vw' : '(min-width: 900px) 30vw, 100vw'}
+        loading="lazy"
+      />
+      <span class="ncard__tag">{categoryLabel}</span>
+    </div>
+
+    <div class="ncard__body">
+      <time class="ncard__date" datetime={date.toISOString().slice(0, 10)}>
+        {formatDate(date, lang)}
+      </time>
+      <h3 class="ncard__title">{title}</h3>
+      <p class="ncard__desc">{description}</p>
+      <span class="ncard__more" aria-hidden="true">{t.news.readMore} →</span>
+    </div>
+  </a>
+</article>
+
+<style>
+  .ncard { display: flex; height: 100%; background: var(--white); }
+  .ncard__link {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .ncard__media { position: relative; overflow: hidden; aspect-ratio: 16 / 10; }
+  .ncard__media :global(img) {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform 500ms var(--ease);
+  }
+  .ncard:hover .ncard__media :global(img) { transform: scale(1.05); }
+
+  .ncard__tag {
+    position: absolute;
+    top: var(--space-3);
+    left: var(--space-3);
+    padding: var(--space-1) var(--space-3);
+    background: var(--white);
+    color: var(--green-800);
+    border-radius: var(--radius-full);
+    font-size: var(--step--1);
+    font-weight: 600;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .ncard__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-5);
+    flex: 1;
+  }
+  .ncard__date {
+    font-size: var(--step--1);
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .ncard__title { font-size: var(--step-2); }
+  .ncard__desc { color: var(--text-muted); flex: 1; }
+  .ncard__more {
+    margin-top: var(--space-2);
+    font-weight: 600;
+    color: var(--yaac-primary);
+  }
+
+  /* Carte large : image et texte côte à côte sur grand écran */
+  @media (min-width: 900px) {
+    .ncard--wide { grid-column: 1 / -1; }
+    .ncard--wide .ncard__link { flex-direction: row; }
+    .ncard--wide .ncard__media { flex: 1 1 55%; aspect-ratio: auto; }
+    .ncard--wide .ncard__body { flex: 1 1 45%; justify-content: center; padding: var(--space-7); }
+    .ncard--wide .ncard__title { font-size: var(--step-3); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ncard:hover .ncard__media :global(img) { transform: none; }
+  }
+</style>

@@ -1,0 +1,106 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import Hero from '../Hero.astro';
+import FeatureGrid from '../FeatureGrid.astro';
+import ContactForm from '../ContactForm.astro';
+import CtaBand from '../CtaBand.astro';
+import heroImage from '../../assets/photos/community-3.jpg';
+import teamImage from '../../assets/photos/community-1.jpg';
+import { useTranslations, externalLinks, type Lang } from '../../i18n/utils';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+---
+<Base lang={lang} routeKey="about" title={t.about.title} description={t.about.lead}>
+  <Hero
+    compact
+    eyebrow={t.meta.siteName}
+    title={t.about.title}
+    lead={t.about.lead}
+    image={heroImage}
+    imageAlt={t.about.title}
+  />
+
+  <!-- Vision et mission en vis-à-vis : ce sont deux faces du même engagement -->
+  <section class="section">
+    <div class="container vm">
+      <article class="vm__card vm__card--vision">
+        <p class="eyebrow">01</p>
+        <h2>{t.about.visionTitle}</h2>
+        <p>{t.about.visionText}</p>
+      </article>
+      <article class="vm__card vm__card--mission">
+        <p class="eyebrow">02</p>
+        <h2>{t.about.missionTitle}</h2>
+        <p>{t.about.missionText}</p>
+      </article>
+    </div>
+  </section>
+
+  <FeatureGrid
+    tint
+    numbered
+    title={t.about.valuesTitle}
+    lead={t.about.valuesLead}
+    items={t.about.values}
+  />
+
+  <section class="section">
+    <div class="container team">
+      <div class="team__media">
+        <Image
+          src={teamImage}
+          alt={t.about.teamTitle}
+          widths={[480, 900]}
+          sizes="(min-width: 900px) 45vw, 100vw"
+          loading="lazy"
+        />
+      </div>
+      <div class="team__text">
+        <p class="eyebrow">{t.meta.siteName}</p>
+        <h2>{t.about.teamTitle}</h2>
+        <p class="lead">{t.about.teamText}</p>
+      </div>
+    </div>
+  </section>
+
+  <CtaBand
+    title={t.home.ctaTitle}
+    lead={t.home.ctaLead}
+    ctaLabel={t.home.ctaButton}
+    ctaHref={externalLinks.membership}
+  />
+
+  <ContactForm lang={lang} />
+</Base>
+
+<style>
+  .vm { display: grid; gap: var(--space-6); }
+  @media (min-width: 860px) { .vm { grid-template-columns: 1fr 1fr; } }
+
+  .vm__card {
+    padding: var(--space-7);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+  }
+  .vm__card h2 { font-size: var(--step-3); margin-block: var(--space-3); }
+  .vm__card p { color: var(--text-muted); font-size: var(--step-1); line-height: var(--leading-snug); }
+
+  /* La vision est projetée, la mission est ancrée : on marque la différence
+     par le fond plutôt que par un ornement décoratif. */
+  .vm__card--vision { background: var(--green-900); border-color: var(--green-900); }
+  .vm__card--vision h2 { color: var(--white); }
+  .vm__card--vision p { color: var(--green-100); }
+  .vm__card--vision .eyebrow { color: var(--green-300); }
+
+  .vm__card--mission { background: var(--bg-subtle); }
+
+  .team { display: grid; gap: var(--space-7); align-items: center; }
+  @media (min-width: 900px) { .team { grid-template-columns: 5fr 6fr; } }
+
+  .team__media { border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-lg); }
+  .team__media :global(img) { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+  .team__text h2 { margin-block: var(--space-3) var(--space-4); }
+</style>

@@ -1,0 +1,118 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import NewsCard from '../NewsCard.astro';
+import ContactForm from '../ContactForm.astro';
+import { useTranslations, type Lang } from '../../i18n/utils';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const posts = (await getCollection('news', ({ id }) => id.startsWith(`${lang}/`)))
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+// Seules les catégories réellement présentes sont proposées — un filtre qui
+// ne renvoie jamais rien est pire que pas de filtre du tout.
+const used = [...new Set(posts.map((p) => p.data.category))];
+const filters = [
+  { value: 'all', label: t.news.filterAll },
+  ...used.map((c) => ({ value: c, label: t.news.categories[c] })),
+];
+---
+<Base lang={lang} routeKey="news" title={t.news.title} description={t.news.lead}>
+  <section class="section news-head">
+    <div class="container">
+      <p class="eyebrow">{t.meta.siteName}</p>
+      <h1>{t.news.title}</h1>
+      <p class="lead news-head__lead">{t.news.lead}</p>
+    </div>
+  </section>
+
+  <section class="section news-list">
+    <div class="container">
+      <div class="filters" role="group" aria-label={t.news.filterLabel}>
+        {filters.map((f, i) => (
+          <button
+            class:list={['filters__btn', { 'is-active': i === 0 }]}
+            type="button"
+            data-filter={f.value}
+            aria-pressed={i === 0 ? 'true' : 'false'}
+          >{f.label}</button>
+        ))}
+      </div>
+
+      <div class="news-grid" id="news-grid">
+        {posts.map((entry) => <NewsCard entry={entry} lang={lang} />)}
+      </div>
+
+      <p class="news-empty" id="news-empty" hidden>{t.news.empty}</p>
+    </div>
+  </section>
+
+  <ContactForm lang={lang} />
+</Base>
+
+<style>
+  .news-head { padding-bottom: 0; }
+  .news-head h1 { margin-block: var(--space-3); }
+  .news-head__lead { max-width: 60ch; }
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-bottom: var(--space-7);
+  }
+  .filters__btn {
+    padding: var(--space-2) var(--space-5);
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-full);
+    font-weight: 500;
+    color: var(--ink-700);
+    cursor: pointer;
+    transition: background var(--dur) var(--ease), color var(--dur) var(--ease),
+                border-color var(--dur) var(--ease);
+  }
+  .filters__btn:hover { border-color: var(--yaac-primary); color: var(--yaac-primary); }
+  .filters__btn.is-active {
+    background: var(--yaac-primary);
+    border-color: var(--yaac-primary);
+    color: var(--white);
+  }
+
+  .news-grid {
+    display: grid;
+    gap: var(--space-5);
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+  }
+  .news-empty { margin-top: var(--space-6); color: var(--text-muted); }
+</style>
+
+<script>
+  const buttons = document.querySelectorAll<HTMLButtonElement>('.filters__btn');
+  const cards = document.querySelectorAll<HTMLElement>('#news-grid [data-category]');
+  const empty = document.getElementById('news-empty');
+
+  buttons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const filter = btn.dataset.filter;
+
+      buttons.forEach((b) => {
+        const active = b === btn;
+        b.classList.toggle('is-active', active);
+        b.setAttribute('aria-pressed', String(active));
+      });
+
+      let visible = 0;
+      cards.forEach((card) => {
+        const show = filter === 'all' || card.dataset.category === filter;
+        card.hidden = !show;
+        if (show) visible++;
+      });
+
+      if (empty) empty.hidden = visible > 0;
+    });
+  });
+</script>

@@ -1,0 +1,45 @@
+---
+// Page de bascule à la racine : détecte la langue du navigateur et redirige.
+// Un site statique n'a pas de négociation de contenu côté serveur, donc la
+// redirection se fait en JS, avec une balise meta et des liens visibles en
+// repli si le script ne s'exécute pas.
+const base = import.meta.env.BASE_URL.replace(/\/+$/, '');
+const fr = `${base}/fr/`;
+const en = `${base}/en/`;
+---
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>YAAC — Youth Alliance for Agroecology and Climate</title>
+    <meta name="robots" content="noindex" />
+    <meta http-equiv="refresh" content={`0; url=${fr}`} />
+    <link rel="canonical" href={fr} />
+    <script is:inline define:vars={{ fr, en }}>
+      const target = (navigator.language || 'fr').toLowerCase().startsWith('en') ? en : fr;
+      window.location.replace(target);
+    </script>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        display: grid;
+        place-items: center;
+        min-height: 100vh;
+        margin: 0;
+        gap: 1rem;
+        background: #f5faf0;
+        color: #123524;
+        text-align: center;
+        padding: 1rem;
+      }
+      a { color: #006738; font-weight: 600; }
+    </style>
+  </head>
+  <body>
+    <p>YAAC — Youth Alliance for Agroecology and Climate</p>
+    <p>
+      <a href={fr}>Continuer en français</a> · <a href={en}>Continue in English</a>
+    </p>
+  </body>
+</html>

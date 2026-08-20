@@ -1,0 +1,46 @@
+---
+import Base from '../../layouts/Base.astro';
+import Hero from '../Hero.astro';
+import PartnerGrid from '../PartnerGrid.astro';
+import FeatureGrid from '../FeatureGrid.astro';
+import CtaBand from '../CtaBand.astro';
+import ContactForm from '../ContactForm.astro';
+import heroImage from '../../assets/photos/partners-hero.jpg';
+import { useTranslations, externalLinks, type Lang } from '../../i18n/utils';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+---
+<Base lang={lang} routeKey="partners" title={t.partners.title} description={t.partners.lead}>
+  <Hero
+    compact
+    eyebrow={t.nav.partners}
+    title={t.partners.title}
+    lead={t.partners.lead}
+    image={heroImage}
+    imageAlt={t.partners.title}
+  >
+    <a class="btn btn--accent" href={externalLinks.partnership} target="_blank" rel="noopener">
+      {t.partners.partnerCta}
+    </a>
+  </Hero>
+
+  <PartnerGrid title={t.partners.logosTitle} />
+
+  <FeatureGrid
+    tint
+    title={t.partners.whyTitle}
+    lead={t.partners.whyLead}
+    items={t.partners.why}
+  />
+
+  <CtaBand
+    title={t.partners.volunteerTitle}
+    lead={t.partners.volunteerText}
+    ctaLabel={t.partners.volunteerCta}
+    ctaHref={externalLinks.volunteer}
+  />
+
+  <ContactForm lang={lang} />
+</Base>

@@ -1,0 +1,99 @@
+---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  eyebrow?: string;
+  title: string;
+  lead: string;
+  image: ImageMetadata;
+  imageAlt: string;
+  /** Hauteur réduite pour les pages intérieures. */
+  compact?: boolean;
+}
+
+const { eyebrow, title, lead, image, imageAlt, compact = false } = Astro.props;
+---
+<section class:list={['hero', { 'hero--compact': compact }]}>
+  <Image
+    class="hero__bg"
+    src={image}
+    alt={imageAlt}
+    {/* Ne jamais demander plus large que la source (1600 px) : Astro ne
+        peut pas agrandir et réémet alors l'original non optimisé. */}
+    widths={[640, 1024, 1600]}
+    sizes="100vw"
+    loading="eager"
+    fetchpriority="high"
+  />
+  <div class="hero__veil" aria-hidden="true"></div>
+
+  <div class="container hero__inner">
+    {eyebrow && <p class="eyebrow hero__eyebrow">{eyebrow}</p>}
+    <h1 class="hero__title">{title}</h1>
+    <p class="hero__lead">{lead}</p>
+    <div class="hero__actions"><slot /></div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    display: grid;
+    isolation: isolate;
+    min-height: clamp(30rem, 26rem + 22vw, 44rem);
+    align-items: center;
+    overflow: hidden;
+  }
+  .hero--compact { min-height: clamp(20rem, 17rem + 14vw, 28rem); }
+
+  .hero__bg {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Voile dégradé : garantit le contraste du texte quelle que soit la photo.
+     Sans lui, le blanc sur photo claire tombe sous le seuil WCAG. */
+  .hero__veil {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      linear-gradient(180deg,
+        color-mix(in srgb, var(--green-950) 62%, transparent) 0%,
+        color-mix(in srgb, var(--green-950) 74%, transparent) 100%),
+      linear-gradient(100deg,
+        color-mix(in srgb, var(--green-900) 55%, transparent) 0%,
+        transparent 65%);
+  }
+
+  .hero__inner {
+    padding-block: var(--space-9);
+    max-width: 62ch;
+  }
+  .hero__eyebrow { color: var(--green-300); margin-bottom: var(--space-4); }
+  .hero__eyebrow::before { background: var(--yaac-accent); }
+
+  .hero__title {
+    color: var(--white);
+    margin-bottom: var(--space-5);
+    text-shadow: 0 2px 20px rgb(8 24 15 / 0.4);
+  }
+  .hero__lead {
+    font-size: var(--step-1);
+    line-height: var(--leading-snug);
+    color: var(--green-100);
+    max-width: 54ch;
+  }
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+  }
+  .hero__actions:empty { display: none; }
+</style>

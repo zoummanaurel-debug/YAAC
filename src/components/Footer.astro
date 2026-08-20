@@ -1,0 +1,104 @@
+---
+import {
+  useTranslations, localePath, externalLinks,
+  type Lang, type RouteKey,
+} from '../i18n/utils';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const year = new Date().getFullYear();
+
+const navItems: { key: RouteKey; label: string }[] = [
+  { key: 'home',     label: t.nav.home },
+  { key: 'about',    label: t.nav.about },
+  { key: 'news',     label: t.nav.news },
+  { key: 'partners', label: t.nav.partners },
+];
+---
+<footer class="ftr">
+  <div class="container ftr__grid">
+    <div class="ftr__brand">
+      <p class="ftr__name">{t.footer.about}</p>
+      <p class="ftr__blurb">{t.footer.blurb}</p>
+    </div>
+
+    <nav class="ftr__col" aria-label={t.footer.navTitle}>
+      <h2 class="ftr__title">{t.footer.navTitle}</h2>
+      <ul>
+        {navItems.map(({ key, label }) => (
+          <li><a href={localePath(lang, key)}>{label}</a></li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="ftr__col">
+      <h2 class="ftr__title">{t.footer.actTitle}</h2>
+      <ul>
+        <li><a href={externalLinks.membership} target="_blank" rel="noopener">{t.nav.join}</a></li>
+        <li><a href={externalLinks.partnership} target="_blank" rel="noopener">{t.partners.partnerCta}</a></li>
+        <li><a href={externalLinks.volunteer} target="_blank" rel="noopener">{t.partners.volunteerCta}</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="container ftr__bar">
+    <p>© {year} {t.footer.about} (YAAC). {t.footer.rights}</p>
+    <a class="ftr__top" href="#main">{t.footer.backToTop} ↑</a>
+  </div>
+</footer>
+
+<style>
+  .ftr {
+    margin-top: var(--space-9);
+    padding-top: var(--space-8);
+    background: var(--green-900);
+    color: var(--green-100);
+  }
+  .ftr__grid {
+    display: grid;
+    gap: var(--space-7);
+    grid-template-columns: 1fr;
+    padding-bottom: var(--space-7);
+  }
+  @media (min-width: 720px) {
+    .ftr__grid { grid-template-columns: 2fr 1fr 1fr; gap: var(--space-6); }
+  }
+
+  .ftr__name {
+    font-family: var(--font-display);
+    font-size: var(--step-1);
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: var(--space-3);
+  }
+  .ftr__blurb { max-width: 42ch; color: var(--green-200); }
+
+  .ftr__title {
+    font-size: var(--step--1);
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--green-300);
+    margin-bottom: var(--space-4);
+  }
+  .ftr__col ul { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--space-3); }
+  .ftr__col a, .ftr__top {
+    color: var(--green-100);
+    text-decoration: none;
+    transition: color var(--dur) var(--ease);
+  }
+  .ftr__col a:hover, .ftr__top:hover { color: var(--yaac-accent); text-decoration: underline; }
+
+  .ftr__bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    align-items: center;
+    justify-content: space-between;
+    padding-block: var(--space-5);
+    border-top: 1px solid color-mix(in srgb, var(--green-300) 25%, transparent);
+    font-size: var(--step--1);
+    color: var(--green-200);
+  }
+</style>
