@@ -2,14 +2,18 @@
 import { Image } from 'astro:assets';
 import logo from '../assets/brand/yaac-logo.png';
 import {
-  useTranslations, localePath, otherLang, languages, externalLinks,
+  useTranslations, localePath, articlePath, otherLang, languages, externalLinks,
   routes, type Lang, type RouteKey,
 } from '../i18n/utils';
 
-interface Props { lang: Lang; routeKey: RouteKey }
-const { lang, routeKey } = Astro.props;
+interface Props { lang: Lang; routeKey: RouteKey; articleSlug?: string }
+const { lang, routeKey, articleSlug } = Astro.props;
 const t = useTranslations(lang);
 const alt = otherLang(lang);
+
+// Depuis un article, basculer de langue doit mener à la traduction de CET
+// article, pas à l'index des actualités. Les slugs sont identiques FR/EN.
+const altHref = articleSlug ? articlePath(alt, articleSlug) : localePath(alt, routeKey);
 
 const items: { key: RouteKey; label: string }[] = [
   { key: 'home',     label: t.nav.home },
@@ -44,7 +48,7 @@ const items: { key: RouteKey; label: string }[] = [
       </ul>
 
       <div class="hdr__actions">
-        <a class="hdr__lang" href={localePath(alt, routeKey)} lang={alt} hreflang={alt}>
+        <a class="hdr__lang" href={altHref} lang={alt} hreflang={alt}>
           <span class="visually-hidden">{t.nav.langLabel}: </span>{languages[alt]}
         </a>
         <a class="btn btn--primary hdr__cta" href={externalLinks.membership} target="_blank" rel="noopener">

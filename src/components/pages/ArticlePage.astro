@@ -10,8 +10,11 @@ const { entry, lang } = Astro.props;
 const t = useTranslations(lang);
 const { Content } = await render(entry);
 const { title, description, date, category, cover, coverAlt } = entry.data;
+
+// L'id vaut "<lang>/<slug>" ; le slug est le même dans les deux langues.
+const slug = entry.id.split('/').pop()!;
 ---
-<Base lang={lang} routeKey="news" title={title} description={description}>
+<Base lang={lang} routeKey="news" title={title} description={description} articleSlug={slug}>
   <Fragment slot="head">
     <meta property="og:type" content="article" />
     <meta property="article:published_time" content={date.toISOString()} />

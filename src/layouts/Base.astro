@@ -3,7 +3,7 @@ import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import {
-  useTranslations, localePath, otherLang, languages,
+  useTranslations, localePath, articlePath, otherLang, languages,
   type Lang, type RouteKey,
 } from '../i18n/utils';
 
@@ -12,15 +12,23 @@ interface Props {
   routeKey: RouteKey;
   title?: string;
   description?: string;
+  /** Sur une page d'article : son slug, identique dans les deux langues.
+   *  Permet au canonique, aux hreflang et au sélecteur de langue de viser la
+   *  traduction de l'article plutôt que l'index des actualités. */
+  articleSlug?: string;
 }
 
-const { lang, routeKey, title, description } = Astro.props;
+const { lang, routeKey, title, description, articleSlug } = Astro.props;
 const t = useTranslations(lang);
 
 const pageTitle = title ? `${title} — ${t.meta.siteName}` : `${t.meta.siteName} — ${t.meta.fullName}`;
 const pageDesc = description ?? t.meta.description;
-const canonical = new URL(localePath(lang, routeKey), Astro.site);
 const alt = otherLang(lang);
+
+/** Chemin de cette même page dans la langue demandée. */
+const pathFor = (l: Lang) => (articleSlug ? articlePath(l, articleSlug) : localePath(l, routeKey));
+
+const canonical = new URL(pathFor(lang), Astro.site);
 
 // Balisage structuré : YAAC est une ONG, pas une entreprise.
 const jsonLd = {
@@ -45,8 +53,8 @@ const jsonLd = {
 
     <!-- Chaque page déclare sa contrepartie dans l'autre langue -->
     <link rel="alternate" hreflang={lang} href={canonical.href} />
-    <link rel="alternate" hreflang={alt} href={new URL(localePath(alt, routeKey), Astro.site).href} />
-    <link rel="alternate" hreflang="x-default" href={new URL(localePath('fr', routeKey), Astro.site).href} />
+    <link rel="alternate" hreflang={alt} href={new URL(pathFor(alt), Astro.site).href} />
+    <link rel="alternate" hreflang="x-default" href={new URL(pathFor('fr'), Astro.site).href} />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={t.meta.fullName} />
@@ -70,7 +78,7 @@ const jsonLd = {
   </head>
   <body>
     <a class="skip-link" href="#main">{t.nav.skip}</a>
-    <Header lang={lang} routeKey={routeKey} />
+    <Header lang={lang} routeKey={routeKey} articleSlug={articleSlug} />
     <main id="main">
       <slot />
     </main>
