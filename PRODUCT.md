@@ -17,8 +17,8 @@ C'est lui qui arbitre la hiérarchie de chaque page.
 
 Deux publics secondaires, confirmés par les rubriques existantes :
 
-- **Bailleurs et institutions partenaires** (DAAD, BMZ, SESAM+, GBEDJIGBON, RJBD sont
-  déjà des partenaires réels). Ils cherchent des preuves : gouvernance, enregistrement
+- **Bailleurs et institutions partenaires** (DAAD, BMZ, SESAM+, GBEDJIGBON, RJBD,
+  COACH Afrique sont déjà des partenaires réels). Ils cherchent des preuves : gouvernance, enregistrement
   légal, impact vérifiable. La page Partenaires & Donateurs et les mentions
   d'enregistrement existent pour eux.
 - **Les 34 membres déjà inscrits.** Ils possèdent un numéro YAAC et attendent une carte
@@ -69,8 +69,7 @@ environnemental, qu'un acteur purement écologiste ne pourrait pas copier honnê
 ## Capabilities and Constraints
 
 **Ce dépôt remplacera `yaac.network`.** Ce n'est plus un site parallèle d'évaluation —
-le WordPress + Elementor actuel sera abandonné. Quatre conséquences à traiter, dont
-aucune ne l'est aujourd'hui :
+le WordPress + Elementor actuel sera abandonné. Quatre conséquences en découlent :
 
 **Hébergement cible : Hostinger**, décidé, mais volontairement repoussé — la
 qualité du site passe avant la bascule. GitHub Pages reste l'environnement de
@@ -129,15 +128,16 @@ pauvreté · Intégrité · Adaptation locale.
 
 Réel et vérifié, à ne pas étendre par invention :
 
-- **Chiffres** : 34 membres · 3 projets · 5 partenaires. *(Un 4ᵉ compteur a été
+- **Chiffres** : 34 membres · 3 projets · 6 partenaires. *(Un 4ᵉ compteur a été
   volontairement supprimé faute de donnée réelle — ne pas le réintroduire.)*
 - **9 articles** en FR et EN (`src/content/news/`), dates et vignettes récupérées via
   l'API REST de yaac.network, donc exactes. Un seul article, « Insights into clean
   energy », n'a **pas** de vignette d'origine ; l'image de sa vidéo YouTube a été
   utilisée à la place.
-- **5 logos partenaires réels** (`src/assets/partners/`) : DAAD, BMZ, SESAM+,
-  GBEDJIGBON, RJBD. Sur yaac.network ils existent en médiathèque mais le carrousel
-  n'affiche que des placeholders.
+- **6 logos partenaires réels** (`src/assets/partners/`) : DAAD, BMZ, SESAM+,
+  GBEDJIGBON, RJBD, COACH Afrique. Les cinq premiers existent dans la médiathèque de
+  yaac.network, où le carrousel n'affiche pourtant que des placeholders ; COACH Afrique
+  a été fourni directement (ajouté le 20/08/2026).
 - **Organigramme** officiel (`src/assets/brand/organigram.png`) — c'est un schéma :
   lisible en entier, jamais recadré.
 - **Enregistrement légal** :

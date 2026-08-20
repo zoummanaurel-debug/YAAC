@@ -37,7 +37,14 @@ p, h1, h2, h3, h4, li { overflow-wrap: break-word; }
   -webkit-hyphens: auto;
   hyphenate-limit-chars: 8 4 4;
 }
-:lang(fr) h1, :lang(fr) h2, :lang(fr) h3, :lang(fr) h4 { hyphens: manual; -webkit-hyphens: manual; }
+/* Jamais sur les titres, ni sur la navigation et les boutons : une césure y
+   est toujours fausse — « Actua-lités » dans un menu est un défaut, pas une
+   commodité. La césure sert la prose en colonne, rien d'autre. */
+:lang(fr) h1, :lang(fr) h2, :lang(fr) h3, :lang(fr) h4,
+:lang(fr) nav li, :lang(fr) nav a, :lang(fr) .btn, :lang(fr) button {
+  hyphens: manual;
+  -webkit-hyphens: manual;
+}
 
 /* ---------- Surfaces du navigateur ----------
    Sélection, curseur de saisie et barres de défilement arrivent avec les
