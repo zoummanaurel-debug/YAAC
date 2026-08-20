@@ -2,7 +2,7 @@
   "meta": {
     "siteName": "YAAC",
     "fullName": "Youth Alliance for Agroecology and Climate",
-    "tagline": "La durabilité commence ici et maintenant !",
+    "tagline": "La durabilité commence ici et maintenant !",
     "description": "YAAC est une plateforme inclusive et interculturelle qui lutte contre le changement climatique, forme les jeunes et combat la faim en Afrique."
   },
   "nav": {
@@ -19,11 +19,10 @@
     "contact": "Contact"
   },
   "home": {
-    "heroTitle": "La durabilité commence ici et maintenant !",
-    "heroLead": "Nous sommes une alliance portée par la jeunesse, qui fait avancer l'agroécologie et l'action climatique en Afrique — par des projets communautaires, la formation et le plaidoyer.",
+    "heroTitle": "La durabilité commence ici et maintenant !",
+    "heroLead": "Nous sommes une alliance portée par la jeunesse, qui fait avancer l’agroécologie et l’action climatique en Afrique — par des projets communautaires, la formation et le plaidoyer.",
     "heroCta": "Devenir membre",
     "heroCtaAlt": "Découvrir notre mission",
-    "statsEyebrow": "Notre impact",
     "statsTitle": "Un mouvement qui grandit",
     "stats": [
       {
@@ -42,23 +41,22 @@
         "label": "Partenaires"
       }
     ],
-    "testimonialsEyebrow": "Notre communauté",
     "testimonialsTitle": "Paroles du terrain",
-    "testimonialsLead": "Membres, partenaires et communautés racontent ce que l'agroécologie change dans leur quotidien.",
-    "newsEyebrow": "Dernières actualités",
+    "testimonialsLead": "Membres, partenaires et communautés racontent ce que l’agroécologie change dans leur quotidien.",
     "newsTitle": "Ce sur quoi nous travaillons",
     "newsAll": "Voir toutes les actualités",
-    "ctaTitle": "Prêt à agir avec nous ?",
+    "ctaTitle": "Prêt à agir avec nous ?",
     "ctaLead": "Rejoignez un réseau de jeunes Africains qui construisent la résilience climatique là où elle compte le plus.",
     "ctaButton": "Devenir membre",
-    "contactTeaser": "Une question, un projet, une idée de partenariat ?",
-    "contactCta": "Nous contacter"
+    "contactTeaser": "Une question, un projet, une idée de partenariat ?",
+    "contactCta": "Nous contacter",
+    "testimonialVideo": "Témoignage vidéo"
   },
   "about": {
     "title": "Qui sommes-nous",
-    "lead": "Une plateforme inclusive et interculturelle pour l'action climatique, la formation des jeunes et la souveraineté alimentaire en Afrique.",
+    "lead": "Une plateforme inclusive et interculturelle pour l’action climatique, la formation des jeunes et la souveraineté alimentaire en Afrique.",
     "visionTitle": "Notre vision",
-    "visionText": "Un continent africain résilient, où les jeunes disposent des capacités nécessaires pour faire progresser concrètement la conservation de l'environnement et le développement agroécologique durable.",
+    "visionText": "Un continent africain résilient, où les jeunes disposent des capacités nécessaires pour faire progresser concrètement la conservation de l’environnement et le développement agroécologique durable.",
     "missionTitle": "Notre mission",
     "missionText": "YAAC est une plateforme inclusive et interculturelle engagée dans la lutte contre le changement climatique, la formation des jeunes et la lutte contre la faim en Afrique.",
     "valuesTitle": "Nos valeurs",
@@ -66,15 +64,15 @@
     "values": [
       {
         "name": "Inclusion",
-        "text": "Chacun a sa place dans l'alliance, quels que soient son parcours, son genre ou sa formation."
+        "text": "Chacun a sa place dans l’alliance, quels que soient son parcours, son genre ou sa formation."
       },
       {
-        "name": "Protection de l'environnement",
-        "text": "Chaque action est évaluée à l'aune de son impact sur les écosystèmes et la biodiversité."
+        "name": "Protection de l’environnement",
+        "text": "Chaque action est évaluée à l’aune de son impact sur les écosystèmes et la biodiversité."
       },
       {
         "name": "Lutte contre la pauvreté",
-        "text": "L'agroécologie est un levier de revenus dignes, et pas seulement un outil de conservation."
+        "text": "L’agroécologie est un levier de revenus dignes, et pas seulement un outil de conservation."
       },
       {
         "name": "Intégrité",
@@ -82,7 +80,7 @@
       },
       {
         "name": "Adaptation locale",
-        "text": "Les solutions s'enracinent dans les savoirs et les réalités de chaque territoire."
+        "text": "Les solutions s’enracinent dans les savoirs et les réalités de chaque territoire."
       }
     ],
     "teamTitle": "Notre équipe",
@@ -94,7 +92,7 @@
     "lead": "Actions de terrain, YAAC Talks, et ce que nous apprenons en chemin.",
     "filterAll": "Toutes",
     "filterLabel": "Filtrer par catégorie",
-    "readMore": "Lire l'article",
+    "readMore": "Lire l’article",
     "empty": "Aucun article dans cette catégorie pour le moment.",
     "backToNews": "Retour aux actualités",
     "publishedOn": "Publié le",
@@ -108,18 +106,18 @@
   },
   "partners": {
     "title": "Plus forts ensemble pour le changement",
-    "lead": "Nous construisons des relations durables avec les institutions qui partagent notre engagement pour l'agroécologie et la justice climatique.",
+    "lead": "Nous construisons des relations durables avec les institutions qui partagent notre engagement pour l’agroécologie et la justice climatique.",
     "logosTitle": "Ils nous font confiance",
-    "whyTitle": "Pourquoi devenir partenaire ?",
+    "whyTitle": "Pourquoi devenir partenaire ?",
     "whyLead": "Quatre raisons pour lesquelles des organisations choisissent de travailler avec YAAC.",
     "why": [
       {
         "name": "Impact communautaire",
-        "text": "Nos projets sont conçus avec les communautés qui les vivent : les résultats survivent au cycle de financement."
+        "text": "Nos projets sont conçus avec les communautés qui les vivent : les résultats survivent au cycle de financement."
       },
       {
         "name": "Pratiques durables",
-        "text": "L'agroécologie est au cœur de chaque intervention — restaurer ensemble les sols, l'eau et la biodiversité."
+        "text": "L’agroécologie est au cœur de chaque intervention — restaurer ensemble les sols, l’eau et la biodiversité."
       },
       {
         "name": "Ressources partagées",
@@ -127,7 +125,7 @@
       },
       {
         "name": "Ancrage local",
-        "text": "Un réseau de jeunes implanté dans les territoires africains, capable d'agir vite et au plus près du terrain."
+        "text": "Un réseau de jeunes implanté dans les territoires africains, capable d’agir vite et au plus près du terrain."
       }
     ],
     "partnerCta": "Devenir partenaire",
@@ -137,14 +135,14 @@
   },
   "contact": {
     "title": "Nous contacter",
-    "lead": "Une question, un projet, une idée de partenariat ? Écrivez-nous — nous lisons chaque message.",
+    "lead": "Une question, un projet, une idée de partenariat ? Écrivez-nous — nous lisons chaque message.",
     "name": "Nom",
     "email": "E-mail",
     "message": "Message",
     "send": "Envoyer le message",
     "namePlaceholder": "Votre nom complet",
     "emailPlaceholder": "vous@exemple.com",
-    "messagePlaceholder": "Comment pouvons-nous aider ?",
+    "messagePlaceholder": "Comment pouvons-nous aider ?",
     "formTitle": "Envoyez-nous un message",
     "directTitle": "Nous écrire directement",
     "followTitle": "Nous suivre",
@@ -158,7 +156,7 @@
   },
   "footer": {
     "about": "Youth Alliance for Agroecology and Climate",
-    "blurb": "Une plateforme inclusive et interculturelle pour l'action climatique et la souveraineté alimentaire en Afrique.",
+    "blurb": "Une plateforme inclusive et interculturelle pour l’action climatique et la souveraineté alimentaire en Afrique.",
     "navTitle": "Navigation",
     "actTitle": "Agir",
     "rights": "Tous droits réservés.",

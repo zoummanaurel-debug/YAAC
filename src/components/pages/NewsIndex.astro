@@ -22,7 +22,6 @@ const filters = [
 <Base lang={lang} routeKey="news" title={t.news.title} description={t.news.lead}>
   <section class="section news-head">
     <div class="container">
-      <p class="eyebrow">{t.meta.siteName}</p>
       <h1>{t.news.title}</h1>
       <p class="lead news-head__lead">{t.news.lead}</p>
     </div>
@@ -52,7 +51,7 @@ const filters = [
 
 <style>
   .news-head { padding-bottom: 0; }
-  .news-head h1 { margin-block: var(--space-3); }
+  .news-head h1 { margin-block: 0 var(--space-3); }
   .news-head__lead { max-width: 60ch; }
 
   .filters {

@@ -1,27 +1,22 @@
 ---
 interface Item { name: string; text: string }
 interface Props {
-  eyebrow?: string;
   title: string;
   lead?: string;
   items: Item[];
-  /** Numérote les blocs — utile pour des valeurs, pas pour des arguments. */
-  numbered?: boolean;
   tint?: boolean;
 }
 
-const { eyebrow, title, lead, items, numbered = false, tint = false } = Astro.props;
+const { title, lead, items, tint = false } = Astro.props;
 ---
 <section class:list={['section', { 'section--tint': tint }]}>
   <div class="container">
-    {eyebrow && <p class="eyebrow">{eyebrow}</p>}
     <h2 class="fg__title">{title}</h2>
     {lead && <p class="lead fg__lead">{lead}</p>}
 
     <ul class="fg__grid">
-      {items.map((item, i) => (
+      {items.map((item) => (
         <li class="fg__item">
-          {numbered && <span class="fg__num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>}
           <h3 class="fg__name">{item.name}</h3>
           <p class="fg__text">{item.text}</p>
         </li>
@@ -31,54 +26,33 @@ const { eyebrow, title, lead, items, numbered = false, tint = false } = Astro.pr
 </section>
 
 <style>
-  .fg__title { margin-block: var(--space-3) var(--space-3); }
+  .fg__title { margin-block: 0 var(--space-3); }
   .fg__lead { max-width: 60ch; }
   .fg__title + .fg__grid, .fg__lead + .fg__grid { margin-top: var(--space-7); }
 
+  /* Grille éditoriale, pas un jeu de cartes. Ces éléments ne sont pas
+     cliquables : les enfermer dans des boîtes ombrées qui se soulèvent au
+     survol promet une interaction qui n'existe pas. Un filet en tête de
+     colonne suffit à séparer, et laisse la typographie faire la hiérarchie. */
   .fg__grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
-    gap: var(--space-5);
+    column-gap: var(--space-6);
+    row-gap: var(--space-7);
     list-style: none;
     padding: 0;
     margin: 0;
   }
 
+  /* `--ink-400` et pas une teinte verte : mesuré, un filet vert clair tombe à
+     1,4:1 sur le fond teinté, c'est-à-dire invisible — or ce composant sert
+     surtout en section teintée. Ce gris tient 3,7:1 sur blanc et 3,5:1 sur le
+     fond teinté, au-dessus du seuil de 3:1 des éléments non textuels. */
   .fg__item {
-    position: relative;
-    padding: var(--space-6);
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease),
-                transform var(--dur) var(--ease);
-  }
-  .fg__item::before {
-    content: '';
-    position: absolute;
-    top: 0; left: var(--space-6);
-    width: 2.5rem; height: 3px;
-    background: var(--yaac-accent);
-    border-radius: var(--radius-full);
-  }
-  .fg__item:hover {
-    border-color: var(--green-200);
-    box-shadow: var(--shadow-md);
-    transform: translateY(-3px);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--ink-400);
   }
 
-  .fg__num {
-    display: block;
-    font-family: var(--font-display);
-    font-size: var(--step-1);
-    font-weight: 700;
-    color: var(--green-200);
-    margin-bottom: var(--space-2);
-  }
   .fg__name { font-size: var(--step-1); margin-bottom: var(--space-2); }
-  .fg__text { color: var(--text-muted); }
-
-  @media (prefers-reduced-motion: reduce) {
-    .fg__item:hover { transform: none; }
-  }
+  .fg__text { color: var(--text-muted); max-width: 42ch; }
 </style>

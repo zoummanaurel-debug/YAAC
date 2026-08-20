@@ -1,5 +1,5 @@
 ---
-title: "Journée internationale zéro déchet : YAAC agit pour des plages propres à Dakar"
+title: "Journée internationale zéro déchet : YAAC agit pour des plages propres à Dakar"
 description: "À l’occasion de la Journée internationale zéro déchet, YAAC a alerté sur l’urgence de la pollution des plages de la capitale sénégalaise — et est passée à l’action."
 date: 2025-11-13
 category: public-action
@@ -12,7 +12,7 @@ featured: true
 
 ## Le problème, sans détour
 
-Le littoral dakarois reçoit les déchets d’une ville en croissance rapide, dont les infrastructures de collecte n’ont pas suivi. Le plastique s’accumule là où la marée rencontre les dépôts sauvages, et il ne reste pas en place : il se fragmente, entre dans la chaîne alimentaire, et revient vers les foyers qui l’ont produit.
+Le littoral dakarois reçoit les déchets d’une ville en croissance rapide, dont les infrastructures de collecte n’ont pas suivi. Le plastique s’accumule là où la marée rencontre les dépôts sauvages, et il ne reste pas en place : il se fragmente, entre dans la chaîne alimentaire, et revient vers les foyers qui l’ont produit.
 
 ## Ce que nous avons fait
 

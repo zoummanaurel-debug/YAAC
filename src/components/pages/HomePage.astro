@@ -39,10 +39,10 @@ const latest = (featured.length >= 4 ? featured : [...posts].sort(byDate)).slice
     </a>
   </Hero>
 
-  <StatsBand eyebrow={t.home.statsEyebrow} title={t.home.statsTitle} stats={t.home.stats} />
+  <StatsBand title={t.home.statsTitle} stats={t.home.stats} />
 
   <TestimonialCarousel
-    eyebrow={t.home.testimonialsEyebrow}
+    lang={lang}
     title={t.home.testimonialsTitle}
     lead={t.home.testimonialsLead}
   />
@@ -51,7 +51,6 @@ const latest = (featured.length >= 4 ? featured : [...posts].sort(byDate)).slice
     <div class="container">
       <div class="news-head">
         <div>
-          <p class="eyebrow">{t.home.newsEyebrow}</p>
           <h2>{t.home.newsTitle}</h2>
         </div>
         <a class="btn btn--outline" href={localePath(lang, 'news')}>{t.home.newsAll}</a>
@@ -92,7 +91,6 @@ const latest = (featured.length >= 4 ? featured : [...posts].sort(byDate)).slice
     gap: var(--space-4);
     margin-bottom: var(--space-7);
   }
-  .news-head .eyebrow { margin-bottom: var(--space-3); }
 
   .news-grid {
     display: grid;

@@ -15,7 +15,6 @@ const t = useTranslations(lang);
 <Base lang={lang} routeKey="about" title={t.about.title} description={t.about.lead}>
   <Hero
     compact
-    eyebrow={t.meta.siteName}
     title={t.about.title}
     lead={t.about.lead}
     image={heroImage}
@@ -26,12 +25,10 @@ const t = useTranslations(lang);
   <section class="section">
     <div class="container vm">
       <article class="vm__card vm__card--vision">
-        <p class="eyebrow">01</p>
         <h2>{t.about.visionTitle}</h2>
         <p>{t.about.visionText}</p>
       </article>
       <article class="vm__card vm__card--mission">
-        <p class="eyebrow">02</p>
         <h2>{t.about.missionTitle}</h2>
         <p>{t.about.missionText}</p>
       </article>
@@ -51,7 +48,6 @@ const t = useTranslations(lang);
   <section class="section">
     <div class="container team">
       <div class="team__text">
-        <p class="eyebrow">{t.meta.siteName}</p>
         <h2>{t.about.teamTitle}</h2>
         <p class="lead">{t.about.teamText}</p>
       </div>
@@ -84,7 +80,7 @@ const t = useTranslations(lang);
     border-radius: var(--radius-lg);
     border: 1px solid var(--border);
   }
-  .vm__card h2 { font-size: var(--step-3); margin-block: var(--space-3); }
+  .vm__card h2 { font-size: var(--step-3); margin-block: 0 var(--space-3); }
   .vm__card p { color: var(--text-muted); font-size: var(--step-1); line-height: var(--leading-snug); }
 
   /* La vision est projetée, la mission est ancrée : on marque la différence
@@ -92,7 +88,6 @@ const t = useTranslations(lang);
   .vm__card--vision { background: var(--green-900); border-color: var(--green-900); }
   .vm__card--vision h2 { color: var(--white); }
   .vm__card--vision p { color: var(--green-100); }
-  .vm__card--vision .eyebrow { color: var(--green-300); }
 
   .vm__card--mission { background: var(--bg-subtle); }
 

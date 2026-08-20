@@ -23,6 +23,31 @@ img, picture, svg, video { display: block; max-width: 100%; height: auto; }
 input, button, textarea, select { font: inherit; color: inherit; }
 p, h1, h2, h3, h4, li { overflow-wrap: break-word; }
 
+/* ---------- Typographie française ----------
+   Le français aligne des mots nettement plus longs que l'anglais
+   (« développement agroécologique » contre « development »). Dans une colonne
+   étroite, la césure évite les lézardes de blanc au lieu de casser le mot
+   n'importe où comme le ferait `break-word` seul. Les seuils empêchent les
+   coupes ridicules du type « a-groécologie » : mot d'au moins 8 lettres,
+   4 avant la coupe, 4 après. Jamais sur les titres, où une césure se voit. */
+:lang(fr) p,
+:lang(fr) li,
+:lang(fr) dd {
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphenate-limit-chars: 8 4 4;
+}
+:lang(fr) h1, :lang(fr) h2, :lang(fr) h3, :lang(fr) h4 { hyphens: manual; -webkit-hyphens: manual; }
+
+/* ---------- Surfaces du navigateur ----------
+   Sélection, curseur de saisie et barres de défilement arrivent avec les
+   couleurs par défaut du système, qui n'appartiennent à aucune charte.
+   Les habiller coûte six lignes et se remarque à chaque interaction. */
+::selection { background: var(--green-200); color: var(--green-950); }
+.section--invert ::selection { background: var(--yaac-accent); color: var(--green-950); }
+input, textarea { caret-color: var(--yaac-primary); }
+html { scrollbar-color: var(--green-400) var(--green-50); }
+
 /* ---------- Titres ---------- */
 h1, h2, h3, h4 {
   font-family: var(--font-heading);
@@ -89,26 +114,10 @@ a:hover { color: var(--green-600); }
 .stack > * + * { margin-top: var(--space-4); }
 .grid { display: grid; gap: var(--space-5); }
 
-/* ---------- Titre de section ---------- */
-.eyebrow {
-  font-family: var(--font-display);
-  font-size: var(--step--1);
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--accent-text);
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-}
-.eyebrow::before {
-  content: '';
-  width: 2rem; height: 3px;
-  background: var(--yaac-accent);
-  border-radius: var(--radius-full);
-}
-.section--invert .eyebrow { color: var(--green-300); }
-
+/* ---------- Titre de section ----------
+   Pas de surtitre. Un libellé en petites capitales au-dessus d'un titre ne dit
+   jamais rien que le titre ne dise déjà : il ajoute une ligne à lire avant
+   d'arriver à l'information. Le titre porte son propre poids, le chapô précise. */
 .lead { font-size: var(--step-1); color: var(--text-muted); line-height: var(--leading-snug); }
 .section--invert .lead { color: var(--green-100); }
 

@@ -127,10 +127,16 @@ const slug = entry.id.split('/').pop()!;
     border-bottom: 1px solid var(--border);
     text-align: left;
   }
+  /* La citation se distingue par sa mise en page — retrait, corps plus grand,
+     italique — et non par une barre verte collée à gauche. */
   .post__body :global(blockquote) {
-    padding-left: var(--space-5);
-    border-left: 3px solid var(--yaac-accent);
-    color: var(--text-muted);
+    margin-inline: 0;
+    padding-block: var(--space-4);
+    border-block: 1px solid var(--border);
+    font-family: var(--font-heading);
+    font-size: var(--step-2);
+    line-height: var(--leading-snug);
     font-style: italic;
+    color: var(--green-800);
   }
 </style>

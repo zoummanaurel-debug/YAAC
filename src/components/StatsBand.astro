@@ -1,12 +1,11 @@
 ---
 interface Stat { value: number; suffix: string; label: string }
-interface Props { eyebrow: string; title: string; stats: Stat[] }
+interface Props { title: string; stats: Stat[] }
 
-const { eyebrow, title, stats } = Astro.props;
+const { title, stats } = Astro.props;
 ---
 <section class="section section--invert stats">
   <div class="container">
-    <p class="eyebrow">{eyebrow}</p>
     <h2 class="stats__title">{title}</h2>
 
     <dl class="stats__grid">
@@ -28,7 +27,7 @@ const { eyebrow, title, stats } = Astro.props;
 
 <style>
   .stats { background: var(--green-900); }
-  .stats__title { margin-block: var(--space-3) var(--space-7); }
+  .stats__title { margin-block: 0 var(--space-7); }
 
   /* `auto-fit` s'adapte au nombre de compteurs reellement fournis :
      passer de 4 a 3 chiffres ne demande aucune retouche ici. */
@@ -39,9 +38,13 @@ const { eyebrow, title, stats } = Astro.props;
     margin: 0;
   }
 
+  /* Un filet en tête, pas un onglet sur le côté : la barre verticale épaisse
+     collée à gauche d'un bloc est le tic le plus reconnaissable des interfaces
+     générées, et elle déséquilibre la colonne. Le filet horizontal aligne les
+     trois chiffres sur une même ligne de départ. */
   .stats__item {
-    padding-left: var(--space-5);
-    border-left: 3px solid var(--yaac-accent);
+    padding-top: var(--space-4);
+    border-top: 1px solid color-mix(in srgb, var(--yaac-accent) 60%, transparent);
   }
   .stats__value {
     margin: 0;

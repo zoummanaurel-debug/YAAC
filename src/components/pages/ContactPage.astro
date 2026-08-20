@@ -15,7 +15,6 @@ const tel = (n: string) => `tel:${n.replace(/[\s+]/g, (c) => (c === '+' ? '+' : 
 <Base lang={lang} routeKey="contact" title={t.contact.title} description={t.contact.lead}>
   <section class="section chead">
     <div class="container container--narrow">
-      <p class="eyebrow">{t.meta.siteName}</p>
       <h1>{t.contact.title}</h1>
       <p class="lead chead__lead">{t.contact.lead}</p>
     </div>
@@ -58,8 +57,8 @@ const tel = (n: string) => `tel:${n.replace(/[\s+]/g, (c) => (c === '+' ? '+' : 
 
   <section class="section section--tint">
     <div class="container">
-      <p class="eyebrow">{t.contact.legalTitle}</p>
-      <h2 class="legal__title">{t.contact.legalLead}</h2>
+      <h2 class="legal__title">{t.contact.legalTitle}</h2>
+      <p class="lead legal__lead">{t.contact.legalLead}</p>
 
       <dl class="legal__grid">
         {registrations.map((r) => (
@@ -86,7 +85,7 @@ const tel = (n: string) => `tel:${n.replace(/[\s+]/g, (c) => (c === '+' ? '+' : 
 
 <style>
   .chead { padding-bottom: 0; }
-  .chead h1 { margin-block: var(--space-3); }
+  .chead h1 { margin-block: 0 var(--space-3); }
   .chead__lead { max-width: 58ch; }
 
   .cgrid { display: grid; gap: var(--space-7); align-items: start; }
@@ -121,7 +120,8 @@ const tel = (n: string) => `tel:${n.replace(/[\s+]/g, (c) => (c === '+' ? '+' : 
 
   .cbox__wa { margin-top: var(--space-5); width: 100%; }
 
-  .legal__title { margin-block: var(--space-3) var(--space-6); font-size: var(--step-3); }
+  .legal__title { font-size: var(--step-3); }
+  .legal__lead { max-width: 52ch; margin-block: var(--space-3) var(--space-6); }
   .legal__grid { display: grid; gap: var(--space-5); margin: 0; }
   @media (min-width: 700px) { .legal__grid { grid-template-columns: 1fr 1fr; } }
 
@@ -130,7 +130,6 @@ const tel = (n: string) => `tel:${n.replace(/[\s+]/g, (c) => (c === '+' ? '+' : 
     background: var(--white);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
-    border-top: 3px solid var(--yaac-accent);
   }
   .legal__card dt {
     font-family: var(--font-heading);

@@ -1,5 +1,5 @@
 ---
-title: "Mangroves : des savoirs ancestraux à protéger"
+title: "Mangroves : des savoirs ancestraux à protéger"
 description: "Là où le droit de la préservation a échoué, certains pays et ONG se tournent vers les religions endogènes pour protéger les mangroves."
 date: 2025-11-13
 category: informations
@@ -12,7 +12,7 @@ Face à l’échec des lois de protection des mangroves, certains pays et ONG se
 
 ## Pourquoi les mangroves comptent
 
-Les mangroves constituent une barrière naturelle contre l’érosion et un outil puissant de lutte contre le changement climatique, du fait de leur forte capacité de séquestration du carbone — souvent plusieurs fois celle d’une forêt terrestre à l’hectare. Ce sont aussi des nurseries : une large part des pêcheries côtières en dépend à un stade de son cycle de vie.
+Les mangroves constituent une barrière naturelle contre l’érosion et un outil puissant de lutte contre le changement climatique, du fait de leur forte capacité de séquestration du carbone — souvent plusieurs fois celle d’une forêt terrestre à l’hectare. Ce sont aussi des nurseries : une large part des pêcheries côtières en dépend à un stade de son cycle de vie.
 
 ## Quand la loi ne suffit pas
 
@@ -22,4 +22,4 @@ Ce qui s’est révélé plus durable en plusieurs endroits, c’est une protect
 
 ## Une question à ne pas éluder
 
-Cela pose à la conservation une question inconfortable mais féconde : quelle autorité protège réellement un écosystème ? Sur ce littoral, la réponse n’est souvent pas celle qui est inscrite dans la loi.
+Cela pose à la conservation une question inconfortable mais féconde : quelle autorité protège réellement un écosystème ? Sur ce littoral, la réponse n’est souvent pas celle qui est inscrite dans la loi.

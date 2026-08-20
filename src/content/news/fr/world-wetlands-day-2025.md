@@ -1,5 +1,5 @@
 ---
-title: "Journée mondiale des zones humides : une visite inoubliable"
+title: "Journée mondiale des zones humides : une visite inoubliable"
 description: "Pour la Journée mondiale des zones humides, YAAC s’est associée à AGIRE pour une visite de terrain consacrée à ces écosystèmes qui soutiennent discrètement la vie sur Terre."
 date: 2025-11-13
 category: public-action
@@ -21,6 +21,6 @@ Elles sont aussi, trop souvent, considérées comme des terrains vagues à assé
 
 ## Sur le terrain
 
-La visite a placé les participants directement dans le paysage : observation de l’avifaune, des niveaux d’eau et de la végétation, et échanges avec celles et ceux dont les moyens de subsistance dépendent du site. Voir une zone humide fonctionner est un argument plus convaincant que n’importe quelle présentation sur les services écosystémiques.
+La visite a placé les participants directement dans le paysage : observation de l’avifaune, des niveaux d’eau et de la végétation, et échanges avec celles et ceux dont les moyens de subsistance dépendent du site. Voir une zone humide fonctionner est un argument plus convaincant que n’importe quelle présentation sur les services écosystémiques.
 
 Les participants sont repartis avec une conscience plus nette de ce qui se joue localement — et avec des contacts avec lesquels ils travaillent toujours.

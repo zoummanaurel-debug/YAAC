@@ -1,35 +1,35 @@
 ---
-interface Props { eyebrow: string; title: string; lead: string }
-const { eyebrow, title, lead } = Astro.props;
+import { useTranslations, type Lang } from '../i18n/utils';
+
+interface Props { lang: Lang; title: string; lead: string }
+const { lang, title, lead } = Astro.props;
+const t = useTranslations(lang);
 
 // Vidéos déjà intégrées sur yaac.network. On charge une facade (miniature +
 // bouton) plutôt qu'une iframe YouTube : l'iframe pèse ~700 Ko et dépose des
 // cookies avant même que le visiteur ait cliqué.
-const videos = [
-  { id: 'D8LZC2wvi5I', title: 'YAAC — témoignage 1' },
-  { id: 'RF28Kf2TErI', title: 'YAAC — témoignage 2' },
-  { id: 'i3p7r5nu-y8', title: 'YAAC — témoignage 3' },
-  { id: 'qhW_5tUfGjg', title: 'YAAC — témoignage 4' },
-];
+// Les identifiants sont la seule donnée propre au composant ; le libellé
+// accessible est traduit, sinon un lecteur d'écran anglophone annonce
+// « témoignage » en français.
+const videoIds = ['D8LZC2wvi5I', 'RF28Kf2TErI', 'i3p7r5nu-y8', 'qhW_5tUfGjg'];
 ---
 <section class="section testi">
   <div class="container">
-    <p class="eyebrow">{eyebrow}</p>
     <h2 class="testi__title">{title}</h2>
     <p class="lead testi__lead">{lead}</p>
 
     <ul class="testi__track">
-      {videos.map((v) => (
+      {videoIds.map((id, i) => (
         <li class="testi__item">
           <button
             class="testi__card"
             type="button"
-            data-video={v.id}
-            aria-label={v.title}
+            data-video={id}
+            aria-label={`${t.home.testimonialVideo} ${i + 1}`}
           >
             <img
               class="testi__thumb"
-              src={`https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`}
+              src={`https://i.ytimg.com/vi/${id}/hqdefault.jpg`}
               alt=""
               loading="lazy"
               width="480"
@@ -48,7 +48,7 @@ const videos = [
 </section>
 
 <style>
-  .testi__title { margin-block: var(--space-3) var(--space-3); }
+  .testi__title { margin-block: 0 var(--space-3); }
   .testi__lead { max-width: 60ch; margin-bottom: var(--space-7); }
 
   .testi__track {

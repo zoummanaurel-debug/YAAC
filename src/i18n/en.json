@@ -23,7 +23,6 @@
     "heroLead": "We are a youth-driven alliance advancing agroecology and climate action across Africa — through community projects, training and advocacy.",
     "heroCta": "Become a member",
     "heroCtaAlt": "Discover our mission",
-    "statsEyebrow": "Our impact",
     "statsTitle": "A growing movement",
     "stats": [
       {
@@ -42,17 +41,16 @@
         "label": "Partners"
       }
     ],
-    "testimonialsEyebrow": "Our community",
     "testimonialsTitle": "Voices from the field",
     "testimonialsLead": "Members, partners and communities share what agroecology changes in their daily lives.",
-    "newsEyebrow": "Latest news",
     "newsTitle": "What we are working on",
     "newsAll": "See all news",
     "ctaTitle": "Ready to act with us?",
     "ctaLead": "Join a network of young Africans building climate resilience where it matters most.",
     "ctaButton": "Become a member",
     "contactTeaser": "A question, a project, a partnership idea?",
-    "contactCta": "Contact us"
+    "contactCta": "Contact us",
+    "testimonialVideo": "Video testimonial"
   },
   "about": {
     "title": "Who we are",
