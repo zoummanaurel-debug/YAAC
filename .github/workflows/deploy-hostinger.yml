@@ -131,7 +131,9 @@ jobs:
           protocol: ftps
           port: 21
           local-dir: ./dist/
-          server-dir: ${{ secrets.FTP_DOSSIER }}
+          # /public_html/ est le dossier web de tout hébergement Hostinger.
+          # Le secret ne sert qu'à couvrir une installation atypique.
+          server-dir: ${{ secrets.FTP_DOSSIER || '/public_html/' }}
           # Fichiers qui vivent sur le serveur et ne doivent jamais être
           # touchés par un déploiement.
           exclude: |
