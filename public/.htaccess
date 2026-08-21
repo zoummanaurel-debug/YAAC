@@ -1,0 +1,135 @@
+# =========================================================================
+# YAAC — Configuration Apache de la racine du site.
+#
+# Ce fichier REMPLACE le .htaccess de WordPress. Les règles de réécriture de
+# WordPress envoient toute URL inconnue vers index.php, ce qui capte la racine
+# et empêche notre index.html d'être servi.
+#
+# Déployé automatiquement : il vit dans public/, donc la build le copie dans
+# dist/ et il arrive à la racine de public_html.
+# =========================================================================
+
+# --- Page d'index -------------------------------------------------------
+# index.html AVANT index.php. Sans cette ligne, tant qu'un index.php de
+# WordPress traîne à la racine, c'est lui qui est servi.
+DirectoryIndex index.html index.htm
+
+# --- Pas de listing de dossier ------------------------------------------
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # --- HTTPS obligatoire ------------------------------------------------
+  # Le webhook Chariow refuse le HTTP, et une carte de membre vérifiée en
+  # clair n'a pas de sens.
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !https
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+  # --- Hôte canonique ---------------------------------------------------
+  # Une seule forme du domaine, sinon Google indexe les deux et le Pulse
+  # Chariow peut se faire rediriger — ce qui transforme son POST en GET et
+  # vide le corps signé.
+  # Décommentez UNE des deux lignes selon votre choix.
+  #
+  # Sans www (recommandé) :
+  # RewriteCond %{HTTP_HOST} ^www\.yaac\.network$ [NC]
+  # RewriteRule ^ https://yaac.network%{REQUEST_URI} [R=301,L]
+  #
+  # Avec www :
+  # RewriteCond %{HTTP_HOST} ^yaac\.network$ [NC]
+  # RewriteRule ^ https://www.yaac.network%{REQUEST_URI} [R=301,L]
+
+  # --- Le nouveau site ne passe jamais par les règles suivantes ---------
+  # Sans ce garde-fou, une règle de redirection un peu large pourrait capter
+  # une URL du nouveau site et créer une boucle.
+  RewriteRule ^(en|fr)/ - [L]
+
+  # --- Redirections depuis l'ancien WordPress ---------------------------
+  # Relevé le 21/08/2026 dans wp_posts et wp_options de la base WordPress
+  # (u136628570_CqsvP). `permalink_structure` valait `/%postname%/`, donc les
+  # anciennes URL étaient de la forme https://yaac.network/<slug>/.
+  #
+  # Les slugs NE correspondent PAS à ceux du nouveau site : chaque ligne est
+  # une correspondance relevée, pas déduite.
+  #
+  # Le site d'origine était intégralement anglophone : ses visiteurs venus de
+  # Google doivent atterrir en anglais, d'où /en/.
+  RewriteRule ^yaac-talk-n3-african-youth-climate-migration/?$              /en/news/yaac-talk-3-climate-migration/ [R=301,L]
+  RewriteRule ^african-youth-at-the-heart-of-the-green-transition/?$        /en/news/african-youth-green-transition/ [R=301,L]
+  RewriteRule ^international-zero-waste-day-yaac-takes-action-for-clean-beaches-in-dakar/?$ /en/news/zero-waste-day-dakar-beaches/ [R=301,L]
+  RewriteRule ^world-wetlands-day-celebration-an-unforgettable-visit-2025/?$ /en/news/world-wetlands-day-2025/ [R=301,L]
+  RewriteRule ^insights-into-clean-energy/?$                               /en/news/insights-clean-energy/ [R=301,L]
+  RewriteRule ^action-for-the-planet-building-a-sustainable-future/?$      /en/news/action-for-the-planet/ [R=301,L]
+  RewriteRule ^mangroves-ancestral-knowledge-to-protect/?$                 /en/news/mangroves-ancestral-knowledge/ [R=301,L]
+  RewriteRule ^official-launch-of-yaac-youth-alliance-for-agroecology-and-climate/?$ /en/news/official-launch-yaac/ [R=301,L]
+
+  # YAAC Talk 2 : son titre employait des lettres mathématiques Unicode, donc
+  # son slug est stocké encodé en pourcents
+  # (%f0%9d%92%8d%f0%9d%92%86-…-2-women-knowledge-and-agroecology-…).
+  # Apache décode le chemin avant de comparer, et faire correspondre ces
+  # octets en .htaccess est fragile : on s'accroche à la partie ASCII, qui
+  # est sans ambiguïté et n'apparaît nulle part ailleurs.
+  RewriteRule women-knowledge-and-agroecology /en/news/yaac-talk-2-women-agroecology/ [R=301,L]
+
+  # Pages de l'ancien site. `elementor-34` était la page d'accueil
+  # (show_on_front = page, page_on_front = 34).
+  RewriteRule ^news/?$             /en/news/ [R=301,L]
+  RewriteRule ^partners-donors/?$  /en/partners/ [R=301,L]
+  RewriteRule ^who-we-are/?$       /en/who-we-are/ [R=301,L]
+  RewriteRule ^elementor-34/?$     /en/ [R=301,L]
+
+  # Archives, flux et pages d'auteur générés par WordPress : ils existaient
+  # dans son sitemap et n'ont pas d'équivalent. On les ramène aux actualités
+  # plutôt que de les laisser en 404.
+  RewriteRule ^(category|tag|author)(/|$) /en/news/ [R=301,L]
+  RewriteRule (^|/)feed/?$                /en/news/ [R=301,L]
+
+  # --- Vestiges de WordPress -------------------------------------------
+  # Tant que les dossiers wp-* n'ont pas été supprimés, on coupe l'accès :
+  # une administration WordPress laissée en ligne sur un site abandonné est
+  # une porte d'entrée qui ne sera plus jamais mise à jour.
+  RewriteRule ^(wp-admin|wp-includes|wp-content|wp-login\.php|xmlrpc\.php) - [F,L]
+</IfModule>
+
+# --- Page d'erreur ------------------------------------------------------
+ErrorDocument 404 /404.html
+
+# --- Cache --------------------------------------------------------------
+<IfModule mod_expires.c>
+  ExpiresActive On
+
+  # Les noms de fichiers de _astro/ contiennent une empreinte : leur contenu
+  # ne change jamais sans que le nom change. Un an de cache est sans risque
+  # et enlève autant de requêtes sur une connexion mobile contrainte.
+  <FilesMatch "\.(webp|avif|jpg|jpeg|png|svg|woff2|css|js)$">
+    ExpiresDefault "access plus 1 year"
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # Le HTML, lui, doit pouvoir changer : il porte les liens vers les assets.
+  <FilesMatch "\.html$">
+    ExpiresDefault "access plus 0 seconds"
+    Header set Cache-Control "public, max-age=0, must-revalidate"
+  </FilesMatch>
+</IfModule>
+
+# --- Compression --------------------------------------------------------
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/plain text/xml \
+    application/javascript application/json image/svg+xml
+</IfModule>
+
+# --- En-têtes de sécurité ----------------------------------------------
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  # Le site n'a besoin d'aucune de ces trois permissions.
+  Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+</IfModule>
+
+# --- Fichiers à ne jamais servir ---------------------------------------
+<FilesMatch "^(\.htaccess|\.htaccess\.bk|\.env|.*\.sql|.*\.log|composer\.(json|lock))$">
+  Require all denied
+</FilesMatch>

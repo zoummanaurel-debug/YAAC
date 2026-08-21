@@ -2,7 +2,7 @@
 import { Image } from 'astro:assets';
 import logo from '../assets/brand/yaac-logo.png';
 import {
-  useTranslations, localePath, articlePath, otherLang, languages, externalLinks,
+  useTranslations, localePath, articlePath, otherLang, languages,
   routes, type Lang, type RouteKey,
 } from '../i18n/utils';
 
@@ -52,7 +52,7 @@ const items: { key: RouteKey; label: string }[] = [
         <a class="hdr__lang" href={altHref} lang={alt} hreflang={alt}>
           <span class="visually-hidden">{t.nav.langLabel}: </span>{languages[alt]}
         </a>
-        <a class="btn btn--primary hdr__cta" href={externalLinks.membership} target="_blank" rel="noopener">
+        <a class="btn btn--primary hdr__cta" href={localePath(lang, 'join')}>
           {t.nav.join}
         </a>
       </div>

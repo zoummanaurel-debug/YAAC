@@ -1,0 +1,777 @@
+---
+/**
+ * Générateur de carte de membre YAAC.
+ *
+ * Vit à la racine (/badge/) : c'est l'adresse envoyée dans l'e-mail d'adhésion.
+ *
+ * Deux différences de fond avec l'ancien générateur :
+ *
+ * 1. Les informations viennent de /api/verify.php, pas de l'URL. L'ancienne
+ *    version remplissait nom, rôle et date depuis `?prenom=&nom=&role=`, si
+ *    bien que n'importe qui pouvait fabriquer un PDF d'apparence authentique.
+ *    Ici le numéro seul est accepté, et le reste est lu à la source.
+ *    La saisie manuelle reste possible quand l'API ne répond pas — c'est ce
+ *    qui permet à l'équipe de produire les cartes des membres fondateurs.
+ *
+ * 2. La carte porte la charte officielle (Palanquin / Roboto / Montserrat
+ *    Alternates, #006738 / #87BD43 / #123524) au lieu de Segoe UI et de verts
+ *    approximatifs, et l'adresse info@yaac.network — qui n'existe pas — est
+ *    remplacée par les références d'enregistrement légal, qui, elles, sont
+ *    vérifiables.
+ */
+import { Image, getImage } from 'astro:assets';
+import logo from '../assets/brand/yaac-logo.png';
+import cachet from '../assets/brand/cachet-senegal.webp';
+import { assetPath, contactInfo, registrations } from '../i18n/utils';
+
+const apiUrl = assetPath('api/verify.php');
+
+// html2canvas lit le DOM rendu : les images doivent être des URL simples que
+// le navigateur a déjà chargées, d'où `getImage` plutôt que <Image>.
+const logoSrc = (await getImage({ src: logo, width: 320, format: 'webp' })).src;
+const cachetSrc = (await getImage({ src: cachet, width: 320, format: 'webp' })).src;
+
+const roles = [
+  'Membre du Comité exécutif',
+  'Membre',
+  'Volontaire',
+];
+---
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Votre carte de membre — YAAC</title>
+    <meta name="description" content="Générez et téléchargez votre carte de membre YAAC." />
+    <meta name="robots" content="noindex, follow" />
+    <link rel="icon" href={`${import.meta.env.BASE_URL}favicon.ico`} sizes="any" />
+    <link rel="icon" type="image/png" href={`${import.meta.env.BASE_URL}icon-192.png`} sizes="192x192" />
+    <link rel="apple-touch-icon" href={`${import.meta.env.BASE_URL}apple-touch-icon.png`} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Palanquin:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Montserrat+Alternates:wght@600;700&display=swap"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+  </head>
+
+  <body>
+    <header class="top">
+      <div class="top__in">
+        <img class="top__logo" src={logoSrc} alt="YAAC" width="120" height="68" />
+        <button class="ghost" type="button" id="langBtn">English</button>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <h1 data-i18n="title">Votre carte de membre</h1>
+      <p class="lead" data-i18n="lead">
+        Saisissez votre numéro YAAC : vos informations sont lues directement dans le registre
+        des membres. Ajoutez une photo, puis téléchargez votre carte.
+      </p>
+
+      <div class="cols">
+        <!-- ---------- Colonne de saisie ---------- -->
+        <section class="panel" aria-labelledby="formTitle">
+          <h2 class="panel__t" id="formTitle" data-i18n="formTitle">Vos informations</h2>
+
+          <div class="field">
+            <label for="memberId" data-i18n="numLabel">Numéro de membre</label>
+            <div class="row">
+              <input
+                id="memberId" type="text" inputmode="text" autocomplete="off"
+                spellcheck="false" placeholder="YAAC-2026-001"
+              />
+              <button class="solid" type="button" id="lookupBtn" data-i18n="lookup">Rechercher</button>
+            </div>
+            <p class="status" id="status" role="status" aria-live="polite"></p>
+          </div>
+
+          <div class="manual" id="manual" hidden>
+            <div class="field">
+              <label for="firstName" data-i18n="first">Prénoms</label>
+              <input id="firstName" type="text" autocomplete="off" />
+            </div>
+            <div class="field">
+              <label for="lastName" data-i18n="last">Nom</label>
+              <input id="lastName" type="text" autocomplete="off" />
+            </div>
+            <div class="field">
+              <label for="role" data-i18n="role">Rôle</label>
+              <select id="role">
+                {roles.map((r) => <option value={r}>{r}</option>)}
+              </select>
+            </div>
+            <div class="field">
+              <label for="joinDate" data-i18n="join">Date d'adhésion</label>
+              <input id="joinDate" type="date" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="photoInput" data-i18n="photo">Photo <span class="opt" data-i18n="optional">(facultatif)</span></label>
+            <input id="photoInput" type="file" accept="image/*" />
+            <p class="hint" data-i18n="photoHint">
+              Un portrait cadré serré rend mieux. La photo reste sur votre appareil.
+            </p>
+          </div>
+
+          <div class="dl">
+            <button class="solid" type="button" id="btnPng" disabled>
+              <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor"
+                   stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <path d="m7 10 5 5 5-5" /><path d="M12 15V3" />
+              </svg>
+              <span data-i18n="png">Image PNG</span>
+            </button>
+            <button class="ghost" type="button" id="btnPdf" disabled>
+              <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor"
+                   stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
+                <path d="M14 2v5h5" />
+              </svg>
+              <span data-i18n="pdf">PDF recto-verso</span>
+            </button>
+          </div>
+          <p class="status" id="dlStatus" role="status" aria-live="polite"></p>
+        </section>
+
+        <!-- ---------- Colonne aperçu ---------- -->
+        <section class="panel panel--preview" aria-labelledby="previewTitle">
+          <div class="panel__head">
+            <h2 class="panel__t" id="previewTitle" data-i18n="preview">Aperçu</h2>
+            <div class="seg" role="group" aria-label="Face de la carte">
+              <button type="button" class="seg__b is-on" data-side="recto" data-i18n="recto">Recto</button>
+              <button type="button" class="seg__b" data-side="verso" data-i18n="verso">Verso</button>
+            </div>
+          </div>
+
+          <div class="stage">
+            <!-- ================= RECTO ================= -->
+            <article class="card" id="recto">
+              <div class="card__crown">
+                <img class="card__logo" src={logoSrc} alt="" width="150" height="85" />
+              </div>
+              <div class="card__rule" aria-hidden="true"></div>
+
+              <div class="card__body">
+                {/* Aucune balise image en attente ici : sans `src`, c'est une
+                    image cassée qui ne demande qu'à s'afficher. Le portrait est
+                    injecté par le script, seulement s'il existe. */}
+                <div class="card__portrait" id="portrait">
+                  <span class="card__initials" id="initials">—</span>
+                </div>
+
+                <p class="card__name" id="cName">—</p>
+                <p class="card__role" id="cRole">—</p>
+
+                <dl class="card__facts">
+                  <div>
+                    <dt data-i18n="cNum">Numéro de membre</dt>
+                    <dd class="card__num" id="cNum">—</dd>
+                  </div>
+                  <div>
+                    <dt data-i18n="cJoin">Adhésion</dt>
+                    <dd id="cJoin">—</dd>
+                  </div>
+                  <div>
+                    <dt data-i18n="cExp">Valable jusqu'au</dt>
+                    <dd id="cExp">—</dd>
+                  </div>
+                </dl>
+
+                <div class="card__qr">
+                  <div class="card__qrbox" id="qrBox"></div>
+                  <p class="card__qrlab" data-i18n="scan">Scanner pour vérifier</p>
+                </div>
+              </div>
+
+              <div class="card__hem" aria-hidden="true"></div>
+            </article>
+
+            <!-- ================= VERSO ================= -->
+            <article class="card card--back" id="verso" hidden>
+              <div class="card__crown card__crown--back">
+                <p class="card__btitle" data-i18n="bTitle">Carte de membre</p>
+                <p class="card__bsub">Youth Alliance for Agroecology and Climate</p>
+              </div>
+              <div class="card__rule" aria-hidden="true"></div>
+
+              <div class="card__body card__body--back">
+                <p class="card__signature">
+                  La durabilité commence ici et maintenant&#8239;!
+                  <span>Sustainability starts here and now!</span>
+                </p>
+
+                <img class="card__cachet" src={cachetSrc} alt="" width="150" height="150" />
+
+                {/* L'ancienne carte portait « info@yaac.network », qui n'existe
+                    pas. Les références d'enregistrement sont, elles, réelles et
+                    vérifiables — c'est ce qu'on attend au dos d'une carte. */}
+                <dl class="card__legal">
+                  {registrations.map((r) => (
+                    <div>
+                      <dt>{r.country.fr}</dt>
+                      <dd>{r.reference}</dd>
+                      <dd>{r.taxLabel} {r.taxId}</dd>
+                    </div>
+                  ))}
+                </dl>
+
+                <p class="card__contact">
+                  {contactInfo.website} · {contactInfo.email}
+                </p>
+              </div>
+
+              <div class="card__hem" aria-hidden="true"></div>
+            </article>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <script
+      is:inline
+      define:vars={{ apiUrl, verifyBase: assetPath('verify/'), roles }}
+    >
+      (function () {
+        var T = {
+          fr: {
+            title: 'Votre carte de membre',
+            lead: 'Saisissez votre numéro YAAC : vos informations sont lues directement dans le registre des membres. Ajoutez une photo, puis téléchargez votre carte.',
+            formTitle: 'Vos informations', numLabel: 'Numéro de membre', lookup: 'Rechercher',
+            first: 'Prénoms', last: 'Nom', role: 'Rôle', join: "Date d'adhésion",
+            photo: 'Photo', optional: '(facultatif)',
+            photoHint: 'Un portrait cadré serré rend mieux. La photo reste sur votre appareil.',
+            png: 'Image PNG', pdf: 'PDF recto-verso', preview: 'Aperçu',
+            recto: 'Recto', verso: 'Verso',
+            cNum: 'Numéro de membre', cJoin: 'Adhésion', cExp: "Valable jusqu'au",
+            scan: 'Scanner pour vérifier', bTitle: 'Carte de membre',
+            toggle: 'English', locale: 'fr-FR',
+            searching: 'Recherche…',
+            found: 'Membre trouvé. Votre carte est prête.',
+            notFound: "Ce numéro ne figure pas au registre. Vérifiez la saisie, ou remplissez les champs ci-dessous.",
+            needToken: "Ouvrez cette page depuis le lien de votre e-mail d'adhésion pour que vos informations se remplissent seules. Sinon, complétez les champs ci-dessous — le QR code renverra alors une vérification simplifiée.",
+            badFormat: 'Format attendu : YAAC-AAAA-NNN.',
+            offline: "Le registre est injoignable. Remplissez les champs ci-dessous ; la carte restera à vérifier en ligne.",
+            expired: 'Attention : cette adhésion est expirée ou suspendue.',
+            building: 'Préparation du fichier…',
+            libs: 'Les outils de téléchargement n’ont pas pu être chargés. Vérifiez votre connexion et rechargez la page.',
+            dlFail: 'Le téléchargement a échoué. Réessayez.',
+            dlOk: 'Fichier téléchargé.',
+          },
+          en: {
+            title: 'Your membership card',
+            lead: 'Enter your YAAC number: your details are read straight from the member registry. Add a photo, then download your card.',
+            formTitle: 'Your details', numLabel: 'Membership number', lookup: 'Look up',
+            first: 'First name', last: 'Last name', role: 'Role', join: 'Joined on',
+            photo: 'Photo', optional: '(optional)',
+            photoHint: 'A tightly framed portrait works best. The photo stays on your device.',
+            png: 'PNG image', pdf: 'Two-sided PDF', preview: 'Preview',
+            recto: 'Front', verso: 'Back',
+            cNum: 'Membership number', cJoin: 'Joined', cExp: 'Valid until',
+            scan: 'Scan to verify', bTitle: 'Membership card',
+            toggle: 'Français', locale: 'en-GB',
+            searching: 'Searching…',
+            found: 'Member found. Your card is ready.',
+            notFound: 'This number is not in the registry. Check the spelling, or fill in the fields below.',
+            needToken: 'Open this page from the link in your membership email so your details fill in automatically. Otherwise complete the fields below — the QR code will then return a simplified check.',
+            badFormat: 'Expected format: YAAC-YYYY-NNN.',
+            offline: 'The registry is unreachable. Fill in the fields below; the card will still need online verification.',
+            expired: 'Note: this membership is expired or suspended.',
+            building: 'Preparing the file…',
+            libs: 'The download tools could not be loaded. Check your connection and reload the page.',
+            dlFail: 'The download failed. Please try again.',
+            dlOk: 'File downloaded.',
+          },
+        };
+
+        var $ = function (i) { return document.getElementById(i); };
+        var params = new URLSearchParams(location.search);
+        var lang = params.get('lang') === 'en' ? 'en' : 'fr';
+        var authoritative = false;
+        var jeton = params.get('c') || '';
+        var photoUrl = null;
+        var data = { numero: '', prenom: '', nom: '', role: '', adhesion: '', expiration: '' };
+
+        function t() { return T[lang]; }
+
+        function applyLang() {
+          document.documentElement.lang = lang;
+          document.title = t().title + ' — YAAC';
+          document.querySelectorAll('[data-i18n]').forEach(function (el) {
+            var k = el.getAttribute('data-i18n');
+            if (t()[k]) el.textContent = t()[k];
+          });
+          $('langBtn').textContent = t().toggle;
+          paint();
+        }
+
+        $('langBtn').addEventListener('click', function () {
+          lang = lang === 'fr' ? 'en' : 'fr';
+          var u = new URL(location.href);
+          u.searchParams.set('lang', lang);
+          history.replaceState(null, '', u);
+          applyLang();
+        });
+
+        function say(el, texte, ton) {
+          el.textContent = texte || '';
+          el.className = 'status' + (ton ? ' is-' + ton : '');
+        }
+
+        function fmt(iso) {
+          if (!iso) return '—';
+          var d = new Date(iso + 'T00:00:00');
+          if (isNaN(d)) return iso;
+          return d.toLocaleDateString(t().locale, { day: '2-digit', month: 'short', year: 'numeric' });
+        }
+
+        function plusCinqAns(iso) {
+          var d = new Date(iso + 'T00:00:00');
+          if (isNaN(d)) return '';
+          d.setFullYear(d.getFullYear() + 5);
+          return d.toISOString().slice(0, 10);
+        }
+
+        // ---------- Rendu de la carte ----------
+        function paint() {
+          var nomComplet = (data.prenom + ' ' + data.nom).trim();
+          $('cName').textContent = nomComplet || '—';
+          $('cRole').textContent = data.role || '—';
+          $('cNum').textContent = data.numero || '—';
+          $('cJoin').textContent = fmt(data.adhesion);
+          $('cExp').textContent = fmt(data.expiration);
+
+          var ini = ((data.prenom || ' ')[0] + (data.nom || ' ')[0]).toUpperCase().trim();
+          $('initials').textContent = ini || '—';
+          $('initials').hidden = !!photoUrl;
+
+          var portrait = $('portrait');
+          var img = portrait.querySelector('img');
+          if (photoUrl) {
+            if (!img) {
+              img = document.createElement('img');
+              img.alt = '';
+              portrait.appendChild(img);
+            }
+            img.src = photoUrl;
+          } else if (img) {
+            img.remove();
+          }
+
+          // QR : l'URL de vérification, la même que celle de l'e-mail.
+          var box = $('qrBox');
+          box.innerHTML = '';
+          if (data.numero && window.QRCode) {
+            new window.QRCode(box, {
+              text: location.origin + verifyBase + '?id=' + encodeURIComponent(data.numero)
+                    + (jeton ? '&c=' + encodeURIComponent(jeton) : ''),
+              width: 104, height: 104,
+              colorDark: '#123524', colorLight: '#ffffff',
+              correctLevel: window.QRCode.CorrectLevel.M,
+            });
+          }
+
+          var pret = !!(data.numero && nomComplet);
+          $('btnPng').disabled = !pret;
+          $('btnPdf').disabled = !pret;
+        }
+
+        // ---------- Saisie manuelle ----------
+        function lireManuel() {
+          if (authoritative) return;
+          data.prenom = $('firstName').value.trim();
+          data.nom = $('lastName').value.trim();
+          data.role = $('role').value;
+          data.adhesion = $('joinDate').value;
+          data.expiration = plusCinqAns(data.adhesion);
+          data.numero = $('memberId').value.toUpperCase().trim();
+          paint();
+        }
+        ['firstName', 'lastName', 'role', 'joinDate'].forEach(function (id) {
+          $(id).addEventListener('input', lireManuel);
+          $(id).addEventListener('change', lireManuel);
+        });
+
+        function ouvrirManuel(message, ton) {
+          authoritative = false;
+          $('manual').hidden = false;
+          say($('status'), message, ton);
+          if (!$('joinDate').value) $('joinDate').value = new Date().toISOString().slice(0, 10);
+          lireManuel();
+        }
+
+        // ---------- Recherche au registre ----------
+        function chercher(numero) {
+          numero = (numero || '').toUpperCase().trim();
+          $('memberId').value = numero;
+
+          if (!/^YAAC-\d{4}-\d{3,4}$/.test(numero)) {
+            ouvrirManuel(t().badFormat, 'warn');
+            return;
+          }
+
+          say($('status'), t().searching);
+
+          fetch(apiUrl + '?id=' + encodeURIComponent(numero), { headers: { Accept: 'application/json' } })
+            .then(function (r) { if (!r.ok) throw new Error(); return r.json(); })
+            .then(function (m) {
+              if (!m.trouve) { ouvrirManuel(t().notFound, 'warn'); return; }
+              // Sans jeton, le registre ne renvoie que le statut : pas de quoi
+              // remplir une carte. On bascule en saisie manuelle.
+              if (!m.complet) { ouvrirManuel(t().needToken, 'warn'); return; }
+
+              authoritative = true;
+              $('manual').hidden = true;
+              data = {
+                numero: m.numero, prenom: m.prenom, nom: m.nom, role: m.role,
+                adhesion: $('joinDate').value || '', expiration: m.date_expiration,
+              };
+              say($('status'), m.valide ? t().found : t().expired, m.valide ? 'ok' : 'warn');
+              paint();
+            })
+            .catch(function () { ouvrirManuel(t().offline, 'warn'); });
+        }
+
+        $('lookupBtn').addEventListener('click', function () { chercher($('memberId').value); });
+        $('memberId').addEventListener('keydown', function (e) {
+          if (e.key === 'Enter') { e.preventDefault(); chercher($('memberId').value); }
+        });
+
+        // ---------- Photo ----------
+        $('photoInput').addEventListener('change', function () {
+          var f = this.files && this.files[0];
+          if (!f) return;
+          var fr = new FileReader();
+          fr.onload = function (e) { photoUrl = e.target.result; paint(); };
+          fr.readAsDataURL(f);
+        });
+
+        // ---------- Bascule recto / verso ----------
+        document.querySelectorAll('.seg__b').forEach(function (b) {
+          b.addEventListener('click', function () {
+            var side = b.dataset.side;
+            document.querySelectorAll('.seg__b').forEach(function (x) {
+              x.classList.toggle('is-on', x === b);
+            });
+            $('recto').hidden = side !== 'recto';
+            $('verso').hidden = side !== 'verso';
+          });
+        });
+
+        // ---------- Téléchargement ----------
+        function pret() {
+          return window.html2canvas && window.jspdf && window.jspdf.jsPDF;
+        }
+
+        function rendre(el) {
+          // `scale: 3` : 476×756 devient 1428×2268, assez pour une impression
+          // propre en CR80. En dessous, le QR code devient illisible au scan.
+          return window.html2canvas(el, {
+            scale: 3, backgroundColor: null, useCORS: true, logging: false,
+          });
+        }
+
+        function montrerFaces(cb) {
+          // Les deux faces doivent être dans le flux pour être rendues :
+          // html2canvas ne peut pas peindre un élément `hidden`.
+          var r = $('recto'), v = $('verso');
+          var er = r.hidden, ev = v.hidden;
+          r.hidden = false; v.hidden = false;
+          return Promise.resolve(cb()).finally(function () { r.hidden = er; v.hidden = ev; });
+        }
+
+        function nomFichier(ext) {
+          return 'YAAC-' + (data.numero || 'carte').replace(/[^A-Za-z0-9-]/g, '') + '.' + ext;
+        }
+
+        $('btnPng').addEventListener('click', function () {
+          if (!pret()) { say($('dlStatus'), t().libs, 'warn'); return; }
+          say($('dlStatus'), t().building);
+          var face = $('verso').hidden ? $('recto') : $('verso');
+          montrerFaces(function () { return rendre(face); })
+            .then(function (c) {
+              var a = document.createElement('a');
+              a.href = c.toDataURL('image/png');
+              a.download = nomFichier('png');
+              a.click();
+              say($('dlStatus'), t().dlOk, 'ok');
+            })
+            .catch(function () { say($('dlStatus'), t().dlFail, 'warn'); });
+        });
+
+        $('btnPdf').addEventListener('click', function () {
+          if (!pret()) { say($('dlStatus'), t().libs, 'warn'); return; }
+          say($('dlStatus'), t().building);
+
+          montrerFaces(function () {
+            return rendre($('recto')).then(function (cr) {
+              return rendre($('verso')).then(function (cv) { return [cr, cv]; });
+            });
+          })
+            .then(function (faces) {
+              var J = window.jspdf.jsPDF;
+              // Format CR80 portrait, en millimètres : la carte s'imprime à
+              // taille réelle sans réglage dans la boîte de dialogue.
+              var pdf = new J({ orientation: 'portrait', unit: 'mm', format: [53.98, 85.6] });
+              pdf.addImage(faces[0].toDataURL('image/png'), 'PNG', 0, 0, 53.98, 85.6);
+              pdf.addPage([53.98, 85.6], 'portrait');
+              pdf.addImage(faces[1].toDataURL('image/png'), 'PNG', 0, 0, 53.98, 85.6);
+              pdf.save(nomFichier('pdf'));
+              say($('dlStatus'), t().dlOk, 'ok');
+            })
+            .catch(function () { say($('dlStatus'), t().dlFail, 'warn'); });
+        });
+
+        // ---------- Démarrage ----------
+        applyLang();
+
+        var id = params.get('id');
+        if (id) chercher(id);
+        else ouvrirManuel('', null);
+
+        // Les bibliothèques sont en `defer` : le QR peut arriver après le
+        // premier rendu.
+        window.addEventListener('load', paint);
+      })();
+    </script>
+
+    <style is:global>
+      /* ---------------------------------------------------------------
+         Charte officielle. L'ancien générateur utilisait Segoe UI et des
+         verts approximatifs (#1B5E30, #6AB04C) hors charte.
+         --------------------------------------------------------------- */
+      :root {
+        --vert: #006738;
+        --feuille: #87bd43;
+        --foret: #123524;
+        --nuit: #08180f;
+        --encre: #0b0f0c;
+        --gris: #5a6560;
+        --trait: #d8ded9;
+        --pale: #f5faf0;
+        --blanc: #fff;
+
+        --t-titre: Palanquin, 'Segoe UI', system-ui, sans-serif;
+        --t-corps: Roboto, 'Segoe UI', system-ui, sans-serif;
+        --t-chiffre: 'Montserrat Alternates', Palanquin, system-ui, sans-serif;
+      }
+
+      *, *::before, *::after { box-sizing: border-box; }
+      * { margin: 0; }
+
+      body {
+        font-family: var(--t-corps);
+        line-height: 1.6;
+        color: var(--encre);
+        background: var(--pale);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* Les surfaces que le navigateur dessine portent aussi la marque. */
+      ::selection { background: var(--feuille); color: var(--nuit); }
+      :focus-visible { outline: 3px solid var(--vert); outline-offset: 3px; border-radius: 6px; }
+      input, select, button, textarea { font: inherit; caret-color: var(--vert); }
+
+      h1 { font-family: var(--t-titre); font-size: clamp(1.7rem, 1.4rem + 1.3vw, 2.4rem); line-height: 1.15; }
+      h2 { font-family: var(--t-titre); }
+
+      /* ---------- En-tête ---------- */
+      .top { background: var(--blanc); border-bottom: 1px solid var(--trait); }
+      .top__in {
+        max-width: 1080px; margin: 0 auto;
+        padding: 0.9rem clamp(1rem, 4vw, 2rem);
+        display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+      }
+      .top__logo { width: 110px; height: auto; }
+
+      .wrap { max-width: 1080px; margin: 0 auto; padding: clamp(1.5rem, 4vw, 3rem) clamp(1rem, 4vw, 2rem) 4rem; }
+      .lead { max-width: 62ch; margin-top: 0.75rem; color: var(--gris); }
+
+      .cols { display: grid; gap: 1.75rem; margin-top: 2.25rem; align-items: start; }
+      @media (min-width: 940px) { .cols { grid-template-columns: 1fr 1fr; gap: 2.5rem; } }
+
+      /* ---------- Panneaux ---------- */
+      .panel {
+        background: var(--blanc);
+        border: 1px solid var(--trait);
+        border-radius: 18px;
+        padding: clamp(1.1rem, 3vw, 1.75rem);
+        box-shadow: 0 10px 24px -14px rgb(11 15 12 / 0.22);
+      }
+      .panel__head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+      .panel__t { font-size: 1.05rem; margin-bottom: 1.25rem; }
+      .panel__head .panel__t { margin-bottom: 0; }
+
+      .field { margin-bottom: 1.15rem; }
+      .field label { display: block; font-weight: 500; margin-bottom: 0.4rem; }
+      .opt { font-weight: 400; color: var(--gris); font-size: 0.86rem; }
+
+      .field input[type='text'], .field input[type='date'], .field select {
+        width: 100%; min-height: 48px;
+        padding: 0.6rem 0.85rem;
+        color: var(--encre); background: var(--blanc);
+        border: 1px solid #9ba5a0; border-radius: 10px;
+      }
+      .field input[type='file'] {
+        width: 100%; padding: 0.65rem;
+        border: 1px dashed #9ba5a0; border-radius: 10px; background: var(--pale);
+      }
+      .row { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+      .row input { flex: 1 1 11rem; }
+
+      .hint { margin-top: 0.4rem; font-size: 0.86rem; color: var(--gris); }
+
+      .status:empty { display: none; }
+      .status { margin-top: 0.5rem; font-size: 0.88rem; color: var(--gris); }
+      /* La couleur ne porte jamais l'information seule : le texte la dit. */
+      .status.is-ok { color: #0b4527; font-weight: 500; }
+      .status.is-warn { color: #8a5200; font-weight: 500; }
+
+      .solid, .ghost {
+        display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+        min-height: 48px; padding: 0.55rem 1.3rem;
+        font-weight: 600; border-radius: 999px; cursor: pointer;
+        border: 2px solid var(--vert);
+        transition: background 180ms ease, color 180ms ease, opacity 180ms ease;
+      }
+      .solid { background: var(--vert); color: var(--blanc); }
+      .solid:hover:not(:disabled) { background: #0b4527; }
+      .ghost { background: transparent; color: var(--vert); }
+      .ghost:hover:not(:disabled) { background: var(--vert); color: var(--blanc); }
+      .solid:disabled, .ghost:disabled { opacity: 0.45; cursor: not-allowed; }
+
+      .dl { display: flex; gap: 0.7rem; flex-wrap: wrap; margin-top: 1.5rem; }
+
+      .seg { display: inline-flex; border: 1px solid var(--trait); border-radius: 999px; padding: 3px; background: var(--pale); }
+      .seg__b {
+        min-height: 38px; padding: 0.25rem 1rem;
+        border: 0; background: transparent; border-radius: 999px;
+        color: var(--gris); font-weight: 600; cursor: pointer;
+      }
+      .seg__b.is-on { background: var(--vert); color: var(--blanc); }
+
+      .stage { display: flex; justify-content: center; }
+
+      /* ===============================================================
+         LA CARTE — 476 × 756 px, proportions CR80 portrait (53,98 × 85,6 mm)
+         =============================================================== */
+      .card {
+        width: 476px; height: 756px;
+        flex-shrink: 0;
+        display: flex; flex-direction: column;
+        background: var(--blanc);
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 18px 40px -18px rgb(11 15 12 / 0.4);
+      }
+      /* Sous 520 px la carte déborderait : on la réduit sans la déformer,
+         et le rendu html2canvas reste à taille réelle. */
+      @media (max-width: 540px) {
+        .stage { overflow: hidden; }
+        .card { transform: scale(0.72); transform-origin: top center; margin-bottom: -210px; }
+      }
+
+      .card__crown {
+        flex-shrink: 0;
+        background: var(--foret);
+        padding: 26px 30px;
+        display: flex; align-items: center; justify-content: center;
+      }
+      .card__logo { width: 150px; height: auto; }
+
+      .card__crown--back { flex-direction: column; align-items: flex-start; gap: 4px; padding: 24px 30px; }
+      .card__btitle {
+        font-family: var(--t-titre); font-size: 19px; font-weight: 600;
+        color: var(--blanc); letter-spacing: 0.02em;
+      }
+      .card__bsub { font-size: 10px; color: #c2dd9e; letter-spacing: 0.1em; text-transform: uppercase; }
+
+      .card__rule { height: 6px; background: var(--feuille); flex-shrink: 0; }
+
+      .card__body {
+        flex: 1; min-height: 0;
+        display: flex; flex-direction: column; align-items: center;
+        padding: 26px 34px 16px;
+      }
+
+      .card__portrait {
+        width: 132px; height: 132px; flex-shrink: 0;
+        display: grid; place-items: center;
+        border-radius: 50%;
+        background: var(--pale);
+        border: 4px solid var(--vert);
+        overflow: hidden;
+      }
+      .card__portrait img { width: 100%; height: 100%; object-fit: cover; }
+      .card__initials { font-family: var(--t-chiffre); font-size: 40px; font-weight: 700; color: var(--vert); }
+
+      .card__name {
+        font-family: var(--t-titre); font-size: 23px; font-weight: 600;
+        color: var(--foret); text-align: center; line-height: 1.2;
+        margin-top: 16px;
+      }
+      .card__role {
+        margin-top: 8px; padding: 4px 16px;
+        font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+        color: var(--blanc); background: var(--vert); border-radius: 999px;
+      }
+
+      .card__facts {
+        width: 100%; margin-top: 22px;
+        display: grid; gap: 10px;
+        padding-top: 18px;
+        border-top: 1px solid var(--trait);
+      }
+      .card__facts > div { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+      .card__facts dt { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gris); }
+      .card__facts dd { font-size: 13px; font-weight: 500; font-variant-numeric: tabular-nums; text-align: right; }
+      .card__num {
+        font-family: var(--t-chiffre); font-size: 15px !important; font-weight: 700;
+        color: var(--vert); letter-spacing: 0.02em;
+      }
+
+      .card__qr { margin-top: auto; padding-top: 16px; display: grid; justify-items: center; gap: 7px; }
+      .card__qrbox {
+        padding: 7px; background: var(--blanc);
+        border: 1px solid var(--trait); border-radius: 10px;
+        line-height: 0;
+      }
+      .card__qrbox img, .card__qrbox canvas { display: block; width: 104px; height: 104px; }
+      .card__qrlab { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gris); }
+
+      .card__hem { height: 14px; flex-shrink: 0; background: var(--foret); }
+
+      /* ---------- Verso ---------- */
+      .card__body--back { justify-content: space-between; padding: 28px 34px 20px; }
+
+      .card__signature {
+        font-family: var(--t-titre); font-size: 16px; font-weight: 600;
+        color: var(--foret); text-align: center; line-height: 1.4;
+      }
+      .card__signature span { display: block; margin-top: 5px; font-family: var(--t-corps); font-size: 11px; font-weight: 400; color: var(--gris); }
+
+      .card__cachet { width: 150px; height: auto; opacity: 0.95; }
+
+      .card__legal { width: 100%; display: grid; gap: 12px; }
+      .card__legal > div { text-align: center; }
+      .card__legal dt {
+        font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase;
+        color: var(--vert); font-weight: 700; margin-bottom: 3px;
+      }
+      .card__legal dd { font-size: 10px; color: var(--gris); font-variant-numeric: tabular-nums; }
+
+      .card__contact {
+        width: 100%; padding-top: 12px;
+        border-top: 1px solid var(--trait);
+        font-size: 10px; text-align: center; color: var(--gris);
+      }
+    </style>
+  </body>
+</html>

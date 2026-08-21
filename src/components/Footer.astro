@@ -40,7 +40,7 @@ const navItems: { key: RouteKey; label: string }[] = [
     <div class="ftr__col">
       <h2 class="ftr__title">{t.footer.actTitle}</h2>
       <ul>
-        <li><a href={externalLinks.membership} target="_blank" rel="noopener">{t.nav.join}</a></li>
+        <li><a href={localePath(lang, 'join')}>{t.nav.join}</a></li>
         <li><a href={externalLinks.partnership} target="_blank" rel="noopener">{t.partners.partnerCta}</a></li>
         <li><a href={externalLinks.volunteer} target="_blank" rel="noopener">{t.partners.volunteerCta}</a></li>
       </ul>

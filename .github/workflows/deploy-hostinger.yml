@@ -1,0 +1,143 @@
+name: Déploiement Hostinger
+
+# Chaque poussée sur `main` reconstruit le site et le téléverse sur
+# yaac.network. Le déclenchement manuel reste possible depuis l'onglet
+# Actions, pour rejouer un déploiement sans nouveau commit.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Un seul déploiement à la fois. Deux téléversements FTP simultanés sur le
+# même dossier laisseraient le site dans un état mélangé.
+concurrency:
+  group: hostinger
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deployer:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v4
+
+      - name: Installer Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Installer les dépendances
+        run: npm ci
+
+      # `YAAC_CIBLE=production` cale la build sur https://yaac.network à la
+      # racine. Sans lui, tous les liens partiraient sous /YAAC/ et le site
+      # serait entièrement cassé en production.
+      - name: Construire le site
+        run: YAAC_CIBLE=production npm run build
+
+      - name: Vérifier que la build vise bien la production
+        run: |
+          set -e
+          if grep -q 'href="/YAAC/' dist/fr/index.html; then
+            echo "::error::La build pointe vers /YAAC/ — YAAC_CIBLE=production n'a pas été pris en compte."
+            exit 1
+          fi
+          if ! grep -q 'https://yaac.network/' dist/sitemap-0.xml; then
+            echo "::error::Le sitemap ne pointe pas vers yaac.network."
+            exit 1
+          fi
+          echo "Build calée sur yaac.network."
+
+      - name: Vérifier que les pages attendues existent
+        run: |
+          set -e
+          for page in \
+            index.html \
+            404.html \
+            llms.txt \
+            fr/index.html \
+            en/index.html \
+            fr/qui-sommes-nous/index.html \
+            en/who-we-are/index.html \
+            fr/actualites/index.html \
+            en/news/index.html \
+            fr/partenaires/index.html \
+            en/partners/index.html \
+            fr/devenir-membre/index.html \
+            en/become-a-member/index.html \
+            verify/index.html \
+            badge/index.html \
+            api/adhesion.php \
+            api/adhesion-init.php \
+            api/verify.php \
+            api/.htaccess \
+            .htaccess
+          do
+            if [ ! -f "dist/$page" ]; then
+              echo "::error::Fichier manquant dans la build : $page"
+              exit 1
+            fi
+          done
+          echo "Tous les fichiers attendus sont présents."
+
+      # Le dépôt est public. `public/` est copié tel quel dans `dist/`, donc
+      # un config.php oublié partirait en ligne — et sur GitHub Pages, qui
+      # n'exécute pas PHP, il serait servi en texte brut.
+      - name: Vérifier qu'aucun secret n'est publié
+        run: |
+          set -e
+          if [ -f "dist/api/config.php" ]; then
+            echo "::error::dist/api/config.php est présent. Ce fichier contient des secrets et se crée uniquement sur le serveur."
+            exit 1
+          fi
+          if grep -rlE "chat\.whatsapp\.com/[A-Za-z0-9]{10,}|whsec_[A-Za-z0-9]{8,}|sk_live_[A-Za-z0-9]{8,}" dist/ 2>/dev/null | grep -v "config.example.php"; then
+            echo "::error::Un secret a fuité dans la build (fichiers listés ci-dessus)."
+            exit 1
+          fi
+          echo "Aucun secret détecté dans dist/."
+
+      - name: Contrôler la syntaxe PHP
+        run: |
+          set -e
+          for f in dist/api/*.php; do php -l "$f"; done
+
+      # `exclude` protège de la SUPPRESSION autant que de l'envoi : sans la
+      # ligne `api/config.php`, une synchronisation effacerait la
+      # configuration du serveur et mettrait l'adhésion hors service — c'est
+      # exactement ce qui s'est produit lors d'une extraction manuelle.
+      # Tant que les identifiants FTP ne sont pas déclarés, on le dit
+      # clairement au lieu d'échouer sur une erreur de connexion obscure.
+      - name: Vérifier que les identifiants FTP existent
+        id: identifiants
+        run: |
+          if [ -z "${{ secrets.FTP_SERVEUR }}" ]; then
+            echo "pret=non" >> "$GITHUB_OUTPUT"
+            echo "::warning::Identifiants FTP absents. Ajoutez FTP_SERVEUR, FTP_UTILISATEUR, FTP_MOTDEPASSE et FTP_DOSSIER dans Réglages → Secrets and variables → Actions, puis relancez ce workflow. La build a réussi ; seul le téléversement est sauté."
+          else
+            echo "pret=oui" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Téléverser sur Hostinger
+        if: steps.identifiants.outputs.pret == 'oui'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVEUR }}
+          username: ${{ secrets.FTP_UTILISATEUR }}
+          password: ${{ secrets.FTP_MOTDEPASSE }}
+          protocol: ftps
+          port: 21
+          local-dir: ./dist/
+          server-dir: ${{ secrets.FTP_DOSSIER }}
+          # Fichiers qui vivent sur le serveur et ne doivent jamais être
+          # touchés par un déploiement.
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            api/config.php
+            yaac-api.log
+            diagnostic.php

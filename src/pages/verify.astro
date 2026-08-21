@@ -1,0 +1,424 @@
+---
+/**
+ * Vérification d'une carte de membre YAAC.
+ *
+ * Cette page vit à la RACINE (/verify/), pas sous /fr/ ou /en/ : c'est
+ * l'adresse gravée dans le QR code de toutes les cartes déjà imprimées.
+ * Elle ne peut pas être déplacée sans réimprimer les cartes.
+ *
+ * Volontairement hors du menu et sans en-tête de site : quelqu'un qui scanne
+ * une carte veut une réponse, pas une page d'accueil. Les deux langues sont
+ * présentes et permutent sans rechargement.
+ */
+import '../styles/global.css';
+import { Image } from 'astro:assets';
+import logo from '../assets/brand/yaac-logo.png';
+import { assetPath } from '../i18n/utils';
+
+const apiUrl = assetPath('api/verify.php');
+---
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Vérification d'une carte de membre — YAAC</title>
+    <meta
+      name="description"
+      content="Vérifiez l'authenticité d'une carte de membre de la Youth Alliance for Agroecology and Climate."
+    />
+    <!-- Page utilitaire liée à une personne : elle n'a rien à faire dans un index. -->
+    <meta name="robots" content="noindex, follow" />
+    <link rel="icon" href={`${import.meta.env.BASE_URL}favicon.ico`} sizes="any" />
+    <link rel="icon" type="image/png" href={`${import.meta.env.BASE_URL}icon-192.png`} sizes="192x192" />
+    <link rel="apple-touch-icon" href={`${import.meta.env.BASE_URL}apple-touch-icon.png`} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Palanquin:wght@400;600;700&family=Roboto:wght@400;500;700&display=swap"
+    />
+  </head>
+
+  <body class="vpage">
+    <main class="vwrap">
+      <header class="vhead">
+        <Image src={logo} alt="YAAC" widths={[140, 280]} sizes="140px" loading="eager" />
+        <button class="vlang" type="button" id="langToggle" hidden>English</button>
+      </header>
+
+      <h1 class="vtitle" data-i18n="title">Vérification d'une carte de membre</h1>
+      <p class="vlead" data-i18n="lead">
+        Saisissez le numéro figurant sur la carte, ou scannez son QR code.
+      </p>
+
+      <form class="vform" id="form" novalidate>
+        <label class="vlabel" for="numero" data-i18n="label">Numéro de membre</label>
+        <div class="vrow">
+          <input
+            class="vinput"
+            id="numero"
+            name="numero"
+            type="text"
+            inputmode="text"
+            autocomplete="off"
+            spellcheck="false"
+            placeholder="YAAC-2026-0042"
+            aria-describedby="hint"
+            required
+          />
+          <button class="btn btn--primary vsubmit" type="submit" data-i18n="submit">Vérifier</button>
+        </div>
+        <p class="vhint" id="hint" data-i18n="hint">Format : YAAC-AAAA-NNN(N)</p>
+      </form>
+
+      <!-- aria-live : le résultat arrive après coup, il doit être annoncé. -->
+      <div class="vresult" id="result" role="status" aria-live="polite"></div>
+
+      <footer class="vfoot">
+        <a href={`${import.meta.env.BASE_URL}fr/`} data-i18n="back">Retour au site de YAAC</a>
+      </footer>
+    </main>
+
+    <script is:inline define:vars={{ apiUrl }}>
+      (function () {
+        var T = {
+          fr: {
+            title: "Vérification d'une carte de membre",
+            lead: 'Saisissez le numéro figurant sur la carte, ou scannez son QR code.',
+            label: 'Numéro de membre',
+            submit: 'Vérifier',
+            hint: 'Format : YAAC-AAAA-NNN(N)',
+            back: 'Retour au site de YAAC',
+            toggle: 'English',
+            checking: 'Vérification en cours…',
+            valid: 'Carte valide',
+            expired: 'Carte expirée',
+            suspended: 'Carte suspendue',
+            notFound: 'Numéro introuvable',
+            notFoundHelp:
+              "Ce numéro ne correspond à aucun membre. Vérifiez la saisie, ou écrivez à communication@yaac.network.",
+            badFormat: 'Le format attendu est YAAC-AAAA-NNN(N).',
+            error: 'Vérification impossible',
+            errorHelp: 'Le service est momentanément indisponible. Réessayez dans un instant.',
+            member: 'Membre', joined: 'Adhésion', until: "Valable jusqu'au",
+            number: 'Numéro', role: 'Rôle',
+            expiredHelp: "Cette carte a été authentifiée, mais sa validité a expiré.",
+            rateTitle: 'Trop de vérifications',
+            rateHelp: "Trop de numéros ont été essayés depuis cette connexion. Réessayez dans une heure — ou scannez directement le QR code de la carte, qui n'est pas concerné par cette limite.",
+            validOnly: 'Adhésion active',
+            notValidOnly: 'Adhésion inactive',
+            scanHint: "Ce numéro correspond à une adhésion en cours. Pour afficher le nom et le rôle du titulaire, scannez le QR code de sa carte : le nom n'est jamais divulgué à partir du seul numéro.",
+            suspendedHelp: "Cette adhésion a été suspendue. Contactez YAAC pour en savoir plus.",
+            locale: 'fr-FR',
+          },
+          en: {
+            title: 'Verify a membership card',
+            lead: 'Enter the number shown on the card, or scan its QR code.',
+            label: 'Membership number',
+            submit: 'Verify',
+            hint: 'Format: YAAC-YYYY-NNN(N)',
+            back: 'Back to the YAAC website',
+            toggle: 'Français',
+            checking: 'Verifying…',
+            valid: 'Valid card',
+            expired: 'Expired card',
+            suspended: 'Suspended card',
+            notFound: 'Number not found',
+            notFoundHelp:
+              'This number does not match any member. Check the spelling, or write to communication@yaac.network.',
+            badFormat: 'The expected format is YAAC-YYYY-NNN(N).',
+            error: 'Verification unavailable',
+            errorHelp: 'The service is temporarily unavailable. Please try again shortly.',
+            member: 'Member', joined: 'Joined', until: 'Valid until',
+            number: 'Number', role: 'Role',
+            expiredHelp: 'This card is authentic, but its validity has expired.',
+            rateTitle: 'Too many checks',
+            rateHelp: 'Too many numbers have been tried from this connection. Try again in an hour — or scan the card QR code directly, which is not subject to this limit.',
+            validOnly: 'Active membership',
+            notValidOnly: 'Inactive membership',
+            scanHint: 'This number matches a current membership. To see the holder name and role, scan the QR code on their card: names are never disclosed from a number alone.',
+            suspendedHelp: 'This membership has been suspended. Contact YAAC to find out more.',
+            locale: 'en-GB',
+          },
+        };
+
+        var params = new URLSearchParams(location.search);
+        var lang = params.get('lang') === 'en' ? 'en' : 'fr';
+        var last = null;
+
+        var $ = function (id) { return document.getElementById(id); };
+        var result = $('result');
+        var toggle = $('langToggle');
+
+        function apply() {
+          var t = T[lang];
+          document.documentElement.lang = lang;
+          document.title = t.title + ' — YAAC';
+          document.querySelectorAll('[data-i18n]').forEach(function (el) {
+            var k = el.getAttribute('data-i18n');
+            if (t[k]) el.textContent = t[k];
+          });
+          toggle.textContent = t.toggle;
+          if (last) render(last);
+        }
+
+        toggle.hidden = false;
+        toggle.addEventListener('click', function () {
+          lang = lang === 'fr' ? 'en' : 'fr';
+          var u = new URL(location.href);
+          u.searchParams.set('lang', lang);
+          history.replaceState(null, '', u);
+          apply();
+        });
+
+        function fmtDate(iso) {
+          var d = new Date(iso + 'T00:00:00');
+          if (isNaN(d)) return iso;
+          return d.toLocaleDateString(T[lang].locale, {
+            day: 'numeric', month: 'long', year: 'numeric',
+          });
+        }
+
+        function initials(p, n) {
+          return ((p || ' ')[0] + (n || ' ')[0]).toUpperCase().trim();
+        }
+
+        function esc(s) {
+          return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+          });
+        }
+
+        function render(data) {
+          last = data;
+          var t = T[lang];
+
+          if (data.state === 'checking') {
+            result.className = 'vresult is-wait';
+            result.innerHTML = '<p class="vmsg">' + esc(t.checking) + '</p>';
+            return;
+          }
+
+          if (data.state === 'rate') {
+            result.className = 'vresult is-warn';
+            result.innerHTML =
+              '<p class="vstate">' + esc(t.rateTitle) + '</p><p class="vmsg">' + esc(t.rateHelp) + '</p>';
+            return;
+          }
+
+          if (data.state === 'error') {
+            result.className = 'vresult is-bad';
+            result.innerHTML =
+              '<p class="vstate">' + esc(t.error) + '</p><p class="vmsg">' + esc(t.errorHelp) + '</p>';
+            return;
+          }
+
+          if (data.state === 'badformat') {
+            result.className = 'vresult is-bad';
+            result.innerHTML =
+              '<p class="vstate">' + esc(t.notFound) + '</p><p class="vmsg">' + esc(t.badFormat) + '</p>';
+            return;
+          }
+
+          if (!data.trouve) {
+            result.className = 'vresult is-bad';
+            result.innerHTML =
+              '<p class="vstate">' + esc(t.notFound) + '</p><p class="vmsg">' + esc(t.notFoundHelp) + '</p>';
+            return;
+          }
+
+          // Sans jeton valide, le registre ne renvoie que l'existence et le
+          // statut. On l'affiche honnetement plutot que de faire croire a un
+          // echec : la carte EST valide, c'est la fiche qui est retenue.
+          if (!data.complet) {
+            result.className = 'vresult ' + (data.valide ? 'is-ok' : 'is-warn');
+            result.innerHTML =
+              '<p class="vstate">' + esc(data.valide ? t.validOnly : t.notValidOnly) + '</p>' +
+              '<p class="vmsg">' + esc(t.scanHint) + '</p>';
+            return;
+          }
+
+          var ok = data.valide;
+          var label = ok ? t.valid : data.statut === 'suspendu' ? t.suspended : t.expired;
+          var help = ok ? '' : data.statut === 'suspendu' ? t.suspendedHelp : t.expiredHelp;
+
+          result.className = 'vresult ' + (ok ? 'is-ok' : 'is-warn');
+          result.innerHTML =
+            '<p class="vstate">' + esc(label) + '</p>' +
+            '<div class="vcard">' +
+              '<div class="vavatar" aria-hidden="true">' + esc(initials(data.prenom, data.nom)) + '</div>' +
+              '<div class="vident">' +
+                '<p class="vname">' + esc(data.prenom) + ' ' + esc(data.nom) + '</p>' +
+                '<p class="vrole">' + esc(data.role) + '</p>' +
+              '</div>' +
+            '</div>' +
+            '<dl class="vmeta">' +
+              '<div><dt>' + esc(t.number) + '</dt><dd>' + esc(data.numero) + '</dd></div>' +
+              '<div><dt>' + esc(t.joined) + '</dt><dd>' + esc(fmtDate(data.date_adhesion)) + '</dd></div>' +
+              '<div><dt>' + esc(t.until) + '</dt><dd>' + esc(fmtDate(data.date_expiration)) + '</dd></div>' +
+            '</dl>' +
+            (help ? '<p class="vmsg">' + esc(help) + '</p>' : '');
+        }
+
+        function verify(numero) {
+          numero = (numero || '').toUpperCase().trim();
+          // Trois ou quatre chiffres : les numéros historiques en ont trois
+          // (YAAC-2026-001), ceux du générateur en avaient quatre. Les deux
+          // peuvent figurer sur une carte imprimée.
+          if (!/^YAAC-\d{4}-\d{3,4}$/.test(numero)) {
+            render({ state: 'badformat' });
+            return;
+          }
+          render({ state: 'checking' });
+
+          var jeton = new URLSearchParams(location.search).get('c') || '';
+          fetch(apiUrl + '?id=' + encodeURIComponent(numero) + (jeton ? '&c=' + encodeURIComponent(jeton) : ''), {
+            headers: { Accept: 'application/json' },
+          })
+            .then(function (r) {
+              if (r.status === 429) { render({ state: 'rate' }); return null; }
+              if (!r.ok) throw new Error(String(r.status));
+              return r.json();
+            })
+            .then(function (d) { if (d) render(d); })
+            .catch(function () { render({ state: 'error' }); });
+        }
+
+        $('form').addEventListener('submit', function (e) {
+          e.preventDefault();
+          var v = $('numero').value;
+          var u = new URL(location.href);
+          u.searchParams.set('id', v.toUpperCase().trim());
+          history.replaceState(null, '', u);
+          verify(v);
+        });
+
+        apply();
+
+        // Arrivée depuis un QR code : le numéro est déjà dans l'URL.
+        var id = params.get('id');
+        if (id) {
+          $('numero').value = id.toUpperCase().trim();
+          verify(id);
+        }
+      })();
+    </script>
+
+    <style>
+      .vpage {
+        min-height: 100vh;
+        background: var(--bg-subtle);
+        padding: var(--space-6) var(--gutter);
+      }
+      .vwrap {
+        max-width: 34rem;
+        margin: 0 auto;
+        background: var(--white);
+        border-radius: var(--radius-lg);
+        padding: var(--space-6);
+        box-shadow: var(--shadow-md);
+      }
+      .vhead {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-4);
+        margin-bottom: var(--space-6);
+      }
+      .vhead :global(img) { width: 120px; height: auto; }
+      .vlang {
+        min-height: 44px;
+        padding: var(--space-2) var(--space-4);
+        font: inherit;
+        font-size: var(--step--1);
+        font-weight: 600;
+        color: var(--ink-500);
+        background: none;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-full);
+        cursor: pointer;
+      }
+      .vlang:hover { color: var(--yaac-primary); border-color: var(--yaac-primary); }
+
+      .vtitle { font-size: var(--step-3); margin-bottom: var(--space-2); }
+      .vlead { color: var(--text-muted); margin-bottom: var(--space-6); }
+
+      .vlabel {
+        display: block;
+        font-size: var(--step--1);
+        font-weight: 600;
+        margin-bottom: var(--space-2);
+      }
+      .vrow { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+      .vinput {
+        flex: 1 1 12rem;
+        min-height: 48px;
+        padding: var(--space-3) var(--space-4);
+        font: inherit;
+        font-variant-numeric: tabular-nums;
+        text-transform: uppercase;
+        color: var(--text);
+        background: var(--white);
+        border: 1px solid var(--border-strong);
+        border-radius: var(--radius-md);
+      }
+      .vinput:focus-visible { border-color: var(--yaac-primary); }
+      .vsubmit { min-height: 48px; flex: 0 0 auto; }
+      .vhint { margin-top: var(--space-2); font-size: var(--step--1); color: var(--text-muted); }
+
+      .vresult:empty { display: none; }
+      .vresult {
+        margin-top: var(--space-6);
+        padding: var(--space-5);
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border);
+        background: var(--ink-50);
+      }
+      /* Jamais la couleur seule : chaque état porte aussi un mot. */
+      .vresult.is-ok   { background: var(--green-100); border-color: var(--green-300); }
+      .vresult.is-warn { background: #fff4e0; border-color: #e6a23c; }
+      .vresult.is-bad  { background: #fdeceb; border-color: #d16b62; }
+
+      .vstate {
+        font-family: var(--font-heading);
+        font-size: var(--step-2);
+        font-weight: 700;
+        margin-bottom: var(--space-4);
+      }
+      .vresult.is-ok .vstate   { color: #0b4527; }
+      .vresult.is-warn .vstate { color: #8a5200; }
+      .vresult.is-bad .vstate  { color: #8f2b23; }
+
+      .vcard { display: flex; align-items: center; gap: var(--space-4); }
+      .vavatar {
+        flex: 0 0 auto;
+        width: 3.25rem; height: 3.25rem;
+        display: grid; place-items: center;
+        background: var(--yaac-primary);
+        color: var(--white);
+        border-radius: var(--radius-full);
+        font-family: var(--font-display);
+        font-weight: 700;
+      }
+      .vname { font-weight: 700; font-size: var(--step-1); }
+      .vrole { color: var(--text-muted); font-size: var(--step--1); }
+
+      .vmeta {
+        display: grid;
+        gap: var(--space-3);
+        margin: var(--space-5) 0 0;
+        padding-top: var(--space-4);
+        border-top: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+      }
+      .vmeta > div { display: flex; justify-content: space-between; gap: var(--space-4); }
+      .vmeta dt { font-size: var(--step--1); color: var(--text-muted); }
+      .vmeta dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; }
+
+      .vmsg { margin-top: var(--space-4); font-size: var(--step--1); line-height: var(--leading-body); }
+
+      .vfoot { margin-top: var(--space-6); text-align: center; font-size: var(--step--1); }
+      .vfoot a { color: var(--yaac-primary); }
+    </style>
+  </body>
+</html>

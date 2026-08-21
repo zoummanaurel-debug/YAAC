@@ -1,0 +1,68 @@
+---
+/**
+ * Retour après paiement — cible de `redirect_url` côté Chariow.
+ *
+ * Cette page ne prouve rien : c'est le webhook `successful.sale` qui fait foi,
+ * et il peut arriver quelques secondes après le retour du visiteur. On confirme
+ * donc le PAIEMENT, jamais la réception de la carte, et on dit clairement quoi
+ * faire si l'e-mail n'arrive pas.
+ *
+ * Elle est en `noindex` : c'est une page de fin de parcours, elle n'a rien à
+ * faire dans un résultat de recherche.
+ */
+import Base from '../../layouts/Base.astro';
+import { useTranslations, localePath, type Lang } from '../../i18n/utils';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const j = t.join;
+---
+<Base lang={lang} routeKey="joined" title={j.confirmTitle} description={j.confirmLead}>
+  <Fragment slot="head">
+    <meta name="robots" content="noindex, follow" />
+  </Fragment>
+
+  <section class="section jdone">
+    <div class="container container--narrow">
+      <p class="jdone__mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="34" height="34" fill="none"
+             stroke="currentColor" stroke-width="2.5"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 6 9 17l-5-5" />
+        </svg>
+      </p>
+
+      <h1>{j.confirmTitle}</h1>
+      <p class="lead">{j.confirmLead}</p>
+      <p class="jdone__note">{j.confirmNote}</p>
+
+      <a class="btn btn--primary" href={localePath(lang, 'home')}>{j.confirmBack}</a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .jdone { text-align: center; }
+  .jdone h1 { font-size: var(--step-4); margin-bottom: var(--space-4); }
+  .jdone .lead { margin-inline: auto; }
+
+  .jdone__mark {
+    display: grid;
+    place-items: center;
+    width: 4.5rem;
+    height: 4.5rem;
+    margin: 0 auto var(--space-6);
+    color: var(--white);
+    background: var(--yaac-primary);
+    border-radius: var(--radius-full);
+  }
+
+  .jdone__note {
+    margin: var(--space-5) auto var(--space-7);
+    max-width: 52ch;
+    font-size: var(--step--1);
+    color: var(--text-muted);
+    line-height: var(--leading-body);
+  }
+</style>

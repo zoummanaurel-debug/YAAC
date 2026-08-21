@@ -7,7 +7,7 @@ import TestimonialCarousel from '../TestimonialCarousel.astro';
 import NewsCard from '../NewsCard.astro';
 import CtaBand from '../CtaBand.astro';
 import heroImage from '../../assets/photos/hero.jpg';
-import { useTranslations, localePath, externalLinks, type Lang } from '../../i18n/utils';
+import { useTranslations, localePath, type Lang } from '../../i18n/utils';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -31,7 +31,7 @@ const latest = (featured.length >= 4 ? featured : [...posts].sort(byDate)).slice
     image={heroImage}
     imageAlt={t.meta.fullName}
   >
-    <a class="btn btn--accent" href={externalLinks.membership} target="_blank" rel="noopener">
+    <a class="btn btn--accent" href={localePath(lang, 'join')}>
       {t.home.heroCta}
     </a>
     <a class="btn btn--outline hero-alt" href={localePath(lang, 'about')}>
@@ -68,7 +68,7 @@ const latest = (featured.length >= 4 ? featured : [...posts].sort(byDate)).slice
     title={t.home.ctaTitle}
     lead={t.home.ctaLead}
     ctaLabel={t.home.ctaButton}
-    ctaHref={externalLinks.membership}
+    ctaHref={localePath(lang, 'join')}
   />
 
   <section class="section contact-teaser">

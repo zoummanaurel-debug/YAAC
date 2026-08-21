@@ -1,0 +1,23 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "roboto",
+        "createdAt": "2026-08-21T09:43:11.630Z",
+        "reason": "Charte graphique officielle YAAC : PRODUCT.md pinne Roboto comme police de corps (kit global Elementor de yaac.network) et pre-empte cet avertissement mot pour mot — « un avertissement generique sur la banalite de Roboto ne les rouvre pas »."
+      },
+      {
+        "rule": "em-dash-overuse",
+        "value": "*",
+        "files": [
+          "src/pages/badge.astro"
+        ],
+        "createdAt": "2026-08-21T11:36:06.158Z",
+        "reason": "Faux positif mesure : 11 des 17 cadratins sont le marqueur d'etat vide des champs de la carte (nom, role, numero, dates) et ses equivalents JS, plus le separateur de <title>. Seuls 4 sont de la prose, dans des commentaires francais. Cette page ne contient aucun texte editorial."
+      }
+    ]
+  }
+}

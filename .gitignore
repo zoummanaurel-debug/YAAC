@@ -44,3 +44,20 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# Secrets des points d entree PHP (jamais versionne)
+public/api/config.php
+yaac-api.log
+
+# SQL genere contenant des donnees personnelles (depot public)
+*.local.sql
+
+# Fichiers generes contenant des donnees personnelles (noms, e-mails).
+# Le depot est public : ils ne doivent jamais y entrer.
+*.local.csv
+*.local.txt
+
+# Reglages locaux et caches d outillage : propres a la machine.
+.claude/settings.local.json
+.impeccable/config.local.json
+.impeccable/hook.cache.json

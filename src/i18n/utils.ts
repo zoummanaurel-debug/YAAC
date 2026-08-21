@@ -15,14 +15,18 @@ export const routes = {
   news:     { fr: 'actualites',       en: 'news' },
   partners: { fr: 'partenaires',      en: 'partners' },
   contact:  { fr: 'contact',          en: 'contact' },
+  join:     { fr: 'devenir-membre',   en: 'become-a-member' },
+  joined:   { fr: 'adhesion-confirmee', en: 'membership-confirmed' },
 } as const;
 
 export type RouteKey = keyof typeof routes;
 
 /** Formulaires Microsoft Forms de YAAC, partagés par les deux langues. */
 export const externalLinks = {
-  /** Adhésion : lien historique, en attente du formulaire définitif. */
-  membership: 'https://forms.office.com/r/cEwz5H4Bvh',
+  /** Ancien formulaire Microsoft. Conservé pour mémoire : le tunnel passe
+   *  désormais par /devenir-membre/, qui enregistre la candidature puis ouvre
+   *  le paiement Chariow. Ne plus référencer depuis une page. */
+  membershipLegacy: 'https://forms.office.com/r/cEwz5H4Bvh',
   partnership: 'https://forms.cloud.microsoft/r/gSpXzNcFrD',
   volunteer: 'https://forms.cloud.microsoft/r/70kwMWMh3P',
 } as const;

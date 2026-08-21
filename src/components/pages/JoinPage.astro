@@ -1,0 +1,464 @@
+---
+/**
+ * Page d'adhésion — le tunnel complet, sur le site.
+ *
+ * Remplace le formulaire Microsoft Forms, que le visiteur quittait le site
+ * pour atteindre et qui ne lui disait jamais que l'adhésion était payante.
+ * Ici le tarif est écrit avant le premier champ.
+ *
+ * La soumission passe par /api/adhesion-init.php, qui enregistre la
+ * candidature puis renvoie l'URL de paiement Chariow. Une candidature sans
+ * paiement reste visible en base : c'est ce qui rend un abandon mesurable.
+ */
+import Base from '../../layouts/Base.astro';
+import { useTranslations, localePath, assetPath, type Lang } from '../../i18n/utils';
+import { paysTries } from '../../data/pays';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const j = t.join;
+
+const apiUrl = assetPath('api/adhesion-init.php');
+
+/**
+ * Trois listes distinctes, tirées du même référentiel :
+ *   - indicatif  : tous les pays, pour composer un numéro d'où que l'on soit
+ *   - origine    : les 55 pays africains — YAAC est une alliance panafricaine
+ *   - résidence  : tous les pays, un membre pouvant vivre n'importe où
+ *                  (le registre en compte déjà au Japon et en France)
+ */
+const indicatifs = paysTries(lang);
+const origines = paysTries(lang, (p) => p.africain);
+const residences = indicatifs;
+
+const sources = lang === 'fr'
+  ? ['Site web', 'Instagram', 'Facebook', 'LinkedIn', 'WhatsApp', 'YouTube', 'Un membre', 'Un événement', 'Autre']
+  : ['Website', 'Instagram', 'Facebook', 'LinkedIn', 'WhatsApp', 'YouTube', 'A member', 'An event', 'Other'];
+---
+<Base lang={lang} routeKey="join" title={j.title} description={j.lead}>
+  <section class="section jhead">
+    <div class="container container--narrow">
+      <h1>{j.title}</h1>
+      <p class="lead">{j.lead}</p>
+
+      {/* Les deux montants au meme niveau. Mettre l'adhesion en gros et la
+          cotisation en note de bas de bloc reproduirait le defaut corrige :
+          un cout decouvert trop tard. */}
+      <div class="jprice">
+        <p class="jprice__item">
+          <span class="jprice__label">{j.priceLabel}</span>
+          <strong class="jprice__amount">{j.priceAmount}</strong>
+          <span class="jprice__per">{j.priceOnce}</span>
+        </p>
+        <p class="jprice__item">
+          <span class="jprice__label">{j.priceDuesLabel}</span>
+          <strong class="jprice__amount">{j.priceDues}</strong>
+          <span class="jprice__per">{j.priceDuesPer}</span>
+        </p>
+        <p class="jprice__note">{j.priceNote}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--tint">
+    <div class="container container--narrow jcols">
+      <div>
+        <h2 class="jsub">{j.stepsTitle}</h2>
+        <ol class="jsteps">
+          <li>{j.step1}</li>
+          <li>{j.step2}</li>
+          <li>{j.step3}</li>
+        </ol>
+      </div>
+      <div>
+        <h2 class="jsub">{j.getTitle}</h2>
+        <ul class="jgets">
+          <li>{j.get1}</li>
+          <li>{j.get2}</li>
+          <li>{j.get3}</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container container--narrow">
+      <h2 class="jsub">{j.formTitle}</h2>
+
+      <div class="jerror" id="jerror" role="alert" tabindex="-1" hidden>
+        <p class="jerror__title">{j.errTitle}</p>
+        <p id="jerrorMsg"></p>
+      </div>
+
+      <form id="joinForm" class="jform" novalidate>
+        <fieldset class="jset">
+          <legend class="jlegend">{j.identity}</legend>
+
+          <div class="jgrid">
+            <p class="jfield">
+              <label for="prenom">{j.firstName}</label>
+              <input id="prenom" name="prenom" type="text" autocomplete="given-name" required />
+              <span class="jmsg" data-for="prenom"></span>
+            </p>
+            <p class="jfield">
+              <label for="nom">{j.lastName}</label>
+              <input id="nom" name="nom" type="text" autocomplete="family-name" required />
+              <span class="jmsg" data-for="nom"></span>
+            </p>
+          </div>
+
+          <p class="jfield">
+            <label for="date_naissance">{j.birth} <span class="jopt">({j.optional})</span></label>
+            <input id="date_naissance" name="date_naissance" type="date" autocomplete="bday" />
+            <span class="jmsg" data-for="date_naissance"></span>
+          </p>
+        </fieldset>
+
+        <fieldset class="jset">
+          <legend class="jlegend">{j.contact}</legend>
+
+          <p class="jfield">
+            <label for="email">{j.email}</label>
+            <input id="email" name="email" type="email" autocomplete="email" inputmode="email" required />
+            <span class="jmsg" data-for="email"></span>
+          </p>
+
+          <div class="jgrid jgrid--phone">
+            <p class="jfield">
+              <label for="tel_pays">{j.phoneCountry}</label>
+              <select id="tel_pays" name="tel_pays" required>
+                {indicatifs.map((p) => (
+                  <option value={p.code} selected={p.code === 'SN'}>{p.nom} (+{p.indicatif})</option>
+                ))}
+              </select>
+            </p>
+            <p class="jfield">
+              <label for="telephone">{j.phone}</label>
+              <input id="telephone" name="telephone" type="tel" inputmode="tel" autocomplete="tel-national" required />
+              <span class="jmsg" data-for="telephone"></span>
+            </p>
+          </div>
+
+          <div class="jgrid">
+            <p class="jfield">
+              <label for="pays_origine">{j.origin} <span class="jopt">({j.optional})</span></label>
+              <select id="pays_origine" name="pays_origine">
+                <option value="">—</option>
+                {origines.map((p) => <option value={p.nom}>{p.nom}</option>)}
+              </select>
+            </p>
+            <p class="jfield">
+              <label for="pays_residence">{j.residence} <span class="jopt">({j.optional})</span></label>
+              <select id="pays_residence" name="pays_residence">
+                <option value="">—</option>
+                {residences.map((p) => <option value={p.nom}>{p.nom}</option>)}
+              </select>
+            </p>
+          </div>
+        </fieldset>
+
+        <fieldset class="jset">
+          <legend class="jlegend">{j.about}</legend>
+
+          <p class="jfield">
+            <label for="motivation">{j.motivation} <span class="jopt">({j.optional})</span></label>
+            <textarea id="motivation" name="motivation" rows="4" maxlength="2000"></textarea>
+          </p>
+
+          <p class="jfield">
+            <label for="benevolat">{j.volunteer} <span class="jopt">({j.optional})</span></label>
+            <input id="benevolat" name="benevolat" type="text" maxlength="255" />
+          </p>
+
+          <p class="jfield">
+            <label for="source">{j.source} <span class="jopt">({j.optional})</span></label>
+            <select id="source" name="source">
+              <option value="">{j.sourcePick}</option>
+              {sources.map((s) => <option value={s}>{s}</option>)}
+            </select>
+          </p>
+        </fieldset>
+
+        {/* Piège à robots : retiré de l'ordre de tabulation et masqué aux
+            lecteurs d'écran. Un automate qui remplit tout se signale seul. */}
+        <p class="jtrap" aria-hidden="true">
+          <label for="site_web">Ne remplissez pas ce champ</label>
+          <input id="site_web" name="site_web" type="text" tabindex="-1" autocomplete="off" />
+        </p>
+
+        <p class="jcheck">
+          <input id="statuts" name="statuts" type="checkbox" required />
+          <label for="statuts">{j.statutes}</label>
+        </p>
+        <span class="jmsg" data-for="statuts"></span>
+
+        <button class="btn btn--primary jsubmit" type="submit" id="jsubmit">{j.submit}</button>
+      </form>
+    </div>
+  </section>
+</Base>
+
+<script
+  is:inline
+  define:vars={{
+    apiUrl,
+    msg: {
+      sending: j.sending,
+      required: j.errRequired,
+      email: j.errEmail,
+      phone: j.errPhone,
+      young: j.errYoung,
+      already: j.errAlready,
+      paid: j.errPaid,
+      payment: j.errPayment,
+      rate: j.errRate,
+      generic: j.errGeneric,
+      submit: j.submit,
+    },
+  }}
+>
+  (function () {
+    var form = document.getElementById('joinForm');
+    var bouton = document.getElementById('jsubmit');
+    var boite = document.getElementById('jerror');
+    var boiteMsg = document.getElementById('jerrorMsg');
+
+    function messageDe(nom, texte) {
+      var el = document.querySelector('.jmsg[data-for="' + nom + '"]');
+      if (el) el.textContent = texte || '';
+      var champ = document.getElementById(nom);
+      if (champ) {
+        if (texte) champ.setAttribute('aria-invalid', 'true');
+        else champ.removeAttribute('aria-invalid');
+      }
+    }
+
+    function viderMessages() {
+      document.querySelectorAll('.jmsg').forEach(function (el) { el.textContent = ''; });
+      document.querySelectorAll('[aria-invalid]').forEach(function (el) {
+        el.removeAttribute('aria-invalid');
+      });
+      boite.hidden = true;
+    }
+
+    function erreurGlobale(texte) {
+      boiteMsg.textContent = texte;
+      boite.hidden = false;
+      // Le bloc est au-dessus du formulaire : sans ce recentrage, sur mobile
+      // il s'affiche hors écran et le visiteur croit qu'il ne s'est rien passé.
+      boite.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      boite.focus({ preventScroll: true });
+    }
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      viderMessages();
+
+      var d = Object.fromEntries(new FormData(form).entries());
+      var ok = true;
+
+      ['prenom', 'nom', 'email', 'telephone'].forEach(function (k) {
+        if (!String(d[k] || '').trim()) { messageDe(k, msg.required); ok = false; }
+      });
+      if (d.email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(d.email))) {
+        messageDe('email', msg.email); ok = false;
+      }
+      if (d.telephone && String(d.telephone).replace(/\D+/g, '').length < 6) {
+        messageDe('telephone', msg.phone); ok = false;
+      }
+      if (d.date_naissance) {
+        var limite = new Date();
+        limite.setFullYear(limite.getFullYear() - 13);
+        if (new Date(d.date_naissance) > limite) { messageDe('date_naissance', msg.young); ok = false; }
+      }
+      if (!form.statuts.checked) { messageDe('statuts', msg.required); ok = false; }
+
+      if (!ok) {
+        var premier = form.querySelector('[aria-invalid="true"]') || form.statuts;
+        if (premier) premier.focus();
+        return;
+      }
+
+      d.statuts = true;
+      d.lang = document.documentElement.lang || 'fr';
+      bouton.disabled = true;
+      bouton.textContent = msg.sending;
+
+      fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify(d),
+      })
+        .then(function (r) {
+          return r.json().then(function (corps) { return { code: r.status, corps: corps }; });
+        })
+        .then(function (res) {
+          if (res.code === 200 && res.corps.checkout_url) {
+            // Pas de nouvel onglet : le paiement est la suite du parcours,
+            // pas une digression. Le retour se fait par redirect_url.
+            window.location.href = res.corps.checkout_url;
+            return;
+          }
+
+          bouton.disabled = false;
+          bouton.textContent = msg.submit;
+
+          if (res.code === 422 && res.corps.champs) {
+            Object.keys(res.corps.champs).forEach(function (k) {
+              messageDe(k, res.corps.champs[k] === 'trop_jeune' ? msg.young : msg.required);
+            });
+            erreurGlobale(msg.generic);
+            return;
+          }
+
+          var e = res.corps.erreur;
+          erreurGlobale(
+            e === 'deja_membre' ? msg.already :
+            e === 'deja_paye' ? msg.paid :
+            e === 'trop_de_tentatives' ? msg.rate :
+            e === 'paiement_indisponible' ? msg.payment :
+            msg.generic
+          );
+        })
+        .catch(function () {
+          bouton.disabled = false;
+          bouton.textContent = msg.submit;
+          erreurGlobale(msg.payment);
+        });
+    });
+  })();
+</script>
+
+<style>
+  .jhead h1 { font-size: var(--step-4); margin-bottom: var(--space-4); }
+
+  .jprice {
+    display: grid;
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+    padding-top: var(--space-5);
+    border-top: 2px solid var(--yaac-primary);
+  }
+  @media (min-width: 560px) {
+    .jprice { grid-template-columns: 1fr 1fr; }
+    .jprice__note { grid-column: 1 / -1; }
+  }
+  .jprice__item {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-2) var(--space-3);
+    margin: 0;
+  }
+  .jprice__item .jprice__label { flex-basis: 100%; }
+  .jprice__per { font-size: var(--step--1); color: var(--text-muted); }
+  .jprice__label {
+    font-size: var(--step--1);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent-text);
+  }
+  .jprice__amount {
+    font-family: var(--font-display);
+    font-size: var(--step-3);
+    color: var(--yaac-primary);
+    font-variant-numeric: tabular-nums;
+  }
+  .jprice__note { margin: 0; font-size: var(--step--1); color: var(--text-muted); }
+
+  .jcols { display: grid; gap: var(--space-7); }
+  @media (min-width: 720px) { .jcols { grid-template-columns: 1fr 1fr; gap: var(--space-6); } }
+
+  .jsub { font-size: var(--step-2); margin-bottom: var(--space-4); }
+
+  .jsteps, .jgets { margin: 0; padding-left: 1.2em; display: grid; gap: var(--space-3); }
+  .jgets { list-style: none; padding-left: 0; }
+  .jgets li { padding-left: 1.6em; position: relative; }
+  .jgets li::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0.55em;
+    width: 0.7em; height: 0.7em;
+    background: var(--yaac-accent);
+    border-radius: var(--radius-full);
+  }
+
+  .jform { margin-top: var(--space-5); }
+  .jset { border: 0; padding: 0; margin: 0 0 var(--space-7); }
+  .jlegend {
+    padding: 0;
+    font-size: var(--step--1);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent-text);
+    margin-bottom: var(--space-4);
+  }
+
+  .jgrid { display: grid; gap: var(--space-4); }
+  @media (min-width: 620px) {
+    .jgrid { grid-template-columns: 1fr 1fr; }
+    .jgrid--phone { grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); }
+  }
+
+  .jfield { margin: 0 0 var(--space-4); }
+  .jfield label { display: block; font-weight: 500; margin-bottom: var(--space-2); }
+  .jopt { font-weight: 400; color: var(--text-muted); font-size: var(--step--1); }
+
+  .jfield input, .jfield select, .jfield textarea {
+    width: 100%;
+    min-height: 48px;
+    padding: var(--space-3) var(--space-4);
+    font: inherit;
+    color: var(--text);
+    background: var(--white);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
+  }
+  .jfield textarea { min-height: auto; resize: vertical; line-height: var(--leading-body); }
+  .jfield input:focus-visible, .jfield select:focus-visible, .jfield textarea:focus-visible {
+    border-color: var(--yaac-primary);
+  }
+  /* La couleur ne porte jamais l'information seule : un message texte
+     accompagne toujours la bordure. */
+  [aria-invalid='true'] { border-color: #b3261e !important; }
+
+  .jmsg:empty { display: none; }
+  .jmsg {
+    display: block;
+    margin-top: var(--space-2);
+    font-size: var(--step--1);
+    color: #8f2b23;
+  }
+
+  .jcheck { display: flex; gap: var(--space-3); align-items: flex-start; margin: 0; }
+  .jcheck input {
+    flex: 0 0 auto;
+    width: 1.35rem; height: 1.35rem;
+    margin-top: 0.15em;
+    accent-color: var(--yaac-primary);
+  }
+
+  .jsubmit { margin-top: var(--space-6); min-height: 52px; }
+
+  /* Masqué sans `display: none` : certains automates ignorent les champs
+     réellement retirés du flux. */
+  .jtrap {
+    position: absolute;
+    width: 1px; height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .jerror {
+    margin-bottom: var(--space-5);
+    padding: var(--space-4) var(--space-5);
+    background: #fdeceb;
+    border: 1px solid #d16b62;
+    border-radius: var(--radius-md);
+  }
+  .jerror__title { font-weight: 700; color: #8f2b23; margin-bottom: var(--space-2); }
+</style>

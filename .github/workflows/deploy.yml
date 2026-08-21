@@ -1,9 +1,16 @@
-name: Déploiement GitHub Pages
+name: Aperçu GitHub Pages (manuel)
 
+# DÉCLENCHEMENT MANUEL UNIQUEMENT, depuis l'onglet Actions.
+#
+# Le site officiel est https://yaac.network. Publier automatiquement une
+# copie sur zoummanaurel-debug.github.io/YAAC créerait un site jumeau,
+# indexable, qui concurrencerait yaac.network sur la requête « YAAC » — soit
+# l'inverse exact de l'objectif de référencement.
+#
+# Ce workflow reste utile pour prévisualiser une refonte avant de la pousser
+# en production. Pensez à désactiver GitHub Pages dans Réglages → Pages tant
+# que vous ne vous en servez pas.
 on:
-  push:
-    branches: [main]
-  # Permet de relancer le déploiement à la main depuis l'onglet Actions
   workflow_dispatch:
 
 # Un seul déploiement à la fois ; les pushes suivants attendent leur tour
@@ -55,6 +62,25 @@ jobs:
             fi
           done
           echo "Les 8 pages principales sont présentes."
+
+      # Garde-fou : `public/` est copié tel quel dans `dist/`, et `dist/` est
+      # publié. Un `config.php` laissé dans `public/api/` finirait donc en
+      # ligne, servi en texte brut par GitHub Pages qui n'exécute pas PHP —
+      # exposant le mot de passe SMTP, les accès MySQL, le secret Chariow et
+      # le lien du groupe WhatsApp. Le .gitignore ne protège pas de ça : il
+      # empêche le commit, pas la build locale ni un déploiement manuel.
+      - name: Vérifier qu'aucun secret n'est publié
+        run: |
+          set -e
+          if [ -f "dist/api/config.php" ]; then
+            echo "::error::dist/api/config.php est présent dans la build. Ce fichier contient des secrets et ne doit JAMAIS être publié. Il se crée directement sur le serveur Hostinger."
+            exit 1
+          fi
+          if grep -rlE "chat\.whatsapp\.com|whsec_[A-Za-z0-9]|smtp.*password.*=>.*'[^C]" dist/ 2>/dev/null | grep -v "config.example.php"; then
+            echo "::error::Un secret ou un lien d'invitation a fuité dans la build (fichiers listés ci-dessus)."
+            exit 1
+          fi
+          echo "Aucun secret détecté dans dist/."
 
       - name: Publier l'artefact
         uses: actions/upload-pages-artifact@v3

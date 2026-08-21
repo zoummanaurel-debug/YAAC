@@ -1,0 +1,23 @@
+# YAAC — Protection des fichiers internes de l'API.
+#
+# Seuls adhesion.php et verify.php sont des points d'entrée. Les autres
+# fichiers de ce dossier sont inclus par eux et ne doivent jamais être
+# demandés directement — en particulier config.php, qui contient le secret
+# de signature Chariow et le mot de passe SMTP.
+#
+# Un fichier .php n'est normalement pas servi en texte, mais si le module PHP
+# tombe ou est désactivé pendant une maintenance, Apache le renvoie tel quel.
+# Cette règle est l'assurance contre ce cas précis.
+
+<FilesMatch "^(config\.php|config\.example\.php|_.*\.php)$">
+    Require all denied
+</FilesMatch>
+
+# Les journaux n'ont rien à faire sous public_html, mais si l'un y atterrit
+# par erreur de configuration, il ne doit pas être téléchargeable.
+<FilesMatch "\.(log|sql|ini)$">
+    Require all denied
+</FilesMatch>
+
+# Pas de listing du dossier.
+Options -Indexes

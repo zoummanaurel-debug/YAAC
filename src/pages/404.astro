@@ -1,0 +1,131 @@
+---
+/**
+ * Page 404.
+ *
+ * À la racine et hors du système i18n : Apache la sert pour n'importe quelle
+ * URL manquante, dans n'importe quelle langue, y compris les anciennes URL
+ * WordPress qui n'ont pas de correspondance. Elle affiche donc les deux
+ * langues côte à côte plutôt que d'en deviner une.
+ */
+import '../styles/global.css';
+import { Image } from 'astro:assets';
+import logo from '../assets/brand/yaac-logo.png';
+
+const base = import.meta.env.BASE_URL.replace(/\/+$/, '');
+---
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Page introuvable — YAAC</title>
+    <meta name="robots" content="noindex, follow" />
+    <link rel="icon" href={`${base}/favicon.ico`} sizes="any" />
+    <link rel="icon" type="image/png" href={`${base}/icon-192.png`} sizes="192x192" />
+    <link rel="apple-touch-icon" href={`${base}/apple-touch-icon.png`} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Palanquin:wght@400;600&family=Roboto:wght@400;500&display=swap"
+    />
+  </head>
+
+  <body class="e404">
+    <main class="e404__box">
+      <a class="e404__brand" href={`${base}/fr/`}>
+        <Image src={logo} alt="YAAC" widths={[130, 260]} sizes="130px" loading="eager" />
+      </a>
+
+      <p class="e404__code">404</p>
+
+      <h1 class="e404__t">Cette page n'existe pas</h1>
+      <p class="e404__l">
+        Le lien est peut-être ancien, ou l'adresse comporte une erreur.
+        Le site a changé récemment : plusieurs pages ont de nouvelles adresses.
+      </p>
+
+      <p class="e404__t e404__t--en">This page does not exist</p>
+      <p class="e404__l">
+        The link may be outdated, or the address contains a mistake.
+        The site changed recently and several pages moved.
+      </p>
+
+      <nav class="e404__nav" aria-label="Navigation principale">
+        <a class="btn btn--primary" href={`${base}/fr/`}>Aller à l'accueil</a>
+        <a class="btn btn--outline" href={`${base}/en/`}>Go to homepage</a>
+      </nav>
+
+      <p class="e404__help">
+        Vous cherchiez à vérifier une carte de membre ?
+        <a href={`${base}/verify/`}>Vérification d'une carte</a> ·
+        Looking to verify a membership card?
+        <a href={`${base}/verify/`}>Card verification</a>
+      </p>
+    </main>
+
+    <style>
+      .e404 {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: var(--space-6) var(--gutter);
+        background: var(--bg-subtle);
+      }
+      .e404__box {
+        max-width: 40rem;
+        text-align: center;
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: clamp(1.75rem, 5vw, 3.25rem);
+        box-shadow: var(--shadow-md);
+      }
+      .e404__brand { display: inline-block; margin-bottom: var(--space-6); }
+      .e404__brand :global(img) { width: 118px; height: auto; }
+
+      /* Le code est une donnée technique, pas le titre de la page : il reste
+         discret, et c'est la phrase en français qui porte le sens. */
+      .e404__code {
+        font-family: var(--font-display);
+        font-size: var(--step-1);
+        font-weight: 600;
+        letter-spacing: 0.18em;
+        color: var(--accent-text);
+        margin-bottom: var(--space-4);
+      }
+
+      .e404__t { font-family: var(--font-heading); font-size: var(--step-3); line-height: 1.2; }
+      .e404__t--en {
+        margin-top: var(--space-6);
+        padding-top: var(--space-6);
+        border-top: 1px solid var(--border);
+        color: var(--text-muted);
+        font-size: var(--step-2);
+      }
+      .e404__l {
+        margin-top: var(--space-3);
+        color: var(--text-muted);
+        max-width: 46ch;
+        margin-inline: auto;
+      }
+
+      .e404__nav {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: var(--space-3);
+        margin-top: var(--space-7);
+      }
+
+      .e404__help {
+        margin-top: var(--space-6);
+        padding-top: var(--space-5);
+        border-top: 1px solid var(--border);
+        font-size: var(--step--1);
+        color: var(--text-muted);
+      }
+      .e404__help a { color: var(--yaac-primary); }
+    </style>
+  </body>
+</html>

@@ -64,7 +64,9 @@ const jsonLd = {
     <meta property="og:locale" content={lang === 'fr' ? 'fr_FR' : 'en_GB'} />
     <meta name="twitter:card" content="summary_large_image" />
 
-    <link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL}favicon.svg`} />
+    <link rel="icon" href={`${import.meta.env.BASE_URL}favicon.ico`} sizes="any" />
+    <link rel="icon" type="image/png" href={`${import.meta.env.BASE_URL}icon-192.png`} sizes="192x192" />
+    <link rel="apple-touch-icon" href={`${import.meta.env.BASE_URL}apple-touch-icon.png`} />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
