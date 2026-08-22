@@ -39,15 +39,22 @@ export const contactInfo = {
   phoneSenegal: '+221 71 032 22 44',
   /** Format international sans espaces ni +, requis par wa.me */
   whatsapp: '221710322244',
+  /**
+   * Chaîne WhatsApp — diffusion à sens unique. Elle a sa place parmi les
+   * réseaux sociaux, jamais comme moyen de contact : on n'y répond pas.
+   * Le bouton « Discuter sur WhatsApp » de la page Contact reste donc sur
+   * `wa.me`, qui ouvre une vraie conversation.
+   */
+  whatsappChannel: 'https://whatsapp.com/channel/0029Vb5Kgoh7j6g0VJxnmu16',
 } as const;
 
-/** Réseaux sociaux officiels. */
+/** Réseaux sociaux officiels — surfaces de diffusion, pas de contact. */
 export const socialLinks = [
   { name: 'Facebook', url: 'https://www.facebook.com/profile.php?id=61569023037197' },
   { name: 'Instagram', url: 'https://www.instagram.com/yaac_network/' },
   { name: 'YouTube', url: 'https://www.youtube.com/@YAACNetwork' },
   { name: 'LinkedIn', url: 'https://www.linkedin.com/company/yaac-network/' },
-  { name: 'WhatsApp', url: `https://wa.me/${contactInfo.whatsapp}` },
+  { name: 'WhatsApp', url: contactInfo.whatsappChannel },
 ] as const;
 
 /**

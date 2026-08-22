@@ -1,5 +1,7 @@
 ---
+import { Image } from 'astro:assets';
 import SocialLinks from './SocialLinks.astro';
+import feuilles from '../assets/brand/yaac-feuilles.png';
 import {
   useTranslations, localePath, externalLinks, contactInfo, registrations,
   type Lang, type RouteKey,
@@ -19,38 +21,53 @@ const navItems: { key: RouteKey; label: string }[] = [
 ];
 ---
 <footer class="ftr">
+  {/* Le filet vert feuille reprend celui de la carte de membre : même geste,
+      même épaisseur. Il donne au pied de page un bord franc au lieu de le
+      laisser flotter sous le contenu. */}
+  <div class="ftr__rule" aria-hidden="true"></div>
+
   <div class="container ftr__grid">
     <div class="ftr__brand">
-      <p class="ftr__name">{t.footer.about}</p>
+      <div class="ftr__id">
+        <Image class="ftr__mark" src={feuilles} alt="" widths={[56, 112]} sizes="56px" loading="lazy" />
+        <p class="ftr__name">{t.footer.about}</p>
+      </div>
       <p class="ftr__blurb">{t.footer.blurb}</p>
 
       <h2 class="ftr__title ftr__title--social">{t.footer.socialTitle}</h2>
       <SocialLinks tone="dark" />
     </div>
 
-    <nav class="ftr__col" aria-label={t.footer.navTitle}>
-      <h2 class="ftr__title">{t.footer.navTitle}</h2>
-      <ul>
-        {navItems.map(({ key, label }) => (
-          <li><a href={localePath(lang, key)}>{label}</a></li>
-        ))}
-      </ul>
-    </nav>
+    {/* Les deux colonnes de liens passent côte à côte dès 420 px : sur un
+        téléphone, empilées, elles imposaient un défilement inutile alors que
+        chaque liste tient en trois à cinq entrées courtes. */}
+    <div class="ftr__links">
+      <nav class="ftr__col" aria-label={t.footer.navTitle}>
+        <h2 class="ftr__title">{t.footer.navTitle}</h2>
+        <ul>
+          {navItems.map(({ key, label }) => (
+            <li><a href={localePath(lang, key)}>{label}</a></li>
+          ))}
+        </ul>
+      </nav>
 
-    <div class="ftr__col">
-      <h2 class="ftr__title">{t.footer.actTitle}</h2>
-      <ul>
-        <li><a href={localePath(lang, 'join')}>{t.nav.join}</a></li>
-        <li><a href={externalLinks.partnership} target="_blank" rel="noopener">{t.partners.partnerCta}</a></li>
-        <li><a href={externalLinks.volunteer} target="_blank" rel="noopener">{t.partners.volunteerCta}</a></li>
-      </ul>
+      <div class="ftr__col">
+        <h2 class="ftr__title">{t.footer.actTitle}</h2>
+        <ul>
+          <li><a href={localePath(lang, 'join')}>{t.nav.join}</a></li>
+          <li><a href={externalLinks.partnership} target="_blank" rel="noopener">{t.partners.partnerCta}</a></li>
+          <li><a href={externalLinks.volunteer} target="_blank" rel="noopener">{t.partners.volunteerCta}</a></li>
+        </ul>
+      </div>
 
-      <h2 class="ftr__title ftr__title--contact">{t.footer.contactTitle}</h2>
-      <ul>
-        <li><a href={`mailto:${contactInfo.email}`}>{contactInfo.email}</a></li>
-        <li><a href={`tel:${contactInfo.phoneSenegal.replace(/\s/g, '')}`}>{contactInfo.phoneSenegal}</a></li>
-        <li><a href={`tel:${contactInfo.phoneBenin.replace(/\s/g, '')}`}>{contactInfo.phoneBenin}</a></li>
-      </ul>
+      <div class="ftr__col ftr__col--contact">
+        <h2 class="ftr__title">{t.footer.contactTitle}</h2>
+        <ul>
+          <li><a href={`mailto:${contactInfo.email}`}>{contactInfo.email}</a></li>
+          <li><a href={`tel:${contactInfo.phoneSenegal.replace(/\s/g, '')}`}>{contactInfo.phoneSenegal}</a></li>
+          <li><a href={`tel:${contactInfo.phoneBenin.replace(/\s/g, '')}`}>{contactInfo.phoneBenin}</a></li>
+        </ul>
+      </div>
     </div>
   </div>
 
@@ -71,33 +88,46 @@ const navItems: { key: RouteKey; label: string }[] = [
 
   <div class="container ftr__bar">
     <p>© {year} {t.footer.about} (YAAC). {t.footer.rights}</p>
-    <a class="ftr__top" href="#main">{t.footer.backToTop} ↑</a>
+    <a class="ftr__top" href="#main">
+      {t.footer.backToTop}
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+           stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 19V5" /><path d="m5 12 7-7 7 7" />
+      </svg>
+    </a>
   </div>
 </footer>
 
 <style>
   .ftr {
-    margin-top: var(--space-9);
-    padding-top: var(--space-8);
+    /* L'écart au contenu se resserre sur mobile : 6 rem y coûtent un demi-écran
+       de défilement pour un blanc qui ne dit rien. */
+    margin-top: clamp(var(--space-7), 8vw, var(--space-9));
     background: var(--green-900);
     color: var(--green-100);
   }
+  .ftr__rule { height: 4px; background: var(--yaac-accent); }
+
   .ftr__grid {
     display: grid;
     gap: var(--space-7);
     grid-template-columns: 1fr;
+    padding-top: var(--space-8);
     padding-bottom: var(--space-7);
   }
-  @media (min-width: 720px) {
-    .ftr__grid { grid-template-columns: 2fr 1fr 1.2fr; gap: var(--space-6); }
+  @media (min-width: 900px) {
+    .ftr__grid { grid-template-columns: 1.1fr 1.6fr; gap: var(--space-8); }
   }
 
+  /* --- Identité --- */
+  .ftr__id { display: flex; align-items: center; gap: var(--space-4); margin-bottom: var(--space-4); }
+  .ftr__mark { width: 52px; height: 52px; flex-shrink: 0; }
   .ftr__name {
     font-family: var(--font-display);
     font-size: var(--step-1);
     font-weight: 600;
+    line-height: 1.15;
     color: var(--white);
-    margin-bottom: var(--space-3);
   }
   .ftr__blurb { max-width: 42ch; color: var(--green-200); }
 
@@ -109,23 +139,55 @@ const navItems: { key: RouteKey; label: string }[] = [
     color: var(--green-300);
     margin-bottom: var(--space-4);
   }
-  .ftr__title--social, .ftr__title--contact { margin-top: var(--space-6); }
+  .ftr__title--social { margin-top: var(--space-6); }
 
-  .ftr__col ul { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--space-3); }
-  .ftr__col a, .ftr__top {
+  /* --- Colonnes de liens --- */
+  .ftr__links { display: grid; gap: var(--space-6) var(--space-5); }
+  @media (min-width: 420px) { .ftr__links { grid-template-columns: 1fr 1fr; } }
+  @media (min-width: 900px) { .ftr__links { grid-template-columns: repeat(3, 1fr); gap: var(--space-6); } }
+
+  .ftr__col ul { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--space-1); }
+  .ftr__col li { display: flex; }
+
+  .ftr__col a {
+    position: relative;
+    display: inline-block;
+    /* Zone tactile confortable au doigt : le texte seul faisait 24 px de haut,
+       très en dessous du minimum utilisable sur téléphone. */
+    padding-block: var(--space-2);
     color: var(--green-100);
     text-decoration: none;
     transition: color var(--dur) var(--ease);
   }
-  .ftr__col a:hover, .ftr__top:hover { color: var(--yaac-accent); text-decoration: underline; }
+  /* Même soulignement animé que la navigation d'en-tête : le motif existe
+     déjà dans le projet, il n'y a pas de raison d'en inventer un second. */
+  .ftr__col a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0.35em;
+    width: 100%;
+    height: 1px;
+    background: var(--yaac-accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--dur) var(--ease);
+  }
+  .ftr__col a:hover { color: var(--yaac-accent); }
+  .ftr__col a:hover::after { transform: scaleX(1); }
 
+  .ftr__col--contact a { word-break: break-word; }
+
+  /* --- Enregistrement légal --- */
   .ftr__legal { padding-bottom: var(--space-6); }
   .ftr__legal-grid { display: grid; gap: var(--space-5); margin: 0; }
-  @media (min-width: 640px) { .ftr__legal-grid { grid-template-columns: 1fr 1fr; } }
+  @media (min-width: 640px) { .ftr__legal-grid { grid-template-columns: 1fr 1fr; gap: var(--space-6); } }
 
+  /* Un filet horizontal fin plutôt qu'une barrette verticale colorée : la
+     barrette de 2 px est un ornement, le filet marque un début de bloc. */
   .ftr__legal-item {
-    padding-left: var(--space-4);
-    border-left: 2px solid color-mix(in srgb, var(--green-300) 40%, transparent);
+    padding-top: var(--space-4);
+    border-top: 1px solid color-mix(in srgb, var(--green-300) 30%, transparent);
   }
   .ftr__legal-item dt {
     font-weight: 600;
@@ -136,18 +198,43 @@ const navItems: { key: RouteKey; label: string }[] = [
     margin: 0;
     font-size: var(--step--1);
     color: var(--green-200);
+    /* Des références administratives : les chiffres s'alignent en colonne. */
+    font-variant-numeric: tabular-nums;
   }
   .ftr__legal-key { color: var(--green-300); font-weight: 600; }
 
+  /* --- Barre de bas de page --- */
   .ftr__bar {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-3);
+    gap: var(--space-2) var(--space-4);
     align-items: center;
     justify-content: space-between;
     padding-block: var(--space-5);
     border-top: 1px solid color-mix(in srgb, var(--green-300) 25%, transparent);
     font-size: var(--step--1);
     color: var(--green-200);
+  }
+  .ftr__top {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    margin-inline: calc(var(--space-3) * -1);
+    color: var(--green-100);
+    text-decoration: none;
+    border-radius: var(--radius-full);
+    transition: color var(--dur) var(--ease), background var(--dur) var(--ease);
+  }
+  .ftr__top svg { transition: transform var(--dur) var(--ease); }
+  .ftr__top:hover {
+    color: var(--yaac-accent);
+    background: color-mix(in srgb, var(--green-300) 12%, transparent);
+  }
+  .ftr__top:hover svg { transform: translateY(-2px); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ftr__col a::after, .ftr__top svg { transition: none; }
+    .ftr__top:hover svg { transform: none; }
   }
 </style>
