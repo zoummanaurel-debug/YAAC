@@ -113,12 +113,21 @@ export function assetPath(path: string): string {
   return `${joinPath(import.meta.env.BASE_URL)}${path.replace(/^\/+/, '')}`;
 }
 
-/** Formate une date selon la locale. */
+/**
+ * Formate une date selon la locale.
+ *
+ * `timeZone: 'UTC'` n'est pas un détail : les dates du frontmatter sont des
+ * jours (`2025-03-23`), que JavaScript interprète comme minuit UTC. Sans ce
+ * réglage, la date s'affiche dans le fuseau de la machine qui construit —
+ * un poste à l'ouest de Greenwich reculait la publication d'un jour, et la
+ * même page n'avait donc pas la même date en local et sur le serveur.
+ */
 export function formatDate(date: Date, lang: Lang): string {
   return new Intl.DateTimeFormat(lang === 'fr' ? 'fr-FR' : 'en-GB', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
+    timeZone: 'UTC',
   }).format(date);
 }
 
