@@ -6,6 +6,7 @@ category: yaac-talk
 cover: ../../../assets/news/yaac-talk-4.png
 coverAlt: "Poster for the fourth YAAC Talk, on biodiversity and African economies"
 featured: true
+video: ELZs9TtcLiM
 ---
 
 On **23 May 2026**, the Youth Alliance for Agroecology and Climate held its fourth YAAC Talk, on a gap that is rarely named: *"Biodiversity, the invisible pillar of our economies."*
