@@ -130,6 +130,10 @@ jobs:
           password: ${{ secrets.FTP_MOTDEPASSE }}
           protocol: ftps
           port: 21
+          # Le delai par defaut est de 30 s. Une image lourde ou un serveur
+          # momentanement lent suffit a le depasser, et le deploiement echoue
+          # sur « Timeout (control socket) » alors que rien n'est casse.
+          timeout: 120000
           local-dir: ./dist/
           # /public_html/ est le dossier web de tout hébergement Hostinger.
           # Le secret ne sert qu'à couvrir une installation atypique.
