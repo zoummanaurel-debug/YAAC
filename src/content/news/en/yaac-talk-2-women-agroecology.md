@@ -1,7 +1,7 @@
 ---
 title: "YAAC Talk 2: Women, knowledge and agroecology"
 description: "For more than two and a half hours, women leaders and environmental advocates shared how their knowledge sits at the heart of sustainable climate adaptation."
-date: 2025-11-13
+date: 2025-11-08
 category: yaac-talk
 cover: ../../../assets/news/yaac-talk-2.jpg
 coverAlt: "YAAC identity, values, vision and mission board"

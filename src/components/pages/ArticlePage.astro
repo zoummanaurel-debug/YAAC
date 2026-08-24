@@ -22,8 +22,14 @@ const slug = entry.id.split('/').pop()!;
   <article class="post">
     <header class="post__header">
       <div class="container container--narrow">
-        <a class="post__back" href={localePath(lang, 'news')}>← {t.news.backToNews}</a>
-        <p class="post__cat">{t.news.categories[category]}</p>
+        {/* Le lien de retour et la catégorie étaient deux `inline-block`
+            successifs : ils se retrouvaient sur la même ligne, séparés par la
+            seule espace du code source. Une rangée flex leur donne un écart
+            réel et les fait passer à la ligne quand la place manque. */}
+        <div class="post__top">
+          <a class="post__back" href={localePath(lang, 'news')}>← {t.news.backToNews}</a>
+          <p class="post__cat">{t.news.categories[category]}</p>
+        </div>
         <h1 class="post__title">{title}</h1>
         <p class="post__meta">
           {t.news.publishedOn}
@@ -64,30 +70,49 @@ const slug = entry.id.split('/').pop()!;
 </Base>
 
 <style>
-  .post__header { padding-block: var(--space-8) var(--space-6); background: var(--bg-subtle); }
+  /* Le rembourrage bas doit rester SUPÉRIEUR au recouvrement de l'image
+     ci-dessous, sinon la date de publication passe sous la photo. */
+  .post__header { padding-block: var(--space-8) var(--space-8); background: var(--bg-subtle); }
+
+  .post__top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3) var(--space-4);
+    margin-bottom: var(--space-5);
+  }
 
   .post__back {
-    display: inline-block;
-    margin-bottom: var(--space-5);
+    /* Rembourrage vertical et retrait latéral compensé : la cible tactile
+       grandit sans que le texte se décale de la marge. */
+    padding-block: var(--space-2);
+    padding-inline: var(--space-2);
+    margin-inline-start: calc(var(--space-2) * -1);
     font-weight: 600;
     text-decoration: none;
+    border-radius: var(--radius-sm);
   }
   .post__back:hover { text-decoration: underline; }
 
   .post__cat {
-    display: inline-block;
-    padding: var(--space-1) var(--space-4);
+    padding: var(--space-2) var(--space-4);
     background: var(--yaac-primary);
     color: var(--white);
     border-radius: var(--radius-full);
     font-size: var(--step--1);
     font-weight: 600;
-    margin-bottom: var(--space-4);
+    margin: 0;
   }
   .post__title { margin-bottom: var(--space-4); }
   .post__meta { color: var(--text-muted); font-size: var(--step--1); }
 
-  .post__cover { margin-top: calc(var(--space-7) * -1); }
+  /* Le recouvrement est un geste de mise en page qui suppose de la place.
+     Sur téléphone, un titre sur quatre lignes ne laisse rien à recouvrir :
+     l'image se contente de suivre. */
+  .post__cover { margin-top: var(--space-5); }
+  @media (min-width: 720px) {
+    .post__cover { margin-top: calc(var(--space-7) * -1); }
+  }
   .post__cover :global(img) {
     width: 100%;
     aspect-ratio: 16 / 9;

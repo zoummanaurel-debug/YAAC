@@ -1,7 +1,7 @@
 ---
 title: "World Wetlands Day: an unforgettable visit"
 description: "To mark World Wetlands Day, YAAC partnered with AGIRE for a field visit dedicated to the ecosystems that quietly sustain life on Earth."
-date: 2025-11-13
+date: 2025-02-09
 category: public-action
 cover: ../../../assets/news/wetlands.jpg
 coverAlt: "Aerial view of the wetland visited for World Wetlands Day"

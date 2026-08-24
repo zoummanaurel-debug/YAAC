@@ -1,7 +1,7 @@
 ---
 title: "Journée internationale zéro déchet : YAAC agit pour des plages propres à Dakar"
 description: "À l’occasion de la Journée internationale zéro déchet, YAAC a alerté sur l’urgence de la pollution des plages de la capitale sénégalaise — et est passée à l’action."
-date: 2025-11-13
+date: 2025-04-06
 category: public-action
 cover: ../../../assets/news/zero-waste.jpg
 coverAlt: "Membres de YAAC lors du nettoyage de plage à Dakar"
