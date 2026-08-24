@@ -11,7 +11,7 @@
  * paiement reste visible en base : c'est ce qui rend un abandon mesurable.
  */
 import Base from '../../layouts/Base.astro';
-import { useTranslations, localePath, assetPath, type Lang } from '../../i18n/utils';
+import { useTranslations, assetPath, type Lang } from '../../i18n/utils';
 import { paysTries } from '../../data/pays';
 
 interface Props { lang: Lang }
@@ -314,6 +314,13 @@ const sources = lang === 'fr'
             // Pas de nouvel onglet : le paiement est la suite du parcours,
             // pas une digression. Le retour se fait par redirect_url.
             window.location.href = res.corps.checkout_url;
+            return;
+          }
+
+          // Vente gratuite : un code de réduction à 100 % finalise l'achat
+          // sans page de paiement. On va droit à la confirmation.
+          if (res.code === 200 && res.corps.redirection) {
+            window.location.href = res.corps.redirection;
             return;
           }
 

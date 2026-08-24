@@ -137,6 +137,12 @@ $pdo->prepare(
 // fondateur dispensé n'a aucun moyen de faire valoir sa dispense.
 $code_reduction = mb_strtoupper($texte('code_reduction', 100));
 
+// Page de retour, dans la langue où le visiteur est parti. Sert deux fois :
+// comme `redirect_url` après paiement, et comme destination directe quand la
+// vente est gratuite et n'ouvre aucune page de paiement.
+$confirmation = $config['liens']['site']
+    . ($texte('lang', 2) === 'en' ? '/en/membership-confirmed/' : '/fr/adhesion-confirmee/');
+
 $charge = [
     'product_id' => $config['chariow']['product_id'],
     'email'      => $email,
@@ -147,8 +153,7 @@ $charge = [
     // 10 clés max : on n'en utilise qu'une.
     'custom_metadata' => ['candidature' => $jeton],
     // Le visiteur revient dans la langue où il est parti.
-    'redirect_url'    => $config['liens']['site']
-        . ($texte('lang', 2) === 'en' ? '/en/membership-confirmed/' : '/fr/adhesion-confirmee/'),
+    'redirect_url'    => $confirmation,
     'customer_ip'     => (string) ($_SERVER['REMOTE_ADDR'] ?? ''),
 ];
 
@@ -217,6 +222,18 @@ $url  = $data['payment']['checkout_url'] ?? null;
 if (($data['step'] ?? '') === 'already_purchased') {
     yaac_log('checkout_deja_achete', ['email' => $email, 'jeton' => $jeton]);
     yaac_json(409, ['erreur' => 'deja_paye']);
+}
+
+// `completed` : la vente est finalisée sur-le-champ, sans page de paiement.
+// C'est le cas d'un code de réduction à 100 % — celui des membres fondateurs
+// dispensés. Il n'y a donc AUCUN `checkout_url`, et le traiter comme une
+// panne afficherait « service indisponible » sur une vente réussie.
+//
+// Le Pulse `successful.sale` part quand même : le membre sera créé et son
+// e-mail envoyé, exactement comme pour une vente payante.
+if (($data['step'] ?? '') === 'completed') {
+    yaac_log('checkout_gratuit', ['email' => $email, 'jeton' => $jeton, 'code' => $code_reduction]);
+    yaac_json(200, ['statut' => 'ok', 'redirection' => $confirmation]);
 }
 
 if (!is_string($url) || $url === '') {
