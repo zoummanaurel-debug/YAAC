@@ -185,8 +185,16 @@ if ($reponse === false || $http < 200 || $http >= 300) {
     // la personne peut corriger seule. Lui répondre « service indisponible,
     // réessayez dans quelques minutes » l'enverrait attendre un incident qui
     // n'existe pas, et elle réessaierait le même code indéfiniment.
-    if ($http === 422 && $code_reduction !== ''
-        && stripos((string) $reponse, 'discount') !== false) {
+    //
+    // On ne cherche aucun mot-clé dans la réponse de Chariow : son libellé
+    // n'est pas contractuel et peut changer de langue. Le raisonnement porte
+    // sur le code HTTP. 401 et 404 sont exclus : ce sont des défauts de
+    // configuration côté serveur, dont le visiteur n'est pas responsable et
+    // qu'il ne peut pas corriger.
+    $refus_du_client = $http >= 400 && $http < 500
+        && $http !== 401 && $http !== 404 && $http !== 429;
+
+    if ($code_reduction !== '' && $refus_du_client) {
         yaac_json(422, ['erreur' => 'code_reduction_invalide']);
     }
 
