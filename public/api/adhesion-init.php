@@ -132,7 +132,12 @@ $pdo->prepare(
 // ---------------------------------------------------------------------
 // Session de paiement Chariow
 // ---------------------------------------------------------------------
-$corps = json_encode([
+// Code de réduction : la page de paiement hébergée n'offre aucun champ pour
+// le saisir, il doit donc voyager depuis notre formulaire. Sans ça, un membre
+// fondateur dispensé n'a aucun moyen de faire valoir sa dispense.
+$code_reduction = mb_strtoupper($texte('code_reduction', 100));
+
+$charge = [
     'product_id' => $config['chariow']['product_id'],
     'email'      => $email,
     'first_name' => mb_substr($prenom, 0, 50),
@@ -145,7 +150,14 @@ $corps = json_encode([
     'redirect_url'    => $config['liens']['site']
         . ($texte('lang', 2) === 'en' ? '/en/membership-confirmed/' : '/fr/adhesion-confirmee/'),
     'customer_ip'     => (string) ($_SERVER['REMOTE_ADDR'] ?? ''),
-], JSON_UNESCAPED_UNICODE);
+];
+
+// Envoyé seulement s'il est renseigné : Chariow refuse une chaîne vide.
+if ($code_reduction !== '') {
+    $charge['discount_code'] = $code_reduction;
+}
+
+$corps = json_encode($charge, JSON_UNESCAPED_UNICODE);
 
 $ch = curl_init('https://api.chariow.com/v1/checkout');
 curl_setopt_array($ch, [
@@ -168,6 +180,16 @@ if ($reponse === false || $http < 200 || $http >= 300) {
     // La candidature reste en base : la personne n'est pas perdue, et l'appel
     // peut être rejoué. On ne renvoie pas le détail de Chariow au visiteur.
     yaac_log('checkout_echec', ['http' => $http, 'curl' => $err, 'reponse' => (string) $reponse]);
+
+    // Un code de réduction refusé n'est PAS une panne : c'est une saisie que
+    // la personne peut corriger seule. Lui répondre « service indisponible,
+    // réessayez dans quelques minutes » l'enverrait attendre un incident qui
+    // n'existe pas, et elle réessaierait le même code indéfiniment.
+    if ($http === 422 && $code_reduction !== ''
+        && stripos((string) $reponse, 'discount') !== false) {
+        yaac_json(422, ['erreur' => 'code_reduction_invalide']);
+    }
+
     yaac_json(502, ['erreur' => 'paiement_indisponible']);
 }
 

@@ -178,6 +178,21 @@ const sources = lang === 'fr'
               {sources.map((s) => <option value={s}>{s}</option>)}
             </select>
           </p>
+
+          {/* La page de paiement Chariow n'offre aucun champ de code promo :
+              sans celui-ci, un membre fondateur n'aurait aucun moyen de faire
+              valoir sa dispense. Le code part dans `discount_code` à la
+              création de la session. */}
+          <p class="jfield">
+            <label for="code_reduction">{j.discount} <span class="jopt">({j.optional})</span></label>
+            <input
+              id="code_reduction" name="code_reduction" type="text"
+              maxlength="100" autocomplete="off" spellcheck="false"
+              placeholder={j.discountPlaceholder}
+            />
+            <span class="jmsg" data-for="code_reduction"></span>
+            <span class="jhint">{j.discountHint}</span>
+          </p>
         </fieldset>
 
         {/* Piège à robots : retiré de l'ordre de tabulation et masqué aux
@@ -213,6 +228,7 @@ const sources = lang === 'fr'
       paid: j.errPaid,
       payment: j.errPayment,
       rate: j.errRate,
+      discount: j.errDiscount,
       generic: j.errGeneric,
       submit: j.submit,
     },
@@ -313,6 +329,17 @@ const sources = lang === 'fr'
           }
 
           var e = res.corps.erreur;
+
+          // Un code refusé se signale SUR le champ concerné : renvoyer
+          // « service de paiement indisponible » enverrait la personne
+          // attendre un incident qui n'existe pas.
+          if (e === 'code_reduction_invalide') {
+            messageDe('code_reduction', msg.discount);
+            var champ = document.getElementById('code_reduction');
+            if (champ) { champ.focus(); champ.select(); }
+            return;
+          }
+
           erreurGlobale(
             e === 'deja_membre' ? msg.already :
             e === 'deja_paye' ? msg.paid :
@@ -424,6 +451,16 @@ const sources = lang === 'fr'
   /* La couleur ne porte jamais l'information seule : un message texte
      accompagne toujours la bordure. */
   [aria-invalid='true'] { border-color: #b3261e !important; }
+
+  /* Une indication sous le champ, pas un libellé : elle explique quand le
+     champ sert, ce qu'un intitulé seul ne peut pas dire. */
+  .jhint {
+    display: block;
+    margin-top: var(--space-2);
+    font-size: var(--step--1);
+    color: var(--text-muted);
+    line-height: var(--leading-body);
+  }
 
   .jmsg:empty { display: none; }
   .jmsg {
