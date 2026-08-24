@@ -17,7 +17,7 @@ numéro de membre, ni carte.
    └─ renvoie `checkout_url` ; le navigateur y va
    │
    ▼
-Chariow — « YAAC carte de membre » (prd_2tljqv9n, 6 000 FCFA)
+Chariow — « Carte de Membre YAAC » (prd_npi7sgb1, 6 000 FCFA)
    │
    │  Pulse successful.sale — le jeton revient dans custom_metadata
    ▼
@@ -109,7 +109,7 @@ Valeurs confirmées le 21/08/2026 :
 
 | Clé | Valeur |
 |---|---|
-| `chariow.product_id` | `prd_2tljqv9n` — déjà dans l'exemple |
+| `chariow.product_id` | `prd_npi7sgb1` — déjà dans l'exemple |
 | `chariow.api_key` | clé `sk_live_…` de la boutique, **nécessaire** pour créer une session de paiement |
 | `chariow.pulse_secret` | `whsec_…` du Pulse — voir §4 |
 | `adhesion.montant_affiche` | `6 000 FCFA` — déjà dans l'exemple |
@@ -174,7 +174,7 @@ Automation → Pulses → Add Pulse :
   redirige vers l'autre, la redirection peut transformer le POST en GET et
   vider le corps signé, ce qui ferait échouer la vérification de signature.
 - Événements : `successful.sale`, `license.expired`, `license.revoked`
-- Produit : « YAAC carte de membre »
+- Produit : « Carte de Membre YAAC »
 - Copier le **Signing secret** de l'onglet Overview dans `config.php`
 
 > **Chaque Pulse a son propre secret.** Si un Pulse a été recréé, c'est le

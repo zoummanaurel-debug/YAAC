@@ -57,7 +57,7 @@ environnemental, qu'un acteur purement écologiste ne pourrait pas copier honnê
     historique, en attente du formulaire définitif » dans le code)*
   - Formulaire partenaire : `https://forms.cloud.microsoft/r/gSpXzNcFrD`
   - Formulaire bénévole : `https://forms.cloud.microsoft/r/70kwMWMh3P`
-  - Lien de paiement : `https://sdmudmoy.mychariow.online/prd_2tljqv9n/checkout`
+  - Lien de paiement : `https://sdmudmoy.mychariow.online/prd_npi7sgb1/checkout`
   - E-mail expéditeur des cartes : `communication@yaac.network`
 - **Contrainte externe dure** : ajouter quelqu'un à un groupe WhatsApp par API est
   interdit par Meta. Aucune automatisation ne peut le faire. La parade retenue est de

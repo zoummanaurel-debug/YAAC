@@ -5,7 +5,7 @@
  */
 return [
   'db' => ['host'=>'localhost','name'=>'test','user'=>'test','password'=>'test'],
-  'chariow' => ['pulse_secret'=>'whsec_secret_de_test','api_key'=>'sk_live_test','product_id'=>'prd_2tljqv9n'],
+  'chariow' => ['pulse_secret'=>'whsec_secret_de_test','api_key'=>'sk_live_test','product_id'=>'prd_npi7sgb1'],
   'adhesion' => ['montant_affiche'=>'6 000 FCFA','validite_annees'=>5,'role_defaut'=>'Membre'],
   'liens' => [
     'site'=>'https://yaac.network',

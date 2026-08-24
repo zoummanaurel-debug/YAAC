@@ -42,7 +42,7 @@ return [
         // accepter toutes les ventes de la boutique ; renseignez-le si la
         // boutique vend autre chose que l'adhésion, sinon un achat sans
         // rapport créerait un membre.
-        'product_id'   => 'prd_2tljqv9n',
+        'product_id'   => 'prd_npi7sgb1',
     ],
 
     // ---------------------------------------------------------------------
