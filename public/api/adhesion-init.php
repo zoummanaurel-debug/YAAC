@@ -187,12 +187,18 @@ if ($reponse === false || $http < 200 || $http >= 300) {
     // n'existe pas, et elle réessaierait le même code indéfiniment.
     //
     // On ne cherche aucun mot-clé dans la réponse de Chariow : son libellé
-    // n'est pas contractuel et peut changer de langue. Le raisonnement porte
-    // sur le code HTTP. 401 et 404 sont exclus : ce sont des défauts de
-    // configuration côté serveur, dont le visiteur n'est pas responsable et
-    // qu'il ne peut pas corriger.
+    // n'est pas contractuel et peut changer de langue.
+    //
+    // Relevé le 24/08/2026 : un code inexistant donne **404**, pas 422
+    // (« This discount code doesn't exist »). Le 404 ne peut donc pas être
+    // écarté comme « produit introuvable » — d'autant qu'un produit absent
+    // ferait échouer TOUTES les demandes, y compris sans code, ce que le
+    // reste du tunnel dément.
+    //
+    // Restent exclus : 401, la clé API n'est pas l'affaire du visiteur, et
+    // 429, un plafond côté Chariow qu'il ne peut pas corriger non plus.
     $refus_du_client = $http >= 400 && $http < 500
-        && $http !== 401 && $http !== 404 && $http !== 429;
+        && $http !== 401 && $http !== 429;
 
     if ($code_reduction !== '' && $refus_du_client) {
         yaac_json(422, ['erreur' => 'code_reduction_invalide']);
