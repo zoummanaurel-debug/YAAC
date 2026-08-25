@@ -75,6 +75,12 @@ return [
         // QR codes des cartes DÉJÀ IMPRIMÉES. Ne la changez pas sans
         // réimprimer les cartes.
         'verify'   => 'https://yaac.network/verify/',
+        // Page produit hébergée par Chariow. Renseignée, le formulaire y
+        // redirige au lieu de créer une session par l'API. Conséquence : le
+        // rapprochement candidature/vente retombe sur l'ADRESSE E-MAIL, et le
+        // visiteur ne revient pas sur /adhesion-confirmee/.
+        // Videz la valeur pour repasser par l'API et retrouver le jeton.
+        'checkout' => 'https://sdmudmoy.mychariow.online/prd_npi7sgb1/checkout',
 
         // Lien d'invitation au groupe WhatsApp. Meta interdit d'ajouter
         // quelqu'un à un groupe par API : joindre le lien à l'e-mail est la

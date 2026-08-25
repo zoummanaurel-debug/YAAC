@@ -135,13 +135,36 @@ $pdo->prepare(
 // Code de réduction : la page de paiement hébergée n'offre aucun champ pour
 // le saisir, il doit donc voyager depuis notre formulaire. Sans ça, un membre
 // fondateur dispensé n'a aucun moyen de faire valoir sa dispense.
-$code_reduction = mb_strtoupper($texte('code_reduction', 100));
-
 // Page de retour, dans la langue où le visiteur est parti. Sert deux fois :
 // comme `redirect_url` après paiement, et comme destination directe quand la
 // vente est gratuite et n'ouvre aucune page de paiement.
 $confirmation = $config['liens']['site']
     . ($texte('lang', 2) === 'en' ? '/en/membership-confirmed/' : '/fr/adhesion-confirmee/');
+
+// ---------------------------------------------------------------------
+// Deux façons d'envoyer le visiteur payer.
+//
+// `liens.checkout` renseigné : on redirige vers la page produit hébergée par
+// Chariow, qui affiche son propre formulaire. C'est le mode retenu le
+// 24/08/2026, la session créée par l'API ne s'affichant pas correctement.
+//
+// Ce que ce mode coûte, et qu'il faut assumer :
+//   — pas de `custom_metadata`, donc pas de jeton : le rapprochement entre la
+//     candidature et la vente retombe sur l'ADRESSE E-MAIL. Si la personne en
+//     saisit une autre chez Chariow, sa candidature reste orpheline ;
+//   — pas de `redirect_url` : elle ne revient pas sur /adhesion-confirmee/ ;
+//   — pas de `discount_code` : le formulaire de Chariow doit le proposer.
+//
+// La candidature est écrite avant la redirection dans les deux cas : c'est
+// elle qui garde les champs que Chariow ne demande pas (motivation, pays,
+// bénévolat) et qui rend un abandon mesurable.
+// ---------------------------------------------------------------------
+$checkout_direct = trim((string) ($config['liens']['checkout'] ?? ''));
+
+if ($checkout_direct !== '') {
+    yaac_log('checkout_direct', ['email' => $email, 'jeton' => $jeton]);
+    yaac_json(200, ['statut' => 'ok', 'checkout_url' => $checkout_direct]);
+}
 
 $charge = [
     'product_id' => $config['chariow']['product_id'],
@@ -156,11 +179,6 @@ $charge = [
     'redirect_url'    => $confirmation,
     'customer_ip'     => (string) ($_SERVER['REMOTE_ADDR'] ?? ''),
 ];
-
-// Envoyé seulement s'il est renseigné : Chariow refuse une chaîne vide.
-if ($code_reduction !== '') {
-    $charge['discount_code'] = $code_reduction;
-}
 
 $corps = json_encode($charge, JSON_UNESCAPED_UNICODE);
 
@@ -186,29 +204,6 @@ if ($reponse === false || $http < 200 || $http >= 300) {
     // peut être rejoué. On ne renvoie pas le détail de Chariow au visiteur.
     yaac_log('checkout_echec', ['http' => $http, 'curl' => $err, 'reponse' => (string) $reponse]);
 
-    // Un code de réduction refusé n'est PAS une panne : c'est une saisie que
-    // la personne peut corriger seule. Lui répondre « service indisponible,
-    // réessayez dans quelques minutes » l'enverrait attendre un incident qui
-    // n'existe pas, et elle réessaierait le même code indéfiniment.
-    //
-    // On ne cherche aucun mot-clé dans la réponse de Chariow : son libellé
-    // n'est pas contractuel et peut changer de langue.
-    //
-    // Relevé le 24/08/2026 : un code inexistant donne **404**, pas 422
-    // (« This discount code doesn't exist »). Le 404 ne peut donc pas être
-    // écarté comme « produit introuvable » — d'autant qu'un produit absent
-    // ferait échouer TOUTES les demandes, y compris sans code, ce que le
-    // reste du tunnel dément.
-    //
-    // Restent exclus : 401, la clé API n'est pas l'affaire du visiteur, et
-    // 429, un plafond côté Chariow qu'il ne peut pas corriger non plus.
-    $refus_du_client = $http >= 400 && $http < 500
-        && $http !== 401 && $http !== 429;
-
-    if ($code_reduction !== '' && $refus_du_client) {
-        yaac_json(422, ['erreur' => 'code_reduction_invalide']);
-    }
-
     yaac_json(502, ['erreur' => 'paiement_indisponible']);
 }
 
@@ -232,7 +227,7 @@ if (($data['step'] ?? '') === 'already_purchased') {
 // Le Pulse `successful.sale` part quand même : le membre sera créé et son
 // e-mail envoyé, exactement comme pour une vente payante.
 if (($data['step'] ?? '') === 'completed') {
-    yaac_log('checkout_gratuit', ['email' => $email, 'jeton' => $jeton, 'code' => $code_reduction]);
+    yaac_log('checkout_gratuit', ['email' => $email, 'jeton' => $jeton]);
     yaac_json(200, ['statut' => 'ok', 'redirection' => $confirmation]);
 }
 

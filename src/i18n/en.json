@@ -216,10 +216,6 @@
     "priceOnce": "once",
     "priceDuesLabel": "Annual contribution",
     "priceDues": "15,000 FCFA",
-    "priceDuesPer": "per year",
-    "discount": "Discount code",
-    "discountHint": "If YAAC gave you one, enter it here: it will be applied at payment.",
-    "discountPlaceholder": "e.g. FOUNDER2026",
-    "errDiscount": "This discount code is not valid. Check the spelling, or leave the field empty to pay the standard fee."
+    "priceDuesPer": "per year"
   }
 }

@@ -216,10 +216,6 @@
     "priceOnce": "une seule fois",
     "priceDuesLabel": "Cotisation annuelle",
     "priceDues": "15 000 FCFA",
-    "priceDuesPer": "par an",
-    "discount": "Code de réduction",
-    "discountHint": "Si YAAC vous en a communiqué un, saisissez-le ici : il sera appliqué au moment du paiement.",
-    "discountPlaceholder": "Ex. : FONDATEUR2026",
-    "errDiscount": "Ce code de réduction n'est pas valable. Vérifiez la saisie, ou laissez le champ vide pour régler le tarif normal."
+    "priceDuesPer": "par an"
   }
 }
