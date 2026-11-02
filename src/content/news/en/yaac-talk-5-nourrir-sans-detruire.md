@@ -57,7 +57,3 @@ Dr Zoumman highlighted the gap between pledges and disbursements, and how rarely
 Dr Wade described widespread conservation agriculture, producers recognised and paid for the environmental services they provide, local processing and a genuine continental market. Her closing message to young people: act *"not in 2050, but starting now."*
 
 Dr Zoumman wants soils treated *"as living capital"*, biological inputs made locally by youth-led businesses, and farming restored as **a dignified profession and a source of pride**.
-
-## What comes next
-
-For lack of time, several audience questions, including one from Dr Odilon-Parfait Akotchayé on adapting agroecology to family farming, could not be explored in depth. They will feed into future editions.

@@ -57,7 +57,3 @@ Dr Zoumman a pointé l'écart entre les promesses et les décaissements, et le f
 Dr Wade a décrit une agriculture de conservation généralisée, des producteurs reconnus et rémunérés pour les services environnementaux qu'ils rendent, une transformation locale et un vrai marché continental. Son message final aux jeunes : passer à l'action *« pas en 2050, mais dès maintenant »*.
 
 Dr Zoumman a voulu des sols traités *« comme un capital vivant »*, des intrants biologiques produits localement par des entreprises portées par des jeunes, et une agriculture redevenue **un métier digne et une source de fierté**.
-
-## La suite
-
-Faute de temps, plusieurs questions du public, dont celle du Dr Odilon-Parfait Akotchayé sur l'adaptation de l'agroécologie à l'agriculture familiale, n'ont pu être traitées en profondeur. Elles nourriront les prochaines éditions.
