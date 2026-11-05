@@ -231,13 +231,16 @@ const sources = lang === 'fr'
           redirection : ces paiements ne reviennent pas vers le site. */}
       <div class="jpanel" id="jpanel" tabindex="-1" hidden>
         <h2 class="jsub">{j.panelTitle}</h2>
+        {/* Instructions de paiement : masquées une fois « J'ai payé » envoyé,
+            pour qu'on ne paie pas deux fois en revenant sur la page. */}
+        <div id="jpayer">
         <p>{j.panelLead}</p>
         <p class="jpanel__amount">{j.priceAmount}</p>
 
         {waveUrl && (
           <div class="jpanel__mode" data-mode="wave" hidden>
             <p>{j.waveIntro}</p>
-            <a class="btn btn--primary jpanel__btn" href={waveUrl} target="_blank" rel="noopener">{j.waveButton}</a>
+            <a class="btn btn--primary jpanel__btn" href={waveUrl} target="_blank" rel="noopener" data-payer data-encore={j.waveAgain}>{j.waveButton}</a>
           </div>
         )}
 
@@ -245,7 +248,7 @@ const sources = lang === 'fr'
           {om.lien && (
             <>
               <p>{j.omLinkIntro}</p>
-              <a class="btn btn--primary jpanel__btn" href={om.lien} target="_blank" rel="noopener">{j.omLinkButton}</a>
+              <a class="btn btn--primary jpanel__btn" href={om.lien} target="_blank" rel="noopener" data-payer data-encore={j.omAgain}>{j.omLinkButton}</a>
               <p class="jpanel__alt">{j.omAltTitle}</p>
             </>
           )}
@@ -257,6 +260,7 @@ const sources = lang === 'fr'
           </p>
           {/* `#` doit être encodé, sinon le lien s'arrête au premier dièse. */}
           <a class="btn btn--outline jpanel__btn" href={'tel:' + encodeURIComponent(om.ussd)}>{j.omButton}</a>
+        </div>
         </div>
 
         <form id="refForm" class="jform jpanel__ref" novalidate>
@@ -273,6 +277,7 @@ const sources = lang === 'fr'
         <div class="jdone" id="jdone" hidden>
           <p class="jdone__title">{j.refDoneTitle}</p>
           <p>{j.refDone}</p>
+          <p><button type="button" class="jlink" id="jrestart">{j.restart}</button></p>
         </div>
       </div>
     </div>
@@ -440,14 +445,55 @@ const sources = lang === 'fr'
     var refBouton = document.getElementById('refSubmit');
     var fini = document.getElementById('jdone');
     var copier = document.getElementById('jcopy');
+    var payer = document.getElementById('jpayer');
+    var recommencer = document.getElementById('jrestart');
     var jetonCourant = '';
     var modeCourant = '';
 
-    function afficherPanneau(mode, jeton) {
+    // Étape mémorisée dans ce navigateur : en revenant de Wave ou de Max it,
+    // ou si le téléphone a rechargé l'onglet, on retrouve où on en était.
+    // 30 jours, comme la durée de validité d'une candidature côté serveur.
+    var CLE = 'yaac-adhesion';
+    var DUREE = 30 * 24 * 3600 * 1000;
+    var etat = null;
+
+    function lireEtat() {
+      try {
+        var e = JSON.parse(localStorage.getItem(CLE) || 'null');
+        if (e && e.jeton && (e.mode === 'wave' || e.mode === 'om') && Date.now() - e.t < DUREE) return e;
+        localStorage.removeItem(CLE);
+      } catch (err) {}
+      return null;
+    }
+    function ecrireEtat() {
+      try { localStorage.setItem(CLE, JSON.stringify(etat)); } catch (err) {}
+    }
+    function effacerEtat() {
+      try { localStorage.removeItem(CLE); } catch (err) {}
+    }
+
+    // Après un clic sur « Payer », le bouton passe au second plan (il reste
+    // là si le paiement a échoué) et l'étape « J'ai payé » prend la main.
+    function marquerLance() {
+      panneau.querySelectorAll('[data-payer]').forEach(function (a) {
+        a.classList.remove('btn--primary');
+        a.classList.add('btn--outline');
+        a.textContent = a.getAttribute('data-encore');
+      });
+    }
+
+    // Paiement déclaré : plus aucun bouton de paiement, seulement la confirmation.
+    function marquerFini() {
+      payer.hidden = true;
+      refForm.hidden = true;
+      fini.hidden = false;
+    }
+
+    function afficherPanneau(mode, jeton, payeur) {
       jetonCourant = jeton;
       modeCourant = mode;
       // Le plus souvent, on paie avec le numéro donné dans le formulaire.
-      refForm.payeur.value = String(form.telephone.value || '').trim();
+      refForm.payeur.value = payeur || String(form.telephone.value || '').trim();
       form.hidden = true;
       boite.hidden = true;
       panneau.querySelectorAll('[data-mode]').forEach(function (el) {
@@ -456,6 +502,39 @@ const sources = lang === 'fr'
       panneau.hidden = false;
       panneau.scrollIntoView({ block: 'start', behavior: 'smooth' });
       panneau.focus({ preventScroll: true });
+      if (!etat || etat.jeton !== jeton) {
+        etat = { jeton: jeton, mode: mode, payeur: refForm.payeur.value, lance: false, fini: false, t: Date.now() };
+        ecrireEtat();
+      }
+    }
+
+    panneau.querySelectorAll('[data-payer]').forEach(function (a) {
+      a.addEventListener('click', function () {
+        if (!etat) return;
+        etat.lance = true;
+        ecrireEtat();
+        // Laisser le lien s'ouvrir avant de changer le libellé.
+        setTimeout(marquerLance, 0);
+      });
+    });
+
+    // Retour sur l'onglet après le paiement : on amène la personne à « J'ai payé ».
+    document.addEventListener('visibilitychange', function () {
+      if (document.visibilityState === 'visible' && etat && etat.lance && !etat.fini) {
+        refForm.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      }
+    });
+
+    recommencer.addEventListener('click', function () {
+      effacerEtat();
+      window.location.reload();
+    });
+
+    etat = lireEtat();
+    if (etat) {
+      afficherPanneau(etat.mode, etat.jeton, etat.payeur);
+      if (etat.lance) marquerLance();
+      if (etat.fini) marquerFini();
     }
 
     if (copier && navigator.clipboard) {
@@ -492,8 +571,9 @@ const sources = lang === 'fr'
         .then(function (r) { return r.status; })
         .then(function (code) {
           if (code === 200) {
-            refForm.hidden = true;
-            fini.hidden = false;
+            if (etat) { etat.fini = true; etat.payeur = payeur; ecrireEtat(); }
+            marquerFini();
+            panneau.scrollIntoView({ block: 'start', behavior: 'smooth' });
             fini.setAttribute('tabindex', '-1');
             fini.focus();
             return;
