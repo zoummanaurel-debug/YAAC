@@ -90,7 +90,7 @@ function yaac_montant_adhesion(array $config): int
  *
  * @return array{numero: string, carte_envoyee: bool, erreur: ?string}
  */
-function yaac_creer_membre_manuel(PDO $pdo, array $c, string $mode, array $config): array
+function yaac_creer_membre_manuel(PDO $pdo, array $c, string $mode, array $config, ?string $transaction = null): array
 {
     $aujourdhui = new DateTimeImmutable('today');
     $expiration = $aujourdhui->modify('+' . (int) $config['adhesion']['validite_annees'] . ' years');
@@ -122,7 +122,8 @@ function yaac_creer_membre_manuel(PDO $pdo, array $c, string $mode, array $confi
             $c['motivation'] ?? null, $c['benevolat'] ?? null, $c['source'] ?? null,
             (int) ($c['statuts_acceptes'] ?? 0),
             $membre['role'], $membre['date_adhesion'], $membre['date_expiration'], 'actif',
-            $mode . ':' . $c['jeton'],
+            // Transaction Wave quand le webhook la fournit, sinon le jeton.
+            mb_substr($mode . ':' . ($transaction ?? $c['jeton']), 0, 64),
             null,
             yaac_montant_adhesion($config) * 100,
             'XOF',

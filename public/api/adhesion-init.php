@@ -20,6 +20,8 @@
 declare(strict_types=1);
 
 require __DIR__ . '/_lib.php';
+require __DIR__ . '/_membre.php';
+require __DIR__ . '/_wave.php';
 
 $config = yaac_config();
 
@@ -138,6 +140,20 @@ $pdo->prepare(
 // src/data/paiement.ts. Voir _membre.php pour la suite.
 // ---------------------------------------------------------------------
 $mode_paiement = $texte('paiement', 10);
+
+// Wave avec l'API configurée : chaîne automatique, comme Chariow. Le
+// visiteur part sur Wave, le webhook crée le membre et envoie la carte.
+// Sans clés dans config.php, on retombe sur la validation d'un clic.
+if ($mode_paiement === 'wave' && yaac_wave_actif($config)) {
+    try {
+        $url = yaac_wave_session($jeton, $texte('lang', 2), $config);
+    } catch (RuntimeException $e) {
+        yaac_json(502, ['erreur' => 'paiement_indisponible']);
+    }
+    yaac_log('wave_session_creee', ['email' => $email, 'jeton' => $jeton]);
+    yaac_json(200, ['statut' => 'ok', 'checkout_url' => $url]);
+}
+
 if ($mode_paiement === 'wave' || $mode_paiement === 'om') {
     yaac_log('paiement_manuel_choisi', ['email' => $email, 'mode' => $mode_paiement, 'jeton' => $jeton]);
     yaac_json(200, ['statut' => 'ok', 'paiement' => $mode_paiement, 'jeton' => $jeton]);

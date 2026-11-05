@@ -62,7 +62,26 @@ return [
     ],
 
     // ---------------------------------------------------------------------
-    // Paiements Wave et Orange Money (validés à la main, voir _membre.php)
+    // Wave Checkout API — adhésion automatique, comme Chariow (voir _wave.php)
+    //
+    // Wave Business → Développeurs (business.wave.com/dev-portal), compte
+    // Admin requis :
+    //   api_key        : « Créer une clé API », accès « Checkout API ».
+    //                    Affichée UNE seule fois.
+    //   webhook_secret : Webhooks → Add New Webhook,
+    //                    URL https://yaac.network/api/wave-webhook.php,
+    //                    stratégie « Signing Secret »,
+    //                    événement checkout.session.completed.
+    //                    Affiché UNE seule fois.
+    // Les deux vides : Wave passe par la validation d'un clic du trésorier.
+    // ---------------------------------------------------------------------
+    'wave' => [
+        'api_key'        => '',
+        'webhook_secret' => '',
+    ],
+
+    // ---------------------------------------------------------------------
+    // Paiements validés à la main (Orange Money, et Wave sans API)
     // ---------------------------------------------------------------------
     'paiement' => [
         // Montant de l'adhésion en FCFA, rappelé dans l'e-mail au trésorier.

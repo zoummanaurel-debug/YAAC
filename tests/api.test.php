@@ -2,6 +2,7 @@
 require __DIR__ . '/_lib.php';
 require __DIR__ . '/_mail.php';
 require __DIR__ . '/_membre.php';
+require __DIR__ . '/_wave.php';
 
 $ok = 0; $ko = 0;
 function t(string $nom, bool $cond, string $detail = '') {
@@ -110,6 +111,23 @@ t('signature vide refusee',               !yaac_signature_validation_ok($jt, 'wa
 $lienV = yaac_lien_validation($jt, 'om', $cfg);
 t('lien validation sur le site',          str_starts_with($lienV, 'https://yaac.network/api/valider.php?j=' . $jt . '&m=om&s='), $lienV);
 t('montant par defaut 6000',              yaac_montant_adhesion($cfg) === 6000);
+
+echo "\n== Webhooks Wave ==\n";
+$ws = 'wave_sn_WHS_test';
+$wc = '{"id":"AE_1","type":"checkout.session.completed"}';
+$wt = 1762300000;
+$wv = hash_hmac('sha256', $wt . $wc, $ws);
+t('signature Wave valide',                yaac_signature_wave_valide($wc, "t=$wt,v1=$wv", $ws, $wt + 10));
+t('rotation : second v1 accepte',         yaac_signature_wave_valide($wc, "t=$wt,v1=" . str_repeat('0', 64) . ",v1=$wv", $ws, $wt));
+t('corps altere refuse',                  !yaac_signature_wave_valide($wc . ' ', "t=$wt,v1=$wv", $ws, $wt));
+t('mauvais secret refuse',                !yaac_signature_wave_valide($wc, "t=$wt,v1=$wv", 'autre', $wt));
+t('horodatage > 5 min refuse',            !yaac_signature_wave_valide($wc, "t=$wt,v1=$wv", $ws, $wt + 301));
+t('horodatage absent refuse',             !yaac_signature_wave_valide($wc, "v1=$wv", $ws, $wt));
+t('en-tete vide refuse',                  !yaac_signature_wave_valide($wc, '', $ws, $wt));
+t('secret vide refuse',                   !yaac_signature_wave_valide($wc, "t=$wt,v1=$wv", '', $wt));
+t('Wave inactif sans cles',               !yaac_wave_actif($cfg));
+t('Wave actif avec les deux cles',        yaac_wave_actif(['wave' => ['api_key' => 'k', 'webhook_secret' => 's']]));
+t('Wave inactif avec une seule cle',      !yaac_wave_actif(['wave' => ['api_key' => 'k', 'webhook_secret' => '']]));
 
 printf("\n---- %d reussis, %d echecs ----\n", $ok, $ko);
 exit($ko === 0 ? 0 : 1);

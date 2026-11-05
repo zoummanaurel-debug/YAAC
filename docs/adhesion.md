@@ -243,7 +243,49 @@ dans `adhesion-init.php`.
   le présenter comme un « PIN à conserver précieusement », ce que faisait
   l'ancien e-mail.
 
-## Wave et Orange Money (validation d'un clic)
+## Wave : chaîne automatique (API Checkout)
+
+Même chaîne que Chariow : le paiement déclenche l'adhésion, sans intervention.
+
+```
+/devenir-membre/  — le visiteur choisit Wave
+   │  POST /api/adhesion-init.php  { …, paiement: "wave" }
+   │  → candidature écrite
+   │  → POST https://api.wave.com/v1/checkout/sessions
+   │       amount "6000", currency XOF, client_reference = jeton
+   │  → renvoie wave_launch_url ; le navigateur y va
+   ▼
+Wave — le visiteur paie 6 000 FCFA (montant fixé par le serveur)
+   │  retour sur /fr/adhesion-confirmee/ (success_url)
+   │  webhook checkout.session.completed
+   ▼
+/api/wave-webhook.php
+   ├─ vérifie Wave-Signature (t=…,v1=… ; HMAC-SHA256 de t + corps ; < 5 min)
+   ├─ dédoublonne sur l'id d'événement (webhook_livraison, préfixe wave:)
+   ├─ contrôle payment_status = succeeded, XOF, montant ≥ 6 000
+   ├─ retrouve la candidature par client_reference
+   ├─ attribue le numéro YAAC, écrit le membre (chariow_sale_id = wave:<transaction>)
+   └─ envoie le même e-mail de bienvenue et de carte que Chariow
+```
+
+Le lien marchand statique (`pay.wave.com/m/…`) ne convient pas : il ne porte
+aucune référence de candidature et Wave ne lui documente pas de webhook.
+
+### Mise en service
+
+Dans Wave Business → Développeurs (business.wave.com/dev-portal, compte Admin) :
+
+1. **Clé API** avec accès « Checkout API » → `wave.api_key` dans `config.php`.
+2. **Webhook** : URL `https://yaac.network/api/wave-webhook.php`, stratégie
+   « Signing Secret », événement `checkout.session.completed` → secret dans
+   `wave.webhook_secret`.
+3. Les deux valeurs ne s'affichent qu'une fois. Elles vont dans `config.php`
+   sur le serveur, jamais dans le dépôt (public) ni dans un message.
+
+Sans ces deux valeurs, Wave retombe sur la validation d'un clic décrite
+ci-dessous, et rien ne casse.
+
+## Orange Money (et Wave sans API) : validation d'un clic
 
 Le lien Wave est statique, au montant exact (6 000 FCFA). Mais ni ce lien ni un
 transfert Orange Money ne disent au site QUI a payé : il n'y a pas de webhook.
