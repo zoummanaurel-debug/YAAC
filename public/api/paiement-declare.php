@@ -3,9 +3,10 @@
  * YAAC — Déclaration d'un paiement Wave ou Orange Money.
  *
  *   POST /api/paiement-declare.php   (depuis /devenir-membre/)
- *   { "jeton": "…", "mode": "wave"|"om", "reference": "…" }
+ *   { "jeton": "…", "mode": "wave"|"om", "payeur": "771234567" }
  *
- * Le visiteur a payé hors du site et saisit la référence de sa transaction.
+ * Le visiteur a payé hors du site et clique « J'ai payé » en confirmant le
+ * numéro de téléphone qui a servi à payer.
  * On ne crée PAS de membre ici : rien ne prouve encore que l'argent est
  * arrivé. On prévient l'équipe par e-mail, avec un lien signé qui, après
  * vérification sur le compte Wave Business ou Orange Money, crée le membre.
@@ -36,13 +37,13 @@ if (!is_array($entree)) {
 
 $jeton     = is_string($entree['jeton'] ?? null) ? $entree['jeton'] : '';
 $mode      = is_string($entree['mode'] ?? null) ? $entree['mode'] : '';
-$reference = yaac_reference_propre(is_string($entree['reference'] ?? null) ? $entree['reference'] : '');
+$payeur    = yaac_numero_propre(is_string($entree['payeur'] ?? null) ? $entree['payeur'] : '');
 
 if (!preg_match('/^[0-9a-f]{32}$/', $jeton) || !isset(YAAC_PAIEMENTS_MANUELS[$mode])) {
     yaac_json(400, ['erreur' => 'requete_invalide']);
 }
-if ($reference === '') {
-    yaac_json(422, ['erreur' => 'validation', 'champs' => ['reference' => 'invalide']]);
+if ($payeur === '') {
+    yaac_json(422, ['erreur' => 'validation', 'champs' => ['payeur' => 'invalide']]);
 }
 
 $pdo = yaac_db();
@@ -65,19 +66,19 @@ if ($c['membre_id'] !== null) {
 
 $libelle = YAAC_PAIEMENTS_MANUELS[$mode];
 $montant = number_format(yaac_montant_adhesion($config), 0, ',', ' ') . ' FCFA';
-$lien    = yaac_lien_validation($jeton, $mode, $reference, $config);
+$lien    = yaac_lien_validation($jeton, $mode, $config);
 $nom     = trim($c['prenom'] . ' ' . $c['nom']);
 $tel     = trim(($c['tel_pays'] ?? '') . ' ' . ($c['telephone'] ?? ''));
 
 // Tout est journalisé AVANT l'envoi : si le SMTP tombe, la déclaration n'est
 // pas perdue et le lien peut être retrouvé dans le journal.
 yaac_log('paiement_declare', [
-    'email' => $c['email'], 'mode' => $mode, 'reference' => $reference, 'lien' => $lien,
+    'email' => $c['email'], 'mode' => $mode, 'payeur' => $payeur, 'lien' => $lien,
 ]);
 
 $h = static fn (string $s): string => htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
 
-$sujet = sprintf('[YAAC] Paiement %s à vérifier — %s (%s)', $libelle, $nom, $reference);
+$sujet = sprintf('[YAAC] Paiement %s à vérifier — %s (%s)', $libelle, $nom, $payeur);
 
 $html = '<div style="font-family:Arial,sans-serif;font-size:15px;color:#123524;max-width:560px">'
     . '<p>Une demande d\'adhésion a été réglée par <strong>' . $h($libelle) . '</strong>.</p>'
@@ -86,10 +87,10 @@ $html = '<div style="font-family:Arial,sans-serif;font-size:15px;color:#123524;m
     . '<tr><td style="padding:4px 12px 4px 0;color:#555">E-mail</td><td>' . $h($c['email']) . '</td></tr>'
     . '<tr><td style="padding:4px 12px 4px 0;color:#555">Téléphone</td><td>' . $h($tel) . '</td></tr>'
     . '<tr><td style="padding:4px 12px 4px 0;color:#555">Montant attendu</td><td>' . $h($montant) . '</td></tr>'
-    . '<tr><td style="padding:4px 12px 4px 0;color:#555">Référence</td><td><strong>' . $h($reference) . '</strong></td></tr>'
+    . '<tr><td style="padding:4px 12px 4px 0;color:#555">Numéro qui a payé</td><td><strong>' . $h($payeur) . '</strong></td></tr>'
     . '</table>'
     . '<p><strong>Avant de valider</strong>, vérifiez sur le compte ' . $h($libelle)
-    . ' que ' . $h($montant) . ' sont bien arrivés avec cette référence.</p>'
+    . ' qu\'un paiement de ' . $h($montant) . ' est bien arrivé depuis ce numéro.</p>'
     . '<p style="margin:24px 0"><a href="' . $h($lien) . '" style="background:#006738;color:#fff;'
     . 'padding:12px 20px;border-radius:6px;text-decoration:none;font-weight:bold">Ouvrir la validation</a></p>'
     . '<p style="color:#555;font-size:13px">Le lien ouvre une page de confirmation : rien n\'est créé tant que '
@@ -98,8 +99,8 @@ $html = '<div style="font-family:Arial,sans-serif;font-size:15px;color:#123524;m
 
 $texte = "Une demande d'adhésion a été réglée par $libelle.\n\n"
     . "Nom : $nom\nE-mail : {$c['email']}\nTéléphone : $tel\n"
-    . "Montant attendu : $montant\nRéférence : $reference\n\n"
-    . "Avant de valider, vérifiez sur le compte $libelle que le montant est bien arrivé.\n\n"
+    . "Montant attendu : $montant\nNuméro qui a payé : $payeur\n\n"
+    . "Avant de valider, vérifiez sur le compte $libelle qu'un paiement de $montant est arrivé depuis ce numéro.\n\n"
     . "Validation : $lien\n\n"
     . "Le lien ouvre une page de confirmation ; rien n'est créé avant le clic sur « Valider ».\n";
 
@@ -108,7 +109,7 @@ $destinataire = (string) ($config['paiement']['notifier'] ?? $config['mail']['re
 try {
     yaac_envoyer($destinataire, $sujet, $html, $texte, $config);
 } catch (Throwable $e) {
-    yaac_log('paiement_declare_mail_echec', ['message' => $e->getMessage(), 'reference' => $reference]);
+    yaac_log('paiement_declare_mail_echec', ['message' => $e->getMessage(), 'payeur' => $payeur]);
     yaac_json(502, ['erreur' => 'notification_echec']);
 }
 

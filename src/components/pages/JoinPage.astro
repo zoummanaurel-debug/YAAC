@@ -253,10 +253,10 @@ const sources = lang === 'fr'
         <form id="refForm" class="jform jpanel__ref" novalidate>
           <h3 class="jlegend">{j.refTitle}</h3>
           <p class="jfield">
-            <label for="reference">{j.refLabel}</label>
-            <input id="reference" name="reference" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="60" required aria-describedby="referenceAide" />
-            <span class="jaide" id="referenceAide">{j.refHint}</span>
-            <span class="jmsg" data-for="reference"></span>
+            <label for="payeur">{j.refLabel}</label>
+            <input id="payeur" name="payeur" type="tel" inputmode="tel" autocomplete="tel" maxlength="30" required aria-describedby="payeurAide" />
+            <span class="jaide" id="payeurAide">{j.refHint}</span>
+            <span class="jmsg" data-for="payeur"></span>
           </p>
           <button class="btn btn--primary" type="submit" id="refSubmit">{j.refSubmit}</button>
         </form>
@@ -437,6 +437,8 @@ const sources = lang === 'fr'
     function afficherPanneau(mode, jeton) {
       jetonCourant = jeton;
       modeCourant = mode;
+      // Le plus souvent, on paie avec le numéro donné dans le formulaire.
+      refForm.payeur.value = String(form.telephone.value || '').trim();
       form.hidden = true;
       boite.hidden = true;
       panneau.querySelectorAll('[data-mode]').forEach(function (el) {
@@ -460,13 +462,13 @@ const sources = lang === 'fr'
 
     refForm.addEventListener('submit', function (e) {
       e.preventDefault();
-      messageDe('reference', '');
+      messageDe('payeur', '');
 
-      // Même règle que le serveur (yaac_reference_propre).
-      var reference = String(refForm.reference.value || '').replace(/\s+/g, '');
-      if (!/^[A-Za-z0-9._\-\/]{4,40}$/.test(reference)) {
-        messageDe('reference', msg.refInvalid);
-        refForm.reference.focus();
+      // Même règle que le serveur (yaac_numero_propre) : 6 à 15 chiffres.
+      var payeur = String(refForm.payeur.value || '').replace(/\D+/g, '');
+      if (payeur.length < 6 || payeur.length > 15) {
+        messageDe('payeur', msg.refInvalid);
+        refForm.payeur.focus();
         return;
       }
 
@@ -476,7 +478,7 @@ const sources = lang === 'fr'
       fetch(apiDeclare, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({ jeton: jetonCourant, mode: modeCourant, reference: reference }),
+        body: JSON.stringify({ jeton: jetonCourant, mode: modeCourant, payeur: payeur }),
       })
         .then(function (r) { return r.status; })
         .then(function (code) {
@@ -489,12 +491,12 @@ const sources = lang === 'fr'
           }
           refBouton.disabled = false;
           refBouton.textContent = msg.refSubmit;
-          messageDe('reference', code === 422 ? msg.refInvalid : msg.refError);
+          messageDe('payeur', code === 422 ? msg.refInvalid : msg.refError);
         })
         .catch(function () {
           refBouton.disabled = false;
           refBouton.textContent = msg.refSubmit;
-          messageDe('reference', msg.refError);
+          messageDe('payeur', msg.refError);
         });
     });
   })();

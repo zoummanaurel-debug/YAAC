@@ -2,7 +2,7 @@
 /**
  * YAAC — Validation d'un paiement Wave ou Orange Money par le trésorier.
  *
- *   GET  /api/valider.php?j=…&m=…&r=…&s=…   → page de confirmation
+ *   GET  /api/valider.php?j=…&m=…&s=…   → page de confirmation
  *   POST /api/valider.php (mêmes champs)     → crée le membre, envoie la carte
  *
  * Le lien arrive par e-mail (paiement-declare.php). Le GET ne fait RIEN :
@@ -47,14 +47,12 @@ $src     = $methode === 'POST' ? $_POST : $_GET;
 
 $jeton     = is_string($src['j'] ?? null) ? $src['j'] : '';
 $mode      = is_string($src['m'] ?? null) ? $src['m'] : '';
-$reference = yaac_reference_propre(is_string($src['r'] ?? null) ? $src['r'] : '');
 $signature = is_string($src['s'] ?? null) ? $src['s'] : '';
 
 if (
     !preg_match('/^[0-9a-f]{32}$/', $jeton)
     || !isset(YAAC_PAIEMENTS_MANUELS[$mode])
-    || $reference === ''
-    || !yaac_signature_validation_ok($jeton, $mode, $reference, $signature)
+    || !yaac_signature_validation_ok($jeton, $mode, $signature)
 ) {
     yaac_log('validation_lien_invalide', ['ip' => $_SERVER['REMOTE_ADDR'] ?? '?']);
     $page(403, 'Lien invalide', '<p class="ko">Ce lien de validation est incomplet ou a été modifié.</p>');
@@ -82,7 +80,7 @@ $nom     = trim($c['prenom'] . ' ' . $c['nom']);
 
 if ($methode !== 'POST') {
     $champs = '';
-    foreach (['j' => $jeton, 'm' => $mode, 'r' => $reference, 's' => $signature] as $k => $v) {
+    foreach (['j' => $jeton, 'm' => $mode, 's' => $signature] as $k => $v) {
         $champs .= '<input type="hidden" name="' . $k . '" value="' . $h($v) . '">';
     }
     $page(200, 'Valider un paiement ' . $libelle,
@@ -91,10 +89,9 @@ if ($methode !== 'POST') {
         . '<dt>E-mail</dt><dd>' . $h($c['email']) . '</dd>'
         . '<dt>Téléphone</dt><dd>' . $h(trim(($c['tel_pays'] ?? '') . ' ' . ($c['telephone'] ?? ''))) . '</dd>'
         . '<dt>Montant</dt><dd>' . $h($montant) . '</dd>'
-        . '<dt>Référence</dt><dd>' . $h($reference) . '</dd>'
         . '</dl>'
-        . '<p><strong>Vérifiez sur le compte ' . $h($libelle) . '</strong> que ' . $h($montant)
-        . ' sont bien arrivés avec cette référence avant de valider.</p>'
+        . '<p><strong>Vérifiez sur le compte ' . $h($libelle) . '</strong> qu\'un paiement de ' . $h($montant)
+        . ' est bien arrivé depuis le numéro indiqué dans l\'e-mail avant de valider.</p>'
         . '<form method="post" action="">' . $champs
         . '<button type="submit">Le paiement est arrivé — valider et envoyer la carte</button></form>'
         . '<p class="note">La validation attribue un numéro YAAC et envoie la carte de membre par e-mail. '
@@ -104,13 +101,13 @@ if ($methode !== 'POST') {
 
 // POST : création du membre.
 try {
-    $res = yaac_creer_membre_manuel($pdo, $c, $mode, $reference, $config);
+    $res = yaac_creer_membre_manuel($pdo, $c, $mode, $config);
 } catch (PDOException $e) {
     if ($e->getCode() === '23000') {
-        yaac_log('validation_doublon', ['email' => $c['email'], 'reference' => $reference]);
+        yaac_log('validation_doublon', ['email' => $c['email'], 'mode' => $mode]);
         $page(409, 'Validation impossible',
-            '<p class="ko">Un membre existe déjà avec cet e-mail, ou cette référence de transaction '
-            . 'a déjà servi à valider une autre adhésion. Vérifiez dans la base avant d\'aller plus loin.</p>');
+            '<p class="ko">Un membre existe déjà avec cet e-mail. Vérifiez dans la base avant '
+            . 'd\'aller plus loin.</p>');
     }
     yaac_log('validation_echec', ['message' => $e->getMessage()]);
     $page(500, 'Erreur', '<p class="ko">L\'enregistrement a échoué. Rien n\'a été créé ; réessayez plus tard.</p>');

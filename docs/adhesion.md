@@ -243,31 +243,34 @@ dans `adhesion-init.php`.
   le présenter comme un « PIN à conserver précieusement », ce que faisait
   l'ancien e-mail.
 
-## Wave et Orange Money (validation manuelle)
+## Wave et Orange Money (validation d'un clic)
 
-Un lien Wave permanent ou un transfert Orange Money ne préviennent pas le site :
-il n'y a pas de webhook. Ces deux moyens passent donc par une validation à la
-main, qui aboutit au même résultat que Chariow (numéro YAAC + e-mail de carte).
+Le lien Wave est statique, au montant exact (6 000 FCFA). Mais ni ce lien ni un
+transfert Orange Money ne disent au site QUI a payé : il n'y a pas de webhook.
+Envoyer la carte sur un simple « J'ai payé » la donnerait à quiconque clique.
+Le trésorier valide donc d'un clic, ce qui produit le même résultat que Chariow
+(numéro YAAC + e-mail de carte). Le membre n'a aucun code de transaction à
+saisir.
 
 ```
 /devenir-membre/  — le visiteur choisit Wave ou Orange Money
    │  POST /api/adhesion-init.php  { …, paiement: "wave" | "om" }
    │  → candidature écrite, renvoie { jeton } au lieu d'une URL Chariow
    ▼
-La page affiche le bouton Wave (montant pré-rempli) ou le numéro OM + #144#
-   │  le visiteur paie, puis saisit la référence de la transaction
-   │  POST /api/paiement-declare.php  { jeton, mode, reference }
+La page affiche le bouton Wave (lien statique 6 000 FCFA) ou le numéro OM + #144#
+   │  le visiteur paie, puis clique « J'ai payé » en confirmant le numéro
+   │  qui a payé (pré-rempli avec celui du formulaire)
+   │  POST /api/paiement-declare.php  { jeton, mode, payeur }
    ▼
-E-mail à `paiement.notifier` avec un lien signé (HMAC, verification_secret)
-   │  le trésorier vérifie l'arrivée de l'argent sur Wave Business / OM
+E-mail à `paiement.notifier` : nom, numéro qui a payé, lien signé
+   │  le trésorier retrouve ce numéro dans Wave Business / OM
    ▼
 /api/valider.php  — GET : page de confirmation (ne crée rien)
                   — POST : crée le membre, envoie la carte
 ```
 
-- La référence est stockée dans `membre.chariow_sale_id` sous la forme
-  `wave:REF` ou `om:REF` : l'index unique empêche de valider deux fois la
-  même transaction. Aucune migration de base n'est nécessaire.
+- `membre.chariow_sale_id` reçoit `wave:<jeton>` ou `om:<jeton>` : l'index
+  unique empêche de valider deux fois la même candidature. Aucune migration.
 - Le GET de `valider.php` ne fait rien, à dessein : les messageries ouvrent
   les liens des e-mails pour les analyser.
 - Le lien Wave et le numéro OM sont publics et se règlent dans

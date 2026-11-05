@@ -22,7 +22,7 @@ export const paiement = {
      *
      * Vide : l'option Wave n'apparaît pas sur le site.
      */
-    lien: '',
+    lien: 'https://pay.wave.com/m/M_sn_JoGKsoAZsKEo/c/sn/',
   },
 
   orangeMoney: {
