@@ -1,6 +1,7 @@
 <?php
 require __DIR__ . '/_lib.php';
 require __DIR__ . '/_mail.php';
+require __DIR__ . '/_membre.php';
 
 $ok = 0; $ko = 0;
 function t(string $nom, bool $cond, string $detail = '') {
@@ -94,6 +95,24 @@ $mime = yaac_corps_mime('<p>x</p>', 'x', 'FRONTIERE');
 t('deux parties alternatives',            substr_count($mime, '--FRONTIERE') === 3);
 t('partie texte declaree',                str_contains($mime, 'text/plain; charset=UTF-8'));
 t('partie html declaree',                 str_contains($mime, 'text/html; charset=UTF-8'));
+
+echo "\n== Paiements Wave / Orange Money ==\n";
+t('reference Wave acceptee',              yaac_reference_propre('T_ABCD1234EFGH') === 'T_ABCD1234EFGH');
+t('reference OM a points acceptee',       yaac_reference_propre('CI230101.1234.A12345') === 'CI230101.1234.A12345');
+t('espaces retires',                      yaac_reference_propre(' MP 2311 05 ') === 'MP231105');
+t('trop courte refusee',                  yaac_reference_propre('AB1') === '');
+t('caracteres speciaux refuses',          yaac_reference_propre('<script>') === '');
+t('trop longue refusee',                  yaac_reference_propre(str_repeat('A', 41)) === '');
+$jt  = str_repeat('a', 32);
+$sig = yaac_signature_validation($jt, 'wave', 'T_REF1234');
+t('signature validation acceptee',        yaac_signature_validation_ok($jt, 'wave', 'T_REF1234', $sig));
+t('autre reference refusee',              !yaac_signature_validation_ok($jt, 'wave', 'T_REF9999', $sig));
+t('autre mode refuse',                    !yaac_signature_validation_ok($jt, 'om', 'T_REF1234', $sig));
+t('autre jeton refuse',                   !yaac_signature_validation_ok(str_repeat('b', 32), 'wave', 'T_REF1234', $sig));
+t('signature vide refusee',               !yaac_signature_validation_ok($jt, 'wave', 'T_REF1234', ''));
+$lienV = yaac_lien_validation($jt, 'om', 'MP1234', $cfg);
+t('lien validation sur le site',          str_starts_with($lienV, 'https://yaac.network/api/valider.php?j=' . $jt . '&m=om&r=MP1234&s='), $lienV);
+t('montant par defaut 6000',              yaac_montant_adhesion($cfg) === 6000);
 
 printf("\n---- %d reussis, %d echecs ----\n", $ok, $ko);
 exit($ko === 0 ? 0 : 1);

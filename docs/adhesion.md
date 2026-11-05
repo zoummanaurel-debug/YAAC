@@ -242,3 +242,35 @@ dans `adhesion-init.php`.
   nom, rôle, statut et dates — jamais e-mail, téléphone ni montant. Cesser de
   le présenter comme un « PIN à conserver précieusement », ce que faisait
   l'ancien e-mail.
+
+## Wave et Orange Money (validation manuelle)
+
+Un lien Wave permanent ou un transfert Orange Money ne préviennent pas le site :
+il n'y a pas de webhook. Ces deux moyens passent donc par une validation à la
+main, qui aboutit au même résultat que Chariow (numéro YAAC + e-mail de carte).
+
+```
+/devenir-membre/  — le visiteur choisit Wave ou Orange Money
+   │  POST /api/adhesion-init.php  { …, paiement: "wave" | "om" }
+   │  → candidature écrite, renvoie { jeton } au lieu d'une URL Chariow
+   ▼
+La page affiche le bouton Wave (montant pré-rempli) ou le numéro OM + #144#
+   │  le visiteur paie, puis saisit la référence de la transaction
+   │  POST /api/paiement-declare.php  { jeton, mode, reference }
+   ▼
+E-mail à `paiement.notifier` avec un lien signé (HMAC, verification_secret)
+   │  le trésorier vérifie l'arrivée de l'argent sur Wave Business / OM
+   ▼
+/api/valider.php  — GET : page de confirmation (ne crée rien)
+                  — POST : crée le membre, envoie la carte
+```
+
+- La référence est stockée dans `membre.chariow_sale_id` sous la forme
+  `wave:REF` ou `om:REF` : l'index unique empêche de valider deux fois la
+  même transaction. Aucune migration de base n'est nécessaire.
+- Le GET de `valider.php` ne fait rien, à dessein : les messageries ouvrent
+  les liens des e-mails pour les analyser.
+- Le lien Wave et le numéro OM sont publics et se règlent dans
+  `src/data/paiement.ts`. Lien Wave vide : l'option Wave n'est pas proposée.
+- `config.php` (serveur) : ajouter le bloc `paiement` de `config.example.php`.
+  Sans lui, les déclarations partent à `mail.reply_to` et le montant vaut 6 000.

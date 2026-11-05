@@ -130,6 +130,20 @@ $pdo->prepare(
 ]);
 
 // ---------------------------------------------------------------------
+// Wave et Orange Money : pas de session à créer
+//
+// Le visiteur paie par lien permanent (Wave) ou par transfert (OM), puis
+// déclare sa référence à /api/paiement-declare.php avec ce jeton. La page
+// affiche elle-même les instructions : elles sont publiques et vivent dans
+// src/data/paiement.ts. Voir _membre.php pour la suite.
+// ---------------------------------------------------------------------
+$mode_paiement = $texte('paiement', 10);
+if ($mode_paiement === 'wave' || $mode_paiement === 'om') {
+    yaac_log('paiement_manuel_choisi', ['email' => $email, 'mode' => $mode_paiement, 'jeton' => $jeton]);
+    yaac_json(200, ['statut' => 'ok', 'paiement' => $mode_paiement, 'jeton' => $jeton]);
+}
+
+// ---------------------------------------------------------------------
 // Session de paiement Chariow
 // ---------------------------------------------------------------------
 // Code de réduction : la page de paiement hébergée n'offre aucun champ pour

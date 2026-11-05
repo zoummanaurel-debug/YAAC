@@ -13,6 +13,7 @@
 import Base from '../../layouts/Base.astro';
 import { useTranslations, assetPath, type Lang } from '../../i18n/utils';
 import { paysTries } from '../../data/pays';
+import { paiement, lienWave } from '../../data/paiement';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -20,6 +21,11 @@ const t = useTranslations(lang);
 const j = t.join;
 
 const apiUrl = assetPath('api/adhesion-init.php');
+const apiDeclare = assetPath('api/paiement-declare.php');
+
+// Lien vide dans src/data/paiement.ts : l'option Wave n'est pas proposée.
+const waveUrl = lienWave();
+const om = paiement.orangeMoney;
 
 /**
  * Trois listes distinctes, tirées du même référentiel :
@@ -181,6 +187,27 @@ const sources = lang === 'fr'
 
         </fieldset>
 
+        <fieldset class="jset" id="paiement" tabindex="-1">
+          <legend class="jlegend">{j.payTitle}</legend>
+          <div class="jpay">
+            {waveUrl && (
+              <label class="jpay__opt">
+                <input type="radio" name="paiement" value="wave" />
+                <span><strong>{j.payWave}</strong><small>{j.payWaveHint}</small></span>
+              </label>
+            )}
+            <label class="jpay__opt">
+              <input type="radio" name="paiement" value="om" />
+              <span><strong>{j.payOm}</strong><small>{j.payOmHint}</small></span>
+            </label>
+            <label class="jpay__opt">
+              <input type="radio" name="paiement" value="chariow" />
+              <span><strong>{j.payCard}</strong><small>{j.payCardHint}</small></span>
+            </label>
+          </div>
+          <span class="jmsg" data-for="paiement"></span>
+        </fieldset>
+
         {/* Piège à robots : retiré de l'ordre de tabulation et masqué aux
             lecteurs d'écran. Un automate qui remplit tout se signale seul. */}
         <p class="jtrap" aria-hidden="true">
@@ -196,6 +223,49 @@ const sources = lang === 'fr'
 
         <button class="btn btn--primary jsubmit" type="submit" id="jsubmit">{j.submit}</button>
       </form>
+
+      {/* Suite du parcours pour Wave et Orange Money : la candidature est
+          enregistrée, il reste à payer puis à donner la référence. Pas de
+          redirection : ces paiements ne reviennent pas vers le site. */}
+      <div class="jpanel" id="jpanel" tabindex="-1" hidden>
+        <h2 class="jsub">{j.panelTitle}</h2>
+        <p>{j.panelLead}</p>
+        <p class="jpanel__amount">{j.priceAmount}</p>
+
+        {waveUrl && (
+          <div class="jpanel__mode" data-mode="wave" hidden>
+            <p>{j.waveIntro}</p>
+            <a class="btn btn--primary jpanel__btn" href={waveUrl} target="_blank" rel="noopener">{j.waveButton}</a>
+          </div>
+        )}
+
+        <div class="jpanel__mode" data-mode="om" hidden>
+          <p>{j.omIntro}</p>
+          <p class="jpanel__num">
+            <span class="jprice__label">{j.omNumberLabel}</span>
+            <strong>{om.numero}</strong>
+            <button type="button" class="jlink" id="jcopy" data-num={om.numeroBrut}>{j.copy}</button>
+          </p>
+          {/* `#` doit être encodé, sinon le lien s'arrête au premier dièse. */}
+          <a class="btn btn--outline jpanel__btn" href={'tel:' + encodeURIComponent(om.ussd)}>{j.omButton}</a>
+        </div>
+
+        <form id="refForm" class="jform jpanel__ref" novalidate>
+          <h3 class="jlegend">{j.refTitle}</h3>
+          <p class="jfield">
+            <label for="reference">{j.refLabel}</label>
+            <input id="reference" name="reference" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="60" required aria-describedby="referenceAide" />
+            <span class="jaide" id="referenceAide">{j.refHint}</span>
+            <span class="jmsg" data-for="reference"></span>
+          </p>
+          <button class="btn btn--primary" type="submit" id="refSubmit">{j.refSubmit}</button>
+        </form>
+
+        <div class="jdone" id="jdone" hidden>
+          <p class="jdone__title">{j.refDoneTitle}</p>
+          <p>{j.refDone}</p>
+        </div>
+      </div>
     </div>
   </section>
 </Base>
@@ -204,7 +274,15 @@ const sources = lang === 'fr'
   is:inline
   define:vars={{
     apiUrl,
+    apiDeclare,
     msg: {
+      method: j.errMethod,
+      refSubmit: j.refSubmit,
+      refSending: j.refSending,
+      refInvalid: j.refInvalid,
+      refError: j.refError,
+      copy: j.copy,
+      copied: j.copied,
       sending: j.sending,
       required: j.errRequired,
       email: j.errEmail,
@@ -274,9 +352,11 @@ const sources = lang === 'fr'
         if (new Date(d.date_naissance) > limite) { messageDe('date_naissance', msg.young); ok = false; }
       }
       if (!form.statuts.checked) { messageDe('statuts', msg.required); ok = false; }
+      if (!d.paiement) { messageDe('paiement', msg.method); ok = false; }
 
       if (!ok) {
-        var premier = form.querySelector('[aria-invalid="true"]') || form.statuts;
+        var premier = form.querySelector('[aria-invalid="true"]')
+          || (!d.paiement ? form.querySelector('input[name="paiement"]') : form.statuts);
         if (premier) premier.focus();
         return;
       }
@@ -295,6 +375,13 @@ const sources = lang === 'fr'
           return r.json().then(function (corps) { return { code: r.status, corps: corps }; });
         })
         .then(function (res) {
+          // Wave ou Orange Money : la candidature est enregistrée, la suite
+          // (payer, puis donner la référence) se fait sur cette page.
+          if (res.code === 200 && res.corps.jeton && (res.corps.paiement === 'wave' || res.corps.paiement === 'om')) {
+            afficherPanneau(res.corps.paiement, res.corps.jeton);
+            return;
+          }
+
           if (res.code === 200 && res.corps.checkout_url) {
             // Pas de nouvel onglet : le paiement est la suite du parcours,
             // pas une digression. Le retour se fait par redirect_url.
@@ -333,6 +420,81 @@ const sources = lang === 'fr'
           bouton.disabled = false;
           bouton.textContent = msg.submit;
           erreurGlobale(msg.payment);
+        });
+    });
+
+    // -----------------------------------------------------------------
+    // Wave / Orange Money
+    // -----------------------------------------------------------------
+    var panneau = document.getElementById('jpanel');
+    var refForm = document.getElementById('refForm');
+    var refBouton = document.getElementById('refSubmit');
+    var fini = document.getElementById('jdone');
+    var copier = document.getElementById('jcopy');
+    var jetonCourant = '';
+    var modeCourant = '';
+
+    function afficherPanneau(mode, jeton) {
+      jetonCourant = jeton;
+      modeCourant = mode;
+      form.hidden = true;
+      boite.hidden = true;
+      panneau.querySelectorAll('[data-mode]').forEach(function (el) {
+        el.hidden = el.getAttribute('data-mode') !== mode;
+      });
+      panneau.hidden = false;
+      panneau.scrollIntoView({ block: 'start', behavior: 'smooth' });
+      panneau.focus({ preventScroll: true });
+    }
+
+    if (copier && navigator.clipboard) {
+      copier.addEventListener('click', function () {
+        navigator.clipboard.writeText(copier.getAttribute('data-num')).then(function () {
+          copier.textContent = msg.copied;
+          setTimeout(function () { copier.textContent = msg.copy; }, 2500);
+        });
+      });
+    } else if (copier) {
+      copier.hidden = true;
+    }
+
+    refForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      messageDe('reference', '');
+
+      // Même règle que le serveur (yaac_reference_propre).
+      var reference = String(refForm.reference.value || '').replace(/\s+/g, '');
+      if (!/^[A-Za-z0-9._\-\/]{4,40}$/.test(reference)) {
+        messageDe('reference', msg.refInvalid);
+        refForm.reference.focus();
+        return;
+      }
+
+      refBouton.disabled = true;
+      refBouton.textContent = msg.refSending;
+
+      fetch(apiDeclare, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({ jeton: jetonCourant, mode: modeCourant, reference: reference }),
+      })
+        .then(function (r) { return r.status; })
+        .then(function (code) {
+          if (code === 200) {
+            refForm.hidden = true;
+            fini.hidden = false;
+            fini.setAttribute('tabindex', '-1');
+            fini.focus();
+            return;
+          }
+          refBouton.disabled = false;
+          refBouton.textContent = msg.refSubmit;
+          messageDe('reference', code === 422 ? msg.refInvalid : msg.refError);
+        })
+        .catch(function () {
+          refBouton.disabled = false;
+          refBouton.textContent = msg.refSubmit;
+          messageDe('reference', msg.refError);
         });
     });
   })();
@@ -460,6 +622,80 @@ const sources = lang === 'fr'
     clip-path: inset(50%);
     white-space: nowrap;
   }
+
+  /* Moyens de paiement : des cartes cliquables, la case reste visible. */
+  .jpay { display: grid; gap: var(--space-3); }
+  .jpay__opt {
+    display: flex;
+    gap: var(--space-3);
+    align-items: flex-start;
+    padding: var(--space-4);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    background: var(--white);
+    cursor: pointer;
+  }
+  .jpay__opt:has(input:checked) {
+    border-color: var(--yaac-primary);
+    box-shadow: inset 0 0 0 1px var(--yaac-primary);
+  }
+  .jpay__opt input {
+    flex: 0 0 auto;
+    width: 1.25rem; height: 1.25rem;
+    margin-top: 0.15em;
+    accent-color: var(--yaac-primary);
+  }
+  .jpay__opt span { display: grid; gap: var(--space-1); }
+  .jpay__opt small { font-size: var(--step--1); color: var(--text-muted); }
+
+  .jpanel { display: grid; gap: var(--space-4); }
+  .jpanel:focus { outline: none; }
+  .jpanel p { margin: 0; }
+  .jpanel__amount {
+    font-family: var(--font-display);
+    font-size: var(--step-3);
+    color: var(--yaac-primary);
+    font-variant-numeric: tabular-nums;
+  }
+  .jpanel__mode { display: grid; gap: var(--space-4); }
+  /* `display: grid` l'emporterait sur l'attribut `hidden`. */
+  .jpanel[hidden], .jpanel__mode[hidden] { display: none; }
+  .jpanel__btn { justify-self: start; min-height: 52px; }
+  .jpanel__num {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-2) var(--space-3);
+  }
+  .jpanel__num .jprice__label { flex-basis: 100%; }
+  .jpanel__num strong {
+    font-size: var(--step-2);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+  }
+  .jpanel__ref {
+    margin-top: var(--space-4);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--border-strong);
+  }
+  .jaide { display: block; margin-top: var(--space-2); font-size: var(--step--1); color: var(--text-muted); }
+  .jlink {
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    font-size: var(--step--1);
+    color: var(--yaac-primary);
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  .jdone {
+    padding: var(--space-4) var(--space-5);
+    border-left: 4px solid var(--yaac-primary);
+    background: var(--white);
+  }
+  .jdone:focus { outline: none; }
+  .jdone__title { font-weight: 700; color: var(--yaac-primary); margin-bottom: var(--space-2) !important; }
 
   .jerror {
     margin-bottom: var(--space-5);

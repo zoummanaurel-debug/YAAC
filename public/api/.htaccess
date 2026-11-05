@@ -1,6 +1,7 @@
 # YAAC — Protection des fichiers internes de l'API.
 #
-# Seuls adhesion.php et verify.php sont des points d'entrée. Les autres
+# Points d'entrée : adhesion.php, adhesion-init.php, paiement-declare.php,
+# valider.php et verify.php. Les autres
 # fichiers de ce dossier sont inclus par eux et ne doivent jamais être
 # demandés directement — en particulier config.php, qui contient le secret
 # de signature Chariow et le mot de passe SMTP.

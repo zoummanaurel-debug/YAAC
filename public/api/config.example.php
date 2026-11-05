@@ -62,6 +62,17 @@ return [
     ],
 
     // ---------------------------------------------------------------------
+    // Paiements Wave et Orange Money (validés à la main, voir _membre.php)
+    // ---------------------------------------------------------------------
+    'paiement' => [
+        // Montant de l'adhésion en FCFA, rappelé dans l'e-mail au trésorier.
+        'montant'  => 6000,
+
+        // Qui reçoit les déclarations de paiement à vérifier. Vide : reply_to.
+        'notifier' => 'communication@yaac.network',
+    ],
+
+    // ---------------------------------------------------------------------
     // Liens envoyés au membre
     // ---------------------------------------------------------------------
     'liens' => [

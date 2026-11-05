@@ -26,17 +26,17 @@ const bin = php.stdout.trim().split(/\r?\n/)[0];
 
 const box = mkdtempSync(join(tmpdir(), 'yaac-tests-'));
 try {
-  for (const f of ['_lib.php', '_mail.php']) copyFileSync(join(api, f), join(box, f));
+  for (const f of ['_lib.php', '_mail.php', '_membre.php']) copyFileSync(join(api, f), join(box, f));
   copyFileSync(join(ici, 'config.fixture.php'), join(box, 'config.php'));
   copyFileSync(join(ici, 'api.test.php'), join(box, 'test.php'));
 
   // Contrôle de syntaxe sur tous les points d'entrée, puis tests fonctionnels.
   let souci = 0;
-  for (const f of ['adhesion.php', 'adhesion-init.php', 'verify.php', '_lib.php', '_mail.php']) {
+  for (const f of ['adhesion.php', 'adhesion-init.php', 'paiement-declare.php', 'valider.php', 'verify.php', '_lib.php', '_mail.php', '_membre.php']) {
     const r = spawnSync(bin, ['-l', join(api, f)], { encoding: 'utf8' });
     if (r.status !== 0) { console.error(r.stdout || r.stderr); souci++; }
   }
-  console.log(souci === 0 ? '5 fichiers PHP : aucune erreur de syntaxe\n' : `${souci} fichier(s) en erreur\n`);
+  console.log(souci === 0 ? '8 fichiers PHP : aucune erreur de syntaxe\n' : `${souci} fichier(s) en erreur\n`);
 
   const r = spawnSync(bin, [join(box, 'test.php')], { encoding: 'utf8', stdio: 'inherit' });
   process.exit(souci === 0 ? (r.status ?? 1) : 1);
