@@ -16,7 +16,8 @@
     "closeMenu": "Fermer le menu",
     "skip": "Aller au contenu principal",
     "langLabel": "Langue",
-    "contact": "Contact"
+    "contact": "Contact",
+    "donate": "Faire un don"
   },
   "home": {
     "heroTitle": "La durabilité commence ici et maintenant !",
@@ -251,5 +252,28 @@
     "omLinkIntro": "Le bouton ouvre l'application Max it d'Orange Money pour régler les 6 000 FCFA.",
     "omLinkButton": "Payer 6 000 FCFA avec Orange Money",
     "omAltTitle": "Pas d'application Max it, ou vous êtes sur ordinateur ?"
+  },
+  "donate": {
+    "title": "Soutenir YAAC",
+    "lead": "Votre don finance les projets agroécologiques, les formations et les actions pour le climat menés par de jeunes Africains. Chaque montant compte.",
+    "mobileTitle": "Par mobile money",
+    "waveText": "Le bouton ouvre Wave : vous choisissez le montant de votre don. Sur ordinateur, il affiche un QR code à scanner avec l'application Wave.",
+    "waveButton": "Faire un don avec Wave",
+    "omText": "Le bouton ouvre l'application Max it d'Orange Money, où vous choisissez le montant.",
+    "omButton": "Faire un don avec Orange Money",
+    "omAlt": "Sans Max it, envoyez votre don au numéro Orange Money de YAAC en composant #144# :",
+    "bankTitle": "Par virement bancaire",
+    "bankText": "Depuis le Sénégal ou depuis l'étranger, sur le compte de YAAC.",
+    "holder": "Titulaire",
+    "bank": "Banque",
+    "iban": "IBAN",
+    "bic": "Code BIC / SWIFT",
+    "copy": "Copier",
+    "copied": "Copié",
+    "rib": "Télécharger le RIB (PDF)",
+    "ribNote": "Le RIB indique aussi les banques intermédiaires pour les virements en euros, en dollars et en livres sterling.",
+    "thanksTitle": "Après votre don",
+    "thanksText": "Écrivez-nous avec votre nom et le montant, pour que nous puissions vous remercier.",
+    "thanksButton": "Nous écrire"
   }
 }

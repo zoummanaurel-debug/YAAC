@@ -1,0 +1,161 @@
+---
+/**
+ * Page de don — Wave, Orange Money et virement bancaire, montant libre.
+ *
+ * Aucun appel au serveur : les dons ne déclenchent rien d'automatique, ils
+ * arrivent directement sur les comptes de YAAC. Les coordonnées vivent dans
+ * src/data/paiement.ts (`don`).
+ */
+import Base from '../../layouts/Base.astro';
+import { useTranslations, assetPath, contactInfo, type Lang } from '../../i18n/utils';
+import { don, paiement } from '../../data/paiement';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const d = t.donate;
+const b = don.banque;
+const om = paiement.orangeMoney;
+---
+<Base lang={lang} routeKey="donate" title={d.title} description={d.lead}>
+  <section class="section dhead">
+    <div class="container container--narrow">
+      <h1>{d.title}</h1>
+      <p class="lead dhead__lead">{d.lead}</p>
+    </div>
+  </section>
+
+  <section class="section dbody">
+    <div class="container dgrid">
+      <div class="dcol">
+        <h2 class="dcol__title">{d.mobileTitle}</h2>
+
+        <div class="dcard">
+          <h3 class="dcard__title">Wave</h3>
+          <p>{d.waveText}</p>
+          <a class="btn btn--primary dcard__btn" href={don.wave} target="_blank" rel="noopener">{d.waveButton}</a>
+        </div>
+
+        <div class="dcard">
+          <h3 class="dcard__title">Orange Money</h3>
+          <p>{d.omText}</p>
+          <a class="btn btn--primary dcard__btn" href={don.orangeMoney} target="_blank" rel="noopener">{d.omButton}</a>
+          <p class="dcard__alt">{d.omAlt}</p>
+          <p class="dcard__num">
+            <strong>{om.numero}</strong>
+            <button type="button" class="dcopy" data-copier={om.numeroBrut}>{d.copy}</button>
+          </p>
+        </div>
+      </div>
+
+      <div class="dcol">
+        <h2 class="dcol__title">{d.bankTitle}</h2>
+
+        <div class="dcard">
+          <p>{d.bankText}</p>
+          <dl class="dbank">
+            <dt>{d.holder}</dt>
+            <dd>{b.titulaire}</dd>
+
+            <dt>{d.bank}</dt>
+            <dd>{b.banque}, {b.domiciliation}</dd>
+
+            <dt>{d.iban}</dt>
+            <dd class="dbank__code">
+              <span>{b.iban}</span>
+              <button type="button" class="dcopy" data-copier={b.iban.replace(/\s+/g, '')}>{d.copy}</button>
+            </dd>
+
+            <dt>{d.bic}</dt>
+            <dd class="dbank__code">
+              <span>{b.bic}</span>
+              <button type="button" class="dcopy" data-copier={b.bic}>{d.copy}</button>
+            </dd>
+          </dl>
+          <a class="btn btn--outline dcard__btn" href={assetPath(b.rib)} download>{d.rib}</a>
+          <p class="dcard__note">{d.ribNote}</p>
+        </div>
+
+        <div class="dthanks">
+          <h2 class="dthanks__title">{d.thanksTitle}</h2>
+          <p>{d.thanksText}</p>
+          <a href={`mailto:${contactInfo.email}`}>{contactInfo.email}</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script is:inline define:vars={{ copied: d.copied }}>
+  (function () {
+    var boutons = document.querySelectorAll('.dcopy');
+    if (!navigator.clipboard) {
+      boutons.forEach(function (bt) { bt.hidden = true; });
+      return;
+    }
+    boutons.forEach(function (bt) {
+      var libelle = bt.textContent;
+      bt.addEventListener('click', function () {
+        navigator.clipboard.writeText(bt.getAttribute('data-copier')).then(function () {
+          bt.textContent = copied;
+          setTimeout(function () { bt.textContent = libelle; }, 2500);
+        });
+      });
+    });
+  })();
+</script>
+
+<style>
+  .dhead { padding-bottom: 0; }
+  .dhead h1 { margin-block: 0 var(--space-3); }
+  .dhead__lead { max-width: 58ch; }
+
+  .dgrid { display: grid; gap: var(--space-7); align-items: start; }
+  @media (min-width: 900px) { .dgrid { grid-template-columns: 1fr 1fr; } }
+
+  .dcol { display: grid; gap: var(--space-5); }
+  .dcol__title { font-size: var(--step-2); }
+
+  .dcard {
+    padding: var(--space-6);
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+  }
+  .dcard p { margin: 0 0 var(--space-4); }
+  .dcard__title { font-size: var(--step-1); margin: 0 0 var(--space-3); }
+  .dcard__btn { width: 100%; }
+  .dcard__alt { margin-top: var(--space-5) !important; color: var(--text-muted); font-size: var(--step--1); }
+  .dcard__num { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-3); margin: 0 !important; }
+  .dcard__num strong { font-size: var(--step-1); }
+  .dcard__note { margin: var(--space-4) 0 0 !important; color: var(--text-muted); font-size: var(--step--1); }
+
+  .dbank { margin: 0 0 var(--space-5); display: grid; gap: var(--space-1); }
+  .dbank dt {
+    font-size: var(--step--1);
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-top: var(--space-3);
+  }
+  .dbank dt:first-child { margin-top: 0; }
+  .dbank dd { margin: 0; font-weight: 500; overflow-wrap: anywhere; }
+  .dbank__code { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-3); }
+  .dbank__code span { font-family: ui-monospace, 'Cascadia Mono', Menlo, monospace; font-size: var(--step-0); letter-spacing: 0.02em; }
+
+  .dcopy {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--yaac-primary);
+    font: inherit;
+    font-size: var(--step--1);
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  .dcopy:hover { color: var(--green-800); }
+
+  .dthanks { padding-inline: var(--space-2); }
+  .dthanks__title { font-size: var(--step-1); margin-bottom: var(--space-2); }
+  .dthanks p { margin: 0 0 var(--space-2); color: var(--text-muted); }
+  .dthanks a { font-weight: 600; }
+</style>

@@ -17,6 +17,7 @@ export const routes = {
   contact:  { fr: 'contact',          en: 'contact' },
   join:     { fr: 'devenir-membre',   en: 'become-a-member' },
   joined:   { fr: 'adhesion-confirmee', en: 'membership-confirmed' },
+  donate:   { fr: 'faire-un-don',     en: 'donate' },
 } as const;
 
 export type RouteKey = keyof typeof routes;

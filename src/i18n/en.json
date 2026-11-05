@@ -16,7 +16,8 @@
     "closeMenu": "Close menu",
     "skip": "Skip to main content",
     "langLabel": "Language",
-    "contact": "Contact"
+    "contact": "Contact",
+    "donate": "Donate"
   },
   "home": {
     "heroTitle": "Sustainability starts here and now!",
@@ -251,5 +252,28 @@
     "omLinkIntro": "The button opens Orange Money's Max it app to pay the 6,000 FCFA.",
     "omLinkButton": "Pay 6,000 FCFA with Orange Money",
     "omAltTitle": "No Max it app, or on a computer?"
+  },
+  "donate": {
+    "title": "Support YAAC",
+    "lead": "Your donation funds the agroecology projects, training and climate action led by young Africans. Every amount counts.",
+    "mobileTitle": "By mobile money",
+    "waveText": "The button opens Wave, where you choose the amount of your donation. On a computer, it shows a QR code to scan with the Wave app.",
+    "waveButton": "Donate with Wave",
+    "omText": "The button opens Orange Money's Max it app, where you choose the amount.",
+    "omButton": "Donate with Orange Money",
+    "omAlt": "Without Max it, send your donation to YAAC's Orange Money number by dialling #144#:",
+    "bankTitle": "By bank transfer",
+    "bankText": "From Senegal or abroad, to YAAC's bank account.",
+    "holder": "Account holder",
+    "bank": "Bank",
+    "iban": "IBAN",
+    "bic": "BIC / SWIFT code",
+    "copy": "Copy",
+    "copied": "Copied",
+    "rib": "Download bank details (PDF)",
+    "ribNote": "The document also lists the intermediary banks for transfers in euros, US dollars and pounds sterling.",
+    "thanksTitle": "After your donation",
+    "thanksText": "Write to us with your name and the amount, so that we can thank you.",
+    "thanksButton": "Write to us"
   }
 }

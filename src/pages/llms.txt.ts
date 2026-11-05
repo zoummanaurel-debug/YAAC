@@ -68,6 +68,7 @@ ${legal}
 - [Actualités](${url('fr/actualites/')})
 - [Partenaires & Donateurs](${url('fr/partenaires/')})
 - [Devenir membre](${url('fr/devenir-membre/')}) : adhésion à 6 000 FCFA, valable 5 ans
+- [Faire un don](${url('fr/faire-un-don/')}) : Wave, Orange Money, virement bancaire
 - [Contact](${url('fr/contact/')})
 
 ## Main pages — English
@@ -77,6 +78,7 @@ ${legal}
 - [News](${url('en/news/')})
 - [Partners & Donors](${url('en/partners/')})
 - [Become a member](${url('en/become-a-member/')})
+- [Donate](${url('en/donate/')})
 - [Contact](${url('en/contact/')})
 
 ## Articles — français
