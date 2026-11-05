@@ -240,6 +240,13 @@ const sources = lang === 'fr'
         )}
 
         <div class="jpanel__mode" data-mode="om" hidden>
+          {om.lien && (
+            <>
+              <p>{j.omLinkIntro}</p>
+              <a class="btn btn--primary jpanel__btn" href={om.lien} target="_blank" rel="noopener">{j.omLinkButton}</a>
+              <p class="jpanel__alt">{j.omAltTitle}</p>
+            </>
+          )}
           <p>{j.omIntro}</p>
           <p class="jpanel__num">
             <span class="jprice__label">{j.omNumberLabel}</span>
@@ -663,6 +670,11 @@ const sources = lang === 'fr'
   /* `display: grid` l'emporterait sur l'attribut `hidden`. */
   .jpanel[hidden], .jpanel__mode[hidden] { display: none; }
   .jpanel__btn { justify-self: start; min-height: 52px; }
+  .jpanel__alt {
+    margin-top: var(--space-3) !important;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
   .jpanel__num {
     display: flex;
     flex-wrap: wrap;

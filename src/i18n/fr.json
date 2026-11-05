@@ -221,7 +221,7 @@
     "payWave": "Wave",
     "payWaveHint": "Paiement sur la page sécurisée de Wave, carte de membre envoyée tout de suite",
     "payOm": "Orange Money",
-    "payOmHint": "Transfert vers le numéro Orange Money de YAAC",
+    "payOmHint": "Paiement par l'application Max it ou par #144#",
     "payCard": "Carte bancaire ou autre pays",
     "payCardHint": "Paiement sécurisé par Chariow, carte de membre envoyée tout de suite",
     "errMethod": "Choisissez un moyen de paiement.",
@@ -229,7 +229,7 @@
     "panelLead": "Il reste à régler les frais d'adhésion. Votre carte de membre part dès que nous avons vu le paiement arriver.",
     "waveIntro": "Le bouton ouvre Wave avec le montant exact déjà rempli. Sur ordinateur, il affiche un QR code à scanner avec l'application Wave.",
     "waveButton": "Payer 6 000 FCFA avec Wave",
-    "omIntro": "Envoyez 6 000 FCFA au numéro Orange Money de YAAC, en composant #144# ou depuis l'application Max it (« Transfert d'argent »).",
+    "omIntro": "Envoyez 6 000 FCFA au numéro Orange Money de YAAC en composant #144# depuis votre téléphone.",
     "omNumberLabel": "Numéro Orange Money de YAAC",
     "omButton": "Composer #144#",
     "copy": "Copier le numéro",
@@ -242,6 +242,9 @@
     "refInvalid": "Ce numéro de téléphone n'est pas valide.",
     "refError": "Votre confirmation n'a pas pu être envoyée. Réessayez, ou écrivez à communication@yaac.network avec votre nom et votre numéro.",
     "refDoneTitle": "Merci, nous vérifions votre paiement",
-    "refDone": "Dès que nous voyons votre paiement, en général sous 48 heures, vous recevez par e-mail votre numéro YAAC, votre carte de membre et le lien du groupe WhatsApp."
+    "refDone": "Dès que nous voyons votre paiement, en général sous 48 heures, vous recevez par e-mail votre numéro YAAC, votre carte de membre et le lien du groupe WhatsApp.",
+    "omLinkIntro": "Le bouton ouvre l'application Max it d'Orange Money pour régler les 6 000 FCFA.",
+    "omLinkButton": "Payer 6 000 FCFA avec Orange Money",
+    "omAltTitle": "Pas d'application Max it, ou vous êtes sur ordinateur ?"
   }
 }

@@ -26,6 +26,13 @@ export const paiement = {
   },
 
   orangeMoney: {
+    /**
+     * Lien de paiement statique Orange Money (Max it), au montant de
+     * l'adhésion. Il ouvre l'application Max it sur téléphone ; sur
+     * ordinateur il ne fait que proposer de l'installer. Vide : seul le
+     * transfert vers le numéro ci-dessous est proposé.
+     */
+    lien: 'https://sugu.orange-sonatel.com/mp/dc4f_FUpJ4KN16xIiFiFPC',
     /** Numéro qui reçoit les transferts, tel qu'il s'affiche. */
     numero: '+221 71 032 22 44',
     /** Le même, en chiffres seuls, pour le bouton « copier ». */
