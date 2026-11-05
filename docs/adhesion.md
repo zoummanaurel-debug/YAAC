@@ -281,6 +281,9 @@ Dans Wave Business → Développeurs (business.wave.com/dev-portal, compte Admin
    `wave.webhook_secret`.
 3. Les deux valeurs ne s'affichent qu'une fois. Elles vont dans `config.php`
    sur le serveur, jamais dans le dépôt (public) ni dans un message.
+4. Passer `wave.apiActive` à `true` dans `src/data/paiement.ts` et publier :
+   la page annonce alors une carte envoyée « tout de suite » par Wave au lieu
+   de « sous 48 heures ».
 
 Sans ces deux valeurs, Wave retombe sur la validation d'un clic décrite
 ci-dessous, et rien ne casse.

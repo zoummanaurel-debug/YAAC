@@ -26,6 +26,8 @@ const apiDeclare = assetPath('api/paiement-declare.php');
 // Lien vide dans src/data/paiement.ts : l'option Wave n'est pas proposée.
 const waveUrl = lienWave();
 const om = paiement.orangeMoney;
+// Sans l'API Wave, la carte part après validation : on n'annonce pas « tout de suite ».
+const waveAuto = paiement.wave.apiActive;
 
 /**
  * Trois listes distinctes, tirées du même référentiel :
@@ -74,7 +76,7 @@ const sources = lang === 'fr'
         <ol class="jsteps">
           <li>{j.step1}</li>
           <li>{j.step2}</li>
-          <li>{j.step3}</li>
+          <li>{waveAuto ? j.step3 : j.step3Static}</li>
         </ol>
       </div>
       <div>
@@ -193,7 +195,7 @@ const sources = lang === 'fr'
             {waveUrl && (
               <label class="jpay__opt">
                 <input type="radio" name="paiement" value="wave" />
-                <span><strong>{j.payWave}</strong><small>{j.payWaveHint}</small></span>
+                <span><strong>{j.payWave}</strong><small>{waveAuto ? j.payWaveHint : j.payWaveHintStatic}</small></span>
               </label>
             )}
             <label class="jpay__opt">

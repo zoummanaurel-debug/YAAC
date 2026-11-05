@@ -23,6 +23,13 @@ export const paiement = {
      * Vide : l'option Wave n'apparaît pas sur le site.
      */
     lien: 'https://pay.wave.com/m/M_sn_JoGKsoAZsKEo/c/sn/',
+    /**
+     * true une fois les clés de l'API Checkout posées dans config.php :
+     * la page annonce alors une carte envoyée « tout de suite ». false (lien
+     * statique) : la carte part après la validation du trésorier, et la
+     * page annonce un délai de 48 heures, comme pour Orange Money.
+     */
+    apiActive: false,
   },
 
   orangeMoney: {
