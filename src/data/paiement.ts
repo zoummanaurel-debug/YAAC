@@ -51,15 +51,15 @@ export const paiement = {
 
 /**
  * Dons (/faire-un-don/). Montant libre : les liens n'en portent pas.
- * Relevé d'identité bancaire : FBNBank Sénégal, document du 04/11/2026
- * (Gestion/Finances/Compte bancaire). Le titulaire est écrit exactement comme
- * sur le RIB, faute de frappe comprise : c'est ce nom que la banque contrôle.
+ * Relevé d'identité bancaire : FBNBank Sénégal, document du 06/11/2026
+ * (Gestion/Finances/Compte bancaire), nom du titulaire corrigé le 06/11/2026.
+ * Le titulaire est écrit exactement comme sur le RIB : la banque le contrôle.
  */
 export const don = {
   wave: 'https://pay.wave.com/m/M_sn_JoGKsoAZsKEo/c/sn/',
   orangeMoney: 'https://sugu.orange-sonatel.com/mp/dchz5ugfp000XPkogoGGCW',
   banque: {
-    titulaire: 'YOUTH ALLIANCE FOR AGROECOLOGYAND CLIMATE',
+    titulaire: 'YOUTH ALLIANCE FOR AGROECOLOGY AND CLIMATE',
     banque: 'FBNBank Sénégal',
     domiciliation: 'Dakar',
     iban: 'SN08 SN14 0010 0202 3500 0000 1438',
